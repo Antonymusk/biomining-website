@@ -8,23 +8,27 @@ import Inventory from "./pages/Inventory";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import { AuthProvider } from "./lib/AuthContext";
+import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="mis-entry" element={<MISEntry />} />
-          <Route path="operations" element={<Operations />} />
-          <Route path="fleet-control" element={<FleetControl />} />
-          <Route path="inventory" element={<Inventory />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<ProtectedRoute module="Dashboard"><Dashboard /></ProtectedRoute>} />
+            <Route path="mis-entry" element={<ProtectedRoute module="MIS Entry"><MISEntry /></ProtectedRoute>} />
+            <Route path="operations" element={<ProtectedRoute module="Operations"><Operations /></ProtectedRoute>} />
+            <Route path="fleet-control" element={<ProtectedRoute module="Fleet Control"><FleetControl /></ProtectedRoute>} />
+            <Route path="inventory" element={<ProtectedRoute module="Inventory"><Inventory /></ProtectedRoute>} />
+            <Route path="analytics" element={<ProtectedRoute module="Analytics"><Analytics /></ProtectedRoute>} />
+            <Route path="reports" element={<ProtectedRoute module="Reports"><Reports /></ProtectedRoute>} />
+            <Route path="settings" element={<ProtectedRoute module="Settings"><Settings /></ProtectedRoute>} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
