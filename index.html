@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioMine Intelligence | Sovereign Environmental Data Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Mouse Follow Glow -->
+    <div id="cursor-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar reveal-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-mark"></div>
+                <span>BioMine</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#solutions">Solutions</a>
+                <a href="#intelligence">Intelligence</a>
+            </div>
+            <div class="nav-actions">
+                <a href="#" class="btn btn-ghost">Sign In</a>
+                <a href="#" class="btn btn-primary btn-glow">Request Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <canvas id="particle-canvas"></canvas>
+        <div class="hero-gradient-mesh"></div>
+        
+        <div class="hero-content">
+            <div class="badge fade-up" style="animation-delay: 0.1s;">
+                <span class="pulse-dot"></span> V2.0 Now Available
+            </div>
+            <h1 class="fade-up" style="animation-delay: 0.2s;">
+                Sovereign Control Over<br>
+                <span class="text-gradient">Complex Environments</span>
+            </h1>
+            <p class="fade-up" style="animation-delay: 0.3s;">
+                The ultimate operational intelligence platform for institutional logistics and environmental management. High-density data, delivered with absolute precision.
+            </p>
+            <div class="hero-cta fade-up" style="animation-delay: 0.4s;">
+                <a href="#" class="btn btn-primary btn-large btn-glow-strong">
+                    <span>Get Started</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 8H15M15 8L8 1M15 8L8 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+                <a href="#" class="btn btn-ghost btn-large shine-effect">
+                    Book a Demo
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-mockup-wrapper fade-up" style="animation-delay: 0.6s;">
+            <div class="mockup-tilt" id="hero-tilt">
+                <div class="mockup-glass">
+                    <img src="./biomine_operational_dashboard/screen.png" alt="Operational Dashboard" class="mockup-image">
+                    <div class="mockup-reflection"></div>
+                </div>
+            </div>
+            <!-- Floating Elements -->
+            <div class="floating-card fc-1 parallax" data-speed="0.05">
+                <div class="stat-value text-tertiary">99.9%</div>
+                <div class="stat-label">System Uptime</div>
+            </div>
+            <div class="floating-card fc-2 parallax" data-speed="-0.03">
+                <div class="stat-value text-primary">Live</div>
+                <div class="stat-label">Fleet Syncing</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Live Metrics Strip -->
+    <section class="metrics-strip">
+        <div class="metric scroll-reveal">
+            <div class="metric-number"><span class="counter" data-target="1.2">0</span>B+</div>
+            <div class="metric-label">Data Points Processed Daily</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric scroll-reveal" style="transition-delay: 0.1s">
+            <div class="metric-number"><span class="counter" data-target="45">0</span>%</div>
+            <div class="metric-label">Average Efficiency Gain</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric scroll-reveal" style="transition-delay: 0.2s">
+            <div class="metric-number"><span class="counter" data-target="24">0</span>/7</div>
+            <div class="metric-label">Real-time Monitoring</div>
+        </div>
+    </section>
+
+    <!-- Storytelling: Why BioMine -->
+    <section id="features" class="story-section">
+        <div class="story-container">
+            <div class="story-content scroll-reveal left">
+                <div class="section-label">Why BioMine</div>
+                <h2>Clarity in Chaos</h2>
+                <p>We transform fragmented environmental data into actionable intelligence. With our advanced analytics engine, you don't just see the data—you understand the operational pulse of your entire ecosystem in real-time.</p>
+                <ul class="feature-list">
+                    <li><span class="check">✓</span> Predictive resource allocation</li>
+                    <li><span class="check">✓</span> Automated compliance reporting</li>
+                    <li><span class="check">✓</span> Seamless legacy system integration</li>
+                </ul>
+            </div>
+            <div class="story-visual scroll-reveal right">
+                <div class="glass-container glow-border interactive-card">
+                    <img src="./biomine_advanced_analytics/screen.png" alt="Advanced Analytics">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storytelling: Built for Operations -->
+    <section id="solutions" class="story-section alt-bg">
+        <div class="story-container reverse">
+            <div class="story-content scroll-reveal right">
+                <div class="section-label">Fleet & Operations</div>
+                <h2>Built for the Frontline</h2>
+                <p>Command your fleet with absolute precision. BioMine gives your control room operators a luxury automotive-grade interface to manage complex logistics, track live assets, and resolve bottlenecks before they happen.</p>
+                <a href="#" class="link-arrow text-primary">Explore Fleet Capabilities →</a>
+            </div>
+            <div class="story-visual scroll-reveal left relative-showcase">
+                <div class="glass-container glow-border primary-showcase interactive-card">
+                    <img src="./biomine_operations_control/screen.png" alt="Operations Control">
+                </div>
+                <div class="glass-container secondary-showcase parallax" data-speed="0.1">
+                    <img src="./biomine_fleet_control/screen.png" alt="Fleet Control">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storytelling: Real-Time Intelligence -->
+    <section id="intelligence" class="story-section">
+        <div class="story-container">
+            <div class="story-content scroll-reveal left">
+                <div class="section-label">Inventory & Reporting</div>
+                <h2>Institutional Grade Insights</h2>
+                <p>From granular inventory tracking to high-level executive summaries, BioMine provides the transparency institutional investors and stakeholders demand. Generate audits and export reports in seconds.</p>
+            </div>
+            <div class="story-visual bento-grid scroll-reveal right">
+                <div class="bento-item glass-container interactive-card glow-border-secondary">
+                    <img src="./biomine_inventory_management/screen.png" alt="Inventory">
+                </div>
+                <div class="bento-item glass-container interactive-card glow-border-tertiary">
+                    <img src="./biomine_reports_exports/screen.png" alt="Reports">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="cta-section">
+        <div class="cta-container scroll-reveal bottom">
+            <div class="cta-glow"></div>
+            <h2>Ready to transform your operations?</h2>
+            <p>Join the industry leaders who have already upgraded to sovereign environmental data control.</p>
+            <div class="hero-cta">
+                <a href="#" class="btn btn-primary btn-large btn-glow-strong">
+                    <span>Start Your Free Trial</span>
+                </a>
+                <a href="#" class="btn btn-ghost btn-large shine-effect">
+                    Contact Sales
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-mark"></div>
+                    <span>BioMine</span>
+                </div>
+                <p>Next-generation operational intelligence.</p>
+            </div>
+            <div class="footer-links">
+                <div class="link-col">
+                    <h4>Platform</h4>
+                    <a href="#">Analytics</a>
+                    <a href="#">Fleet Control</a>
+                    <a href="#">Inventory</a>
+                </div>
+                <div class="link-col">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 BioMine Intelligence. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

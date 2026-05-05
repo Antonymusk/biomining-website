@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#001a42",
+            "inverse-surface": "#dce2f6",
+            "on-primary-container": "#00285d",
+            "on-tertiary-fixed": "#001f26",
+            "primary-fixed-dim": "#adc6ff",
+            "error": "#ffb4ab",
+            "tertiary-container": "#009eb9",
+            "secondary-container": "#6f00be",
+            "surface-tint": "#adc6ff",
+            "surface-bright": "#323949",
+            "on-tertiary-container": "#002f38",
+            "on-secondary-fixed": "#2c0051",
+            "surface": "#0c1321",
+            "tertiary": "#4cd7f6",
+            "primary-fixed": "#d8e2ff",
+            "on-secondary-container": "#d6a9ff",
+            "surface-container-low": "#151b2a",
+            "inverse-primary": "#005ac2",
+            "secondary": "#ddb7ff",
+            "on-primary": "#002e6a",
+            "on-background": "#dce2f6",
+            "background": "#0c1321",
+            "tertiary-fixed-dim": "#4cd7f6",
+            "on-error-container": "#ffdad6",
+            "surface-container-high": "#232a39",
+            "secondary-fixed": "#f0dbff",
+            "primary": "#adc6ff",
+            "error-container": "#93000a",
+            "surface-container-lowest": "#070e1c",
+            "on-surface-variant": "#c2c6d6",
+            "on-tertiary": "#003640",
+            "on-surface": "#dce2f6",
+            "primary-container": "#4d8eff",
+            "secondary-fixed-dim": "#ddb7ff",
+            "on-tertiary-fixed-variant": "#004e5c",
+            "surface-container": "#19202e",
+            "inverse-on-surface": "#2a3040",
+            "outline-variant": "#424754",
+            "surface-variant": "#2e3544",
+            "surface-dim": "#0c1321",
+            "tertiary-fixed": "#acedff",
+            "on-secondary": "#490080",
+            "on-error": "#690005",
+            "outline": "#8c909f",
+            "on-primary-fixed-variant": "#004395",
+            "surface-container-highest": "#2e3544",
+            "on-secondary-fixed-variant": "#6900b3"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "24px",
+            "container-padding": "32px",
+            "stack-sm": "8px",
+            "stack-md": "16px",
+            "unit": "8px",
+            "stack-lg": "32px"
+          },
+          "fontFamily": {
+            "display-lg": ["Inter"],
+            "mono-data": ["monospace"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-caps": ["Inter"],
+            "headline-md": ["Inter"],
+            "display-xl": ["Inter"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "display-lg": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+            "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+            "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-card {
+      background: rgba(25, 32, 46, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .glass-card:hover {
+      border-color: rgba(173, 198, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    .input-glow:focus {
+      outline: none;
+      border-color: #adc6ff;
+      box-shadow: 0 0 12px rgba(173, 198, 255, 0.2);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-slate-950/60 backdrop-blur-[20px] border-white/10 border-b-[1px] shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+<div class="flex items-center gap-8">
+<h1 class="text-xl font-black tracking-tighter text-white uppercase font-['Inter']">BioMine</h1>
+<div class="hidden md:flex gap-6 font-['Inter'] tracking-tight text-sm">
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200" href="#">Network</a>
+<a class="text-blue-400 font-bold hover:bg-white/5 hover:text-blue-400 transition-all duration-200" href="#">Management</a>
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+<input class="bg-transparent border-none text-xs focus:ring-0 text-white w-48" placeholder="Search systems..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-400 hover:text-blue-400 transition-all duration-200 scale-95 active:scale-90"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-slate-400 hover:text-blue-400 transition-all duration-200 scale-95 active:scale-90"><span class="material-symbols-outlined">settings</span></button>
+<div class="w-8 h-8 rounded-full bg-primary overflow-hidden border border-white/20">
+<img alt="Executive Profile" data-alt="A professional headshot of a corporate executive in a dark tailored suit, set against a blurred background of a modern high-tech office with cool blue ambient lighting. The style is sharp, cinematic, and emphasizes a high-stakes professional environment consistent with the BioMine corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu4RU7e3R84WzP2V855ex32wYQISHU225syMn14O9CFDyXPHOXV6NyENgb3-8tKrzfklZeNP8QFxZjQrQlNtetBIl9uLHIMbHv9Nw5jNwMkAVA8DLhxiaRavzKlb4nneo3D33-sr_jfgmUdPSOUT2J9b93-Sh4Mk53nJOGD4-y7v4HBz3OWyPia2PTOz8d_sVzVKfHsjVDcDUb8GbNHx81I6EpwBn6qGl3edIDsV0sXx4tly3jGRbKXU7Ih6LHG0_N5Td7kGohMXs"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col py-6 z-40 bg-slate-950/40 backdrop-blur-[20px] border-white/10 border-r-[1px] shadow-2xl pt-20">
+<div class="px-6 mb-8">
+<h2 class="text-lg font-black text-white">BioMine</h2>
+<p class="text-[10px] uppercase tracking-widest text-blue-500 font-bold">Intelligence Suite</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined text-blue-500">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-blue-400 border-r-2 border-blue-500 bg-blue-500/10 shadow-[inset_0_0_10px_rgba(59,130,246,0.2)] font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined text-blue-500">edit_note</span>
+<span>MIS Entry</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined text-blue-500">factory</span>
+<span>Operations</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined text-blue-500">local_shipping</span>
+<span>Fleet Control</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined text-blue-500">insights</span>
+<span>Intelligence</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined text-blue-500">verified_user</span>
+<span>Compliance</span>
+</a>
+</nav>
+<div class="px-6 mt-auto space-y-4">
+<button class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-200">Export Report</button>
+<div class="pt-6 border-t border-white/10 space-y-2">
+<a class="flex items-center gap-4 px-4 py-2 text-slate-500 hover:text-slate-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#"><span class="material-symbols-outlined text-sm">support_agent</span> Support</a>
+<a class="flex items-center gap-4 px-4 py-2 text-slate-500 hover:text-slate-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest" href="#"><span class="material-symbols-outlined text-sm">person</span> Account</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-24 px-container-padding pb-12 max-w-[1600px]">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<span class="text-primary font-label-caps uppercase tracking-widest mb-2 block">Data Management</span>
+<h2 class="font-display-lg text-display-lg text-on-surface">Operational MIS Entry</h2>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-6 py-3 glass-card rounded-xl text-on-surface-variant font-label-caps hover:bg-white/10 transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined text-lg">download</span> EXPORT CSV
+        </button>
+<button class="flex items-center gap-2 px-8 py-3 bg-gradient-to-br from-primary-container to-secondary-container text-white font-label-caps rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">save</span> SAVE ENTRY
+        </button>
+</div>
+</div>
+<!-- Bento Grid Form Sections -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Basic Information -->
+<section class="col-span-12 lg:col-span-4 glass-card p-stack-lg rounded-2xl flex flex-col gap-stack-md">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+<h3 class="font-headline-md text-headline-md">Basic Info</h3>
+</div>
+<div class="space-y-stack-md">
+<div class="relative group">
+<label class="absolute -top-2 left-3 bg-surface px-1 text-[10px] text-primary-fixed uppercase font-bold tracking-tighter">Reporting Date</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-on-surface font-body-sm input-glow transition-all" type="date" value="2023-11-24"/>
+</div>
+<div class="relative group">
+<label class="absolute -top-2 left-3 bg-surface px-1 text-[10px] text-primary-fixed uppercase font-bold tracking-tighter">Shift Lead</label>
+<select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-on-surface font-body-sm input-glow transition-all">
+<option>Marcus Sterling</option>
+<option>Elena Rodriguez</option>
+<option>Chen Wei</option>
+</select>
+</div>
+<div class="relative group">
+<label class="absolute -top-2 left-3 bg-surface px-1 text-[10px] text-primary-fixed uppercase font-bold tracking-tighter">Facility ID</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-on-surface font-body-sm input-glow transition-all" placeholder="BM-HQ-09" type="text"/>
+</div>
+</div>
+</section>
+<!-- Fuel Section -->
+<section class="col-span-12 lg:col-span-8 glass-card p-stack-lg rounded-2xl">
+<div class="flex items-center justify-between mb-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">local_gas_station</span>
+<h3 class="font-headline-md text-headline-md">Fuel Inventory</h3>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="text-[10px] font-bold text-tertiary uppercase">Live Reservoir Update</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-md">
+<div class="p-stack-md rounded-xl bg-white/5 border border-white/5">
+<p class="text-on-surface-variant font-label-caps text-[10px] mb-2 uppercase">Diesel Consumed (L)</p>
+<input class="w-full bg-transparent border-b border-white/20 focus:border-tertiary text-2xl font-mono-data text-white transition-all outline-none pb-2" placeholder="0.00" type="number"/>
+</div>
+<div class="p-stack-md rounded-xl bg-white/5 border border-white/5">
+<p class="text-on-surface-variant font-label-caps text-[10px] mb-2 uppercase">Reservoir Level (%)</p>
+<input class="w-full bg-transparent border-b border-white/20 focus:border-tertiary text-2xl font-mono-data text-white transition-all outline-none pb-2" placeholder="84" type="number"/>
+</div>
+<div class="p-stack-md rounded-xl bg-white/5 border border-white/5">
+<p class="text-on-surface-variant font-label-caps text-[10px] mb-2 uppercase">Fuel Cost (USD)</p>
+<input class="w-full bg-transparent border-b border-white/20 focus:border-tertiary text-2xl font-mono-data text-white transition-all outline-none pb-2" placeholder="0.00" type="number"/>
+</div>
+</div>
+</section>
+<!-- Vehicles Dynamic Table -->
+<section class="col-span-12 glass-card p-stack-lg rounded-2xl">
+<div class="flex items-center justify-between mb-stack-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">commute</span>
+<h3 class="font-headline-md text-headline-md">Vehicle Fleet Logs</h3>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-secondary/30 text-secondary font-label-caps rounded-lg hover:bg-secondary/10 transition-all">
+<span class="material-symbols-outlined text-sm">add_circle</span> ADD VEHICLE
+          </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-on-surface-variant font-label-caps text-[10px] uppercase border-b border-white/10">
+<th class="pb-4 px-2">Unit ID</th>
+<th class="pb-4 px-2">Status</th>
+<th class="pb-4 px-2">Distance (KM)</th>
+<th class="pb-4 px-2">Engine Hours</th>
+<th class="pb-4 px-2">Load Cycles</th>
+<th class="pb-4 px-2 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="group">
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-body-sm text-white focus:ring-0 p-0 w-20" type="text" value="FL-772"/>
+</td>
+<td class="py-4 px-2">
+<span class="px-2 py-1 rounded-full bg-primary/20 text-primary text-[10px] font-bold uppercase tracking-tight">Active</span>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="142"/>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="8.4"/>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="12"/>
+</td>
+<td class="py-4 px-2 text-right">
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-lg">delete</span></button>
+</td>
+</tr>
+<tr class="group">
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-body-sm text-white focus:ring-0 p-0 w-20" type="text" value="FL-409"/>
+</td>
+<td class="py-4 px-2">
+<span class="px-2 py-1 rounded-full bg-error/20 text-error text-[10px] font-bold uppercase tracking-tight">Idle</span>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="0"/>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="1.2"/>
+</td>
+<td class="py-4 px-2">
+<input class="bg-transparent border-none text-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="0"/>
+</td>
+<td class="py-4 px-2 text-right">
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors"><span class="material-symbols-outlined text-lg">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Machines Section -->
+<section class="col-span-12 lg:col-span-6 glass-card p-stack-lg rounded-2xl">
+<div class="flex items-center justify-between mb-stack-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">construction</span>
+<h3 class="font-headline-md text-headline-md">Heavy Machinery</h3>
+</div>
+<button class="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 text-on-surface font-label-caps text-[10px] rounded hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-xs">add</span> ADD MACHINE
+          </button>
+</div>
+<div class="space-y-stack-md">
+<div class="flex items-center gap-4 p-stack-md bg-white/5 border border-white/5 rounded-xl">
+<div class="w-12 h-12 rounded-lg bg-surface flex items-center justify-center border border-white/10">
+<span class="material-symbols-outlined text-primary">precision_manufacturing</span>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold uppercase tracking-tighter text-on-surface">Crusher Unit A1</p>
+<div class="flex gap-4 mt-2">
+<input class="bg-transparent border-b border-white/10 text-xs text-white p-1 w-20 outline-none focus:border-primary" placeholder="Runtime" type="number"/>
+<input class="bg-transparent border-b border-white/10 text-xs text-white p-1 w-20 outline-none focus:border-primary" placeholder="Output" type="number"/>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="flex items-center gap-4 p-stack-md bg-white/5 border border-white/5 rounded-xl">
+<div class="w-12 h-12 rounded-lg bg-surface flex items-center justify-center border border-white/10">
+<span class="material-symbols-outlined text-primary">conveyor_belt</span>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold uppercase tracking-tighter text-on-surface">Sorter Line 04</p>
+<div class="flex gap-4 mt-2">
+<input class="bg-transparent border-b border-white/10 text-xs text-white p-1 w-20 outline-none focus:border-primary" placeholder="Runtime" type="number"/>
+<input class="bg-transparent border-b border-white/10 text-xs text-white p-1 w-20 outline-none focus:border-primary" placeholder="Output" type="number"/>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined">close</span></button>
+</div>
+</div>
+</section>
+<!-- Disposal & Expenses -->
+<section class="col-span-12 lg:col-span-6 flex flex-col gap-gutter">
+<!-- Disposal -->
+<div class="glass-card p-stack-lg rounded-2xl flex-1">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">delete_sweep</span>
+<h3 class="font-headline-md text-headline-md">Disposal Metrics</h3>
+</div>
+<div class="grid grid-cols-2 gap-stack-md">
+<div class="space-y-1">
+<label class="text-[10px] font-label-caps text-on-surface-variant uppercase">Organic (Tons)</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-on-surface input-glow" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-label-caps text-on-surface-variant uppercase">Recyclables (Tons)</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-on-surface input-glow" type="number"/>
+</div>
+</div>
+</div>
+<!-- Expenses -->
+<div class="glass-card p-stack-lg rounded-2xl flex-1 border-l-4 border-l-secondary-container">
+<div class="flex items-center gap-3 mb-stack-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">payments</span>
+<h3 class="font-headline-md text-headline-md">Daily Expenses</h3>
+</div>
+<div class="space-y-stack-md">
+<div class="flex items-center justify-between border-b border-white/5 pb-2">
+<span class="text-body-sm text-on-surface-variant">Maintenance &amp; Repairs</span>
+<div class="flex items-center">
+<span class="text-xs text-secondary-fixed-dim mr-2">$</span>
+<input class="bg-transparent border-none text-right font-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="450.00"/>
+</div>
+</div>
+<div class="flex items-center justify-between border-b border-white/5 pb-2">
+<span class="text-body-sm text-on-surface-variant">Administrative Overheads</span>
+<div class="flex items-center">
+<span class="text-xs text-secondary-fixed-dim mr-2">$</span>
+<input class="bg-transparent border-none text-right font-mono-data text-white focus:ring-0 p-0 w-24" type="number" value="120.00"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Mobile Footer (Suppressed based on rules but logic provided) -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container border-t border-white/10 flex justify-around items-center h-16 z-50">
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[8px] font-bold uppercase">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-blue-400" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="text-[8px] font-bold uppercase">MIS Entry</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">factory</span>
+<span class="text-[8px] font-bold uppercase">Ops</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[8px] font-bold uppercase">Account</span>
+</a>
+</div>
+</main>
+<!-- Image Prompts (Embedded as per instructions) -->
+<div class="hidden">
+<!-- Prompt for executive profile image -->
+<img data-alt="A professional headshot of a corporate executive in a dark tailored suit, set against a blurred background of a modern high-tech office with cool blue ambient lighting. The style is sharp, cinematic, and emphasizes a high-stakes professional environment consistent with the BioMine corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGVCHjVfXqCJjYSLVhOYa3Qfgh4KDgs97TKSQa9WUNmO3aZHwybSEpyeo3ui9aqBL9z6GXXVMwF9pAWdLbeVCNNlHJ86bF8D-t2dUQFF_0WtNbOxWPMA27Z9i8DWruI8r6EcVER_RiRBsRtLg-WNWErZXLJQSCuO8zPdPL9kBgeS__5mrLaNsHtnLzr5rkg4wXbC8t5iiCde5TpFD8uc4UKK2XxgxZIXBq28j0S5Z79g3aZq9deLIxqCcECVY3mtPBWD4cG5Btk2g"/>
+</div>
+</body></html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-primary-fixed": "#001a42",
+                  "inverse-surface": "#dce2f6",
+                  "on-primary-container": "#00285d",
+                  "on-tertiary-fixed": "#001f26",
+                  "primary-fixed-dim": "#adc6ff",
+                  "error": "#ffb4ab",
+                  "tertiary-container": "#009eb9",
+                  "secondary-container": "#6f00be",
+                  "surface-tint": "#adc6ff",
+                  "surface-bright": "#323949",
+                  "on-tertiary-container": "#002f38",
+                  "on-secondary-fixed": "#2c0051",
+                  "surface": "#0c1321",
+                  "tertiary": "#4cd7f6",
+                  "primary-fixed": "#d8e2ff",
+                  "on-secondary-container": "#d6a9ff",
+                  "surface-container-low": "#151b2a",
+                  "inverse-primary": "#005ac2",
+                  "secondary": "#ddb7ff",
+                  "on-primary": "#002e6a",
+                  "on-background": "#dce2f6",
+                  "background": "#0c1321",
+                  "tertiary-fixed-dim": "#4cd7f6",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-high": "#232a39",
+                  "secondary-fixed": "#f0dbff",
+                  "primary": "#adc6ff",
+                  "error-container": "#93000a",
+                  "surface-container-lowest": "#070e1c",
+                  "on-surface-variant": "#c2c6d6",
+                  "on-tertiary": "#003640",
+                  "on-surface": "#dce2f6",
+                  "primary-container": "#4d8eff",
+                  "secondary-fixed-dim": "#ddb7ff",
+                  "on-tertiary-fixed-variant": "#004e5c",
+                  "surface-container": "#19202e",
+                  "inverse-on-surface": "#2a3040",
+                  "outline-variant": "#424754",
+                  "surface-variant": "#2e3544",
+                  "surface-dim": "#0c1321",
+                  "tertiary-fixed": "#acedff",
+                  "on-secondary": "#490080",
+                  "on-error": "#690005",
+                  "outline": "#8c909f",
+                  "on-primary-fixed-variant": "#004395",
+                  "surface-container-highest": "#2e3544",
+                  "on-secondary-fixed-variant": "#6900b3"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "gutter": "24px",
+                  "container-padding": "32px",
+                  "stack-sm": "8px",
+                  "stack-md": "16px",
+                  "unit": "8px",
+                  "stack-lg": "32px"
+          },
+          "fontFamily": {
+                  "display-lg": ["Inter"],
+                  "mono-data": ["monospace"],
+                  "body-lg": ["Inter"],
+                  "body-sm": ["Inter"],
+                  "label-caps": ["Inter"],
+                  "headline-md": ["Inter"],
+                  "display-xl": ["Inter"],
+                  "body-md": ["Inter"]
+          },
+          "fontSize": {
+                  "display-lg": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                  "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                  "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                  "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "600"}],
+                  "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .glass-card {
+      background: rgba(21, 27, 42, 0.4);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+    .glass-card:hover {
+      border-color: rgba(173, 198, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    .neon-pulse {
+      box-shadow: 0 0 10px rgba(173, 198, 255, 0.4);
+    }
+    .grid-bg {
+      background-image: radial-gradient(rgba(173, 198, 255, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .blob-1 {
+      filter: blur(100px);
+      background: linear-gradient(to right, #4d8eff, #6f00be);
+      opacity: 0.15;
+    }
+    .blob-2 {
+      filter: blur(100px);
+      background: linear-gradient(to right, #009eb9, #4cd7f6);
+      opacity: 0.1;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen grid-bg overflow-x-hidden">
+<!-- Background Decorative Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] blob-1 rounded-full z-0 pointer-events-none"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] blob-2 rounded-full z-0 pointer-events-none"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-slate-950/60 backdrop-blur-[20px] border-white/10 border-b-[1px] shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+<div class="flex items-center gap-8">
+<div class="text-xl font-black tracking-tighter text-white uppercase font-['Inter']">BioMine</div>
+<div class="hidden md:flex gap-6 font-['Inter'] tracking-tight text-sm">
+<a class="text-blue-400 font-bold" href="#">Dashboard</a>
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200" href="#">Analytics</a>
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200" href="#">Fleet</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-500">
+<span class="material-symbols-outlined text-sm">search</span>
+</span>
+<input class="bg-surface-container-lowest border border-white/10 rounded-full pl-10 pr-4 py-1.5 text-xs focus:ring-2 focus:ring-primary-container outline-none w-64 transition-all" placeholder="Global Search..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-all rounded-full"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-slate-400 hover:bg-white/5 transition-all rounded-full"><span class="material-symbols-outlined">settings</span></button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden border border-white/20">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a senior executive in a high-tech corporate environment. The person has a confident expression and is wearing a sleek dark suit. The lighting is dramatic and moody with subtle blue rim lighting reflecting the BioMine color palette. The background is softly blurred showing digital terminal interfaces." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkANYf5Dxhhh2Jh_hmCUotH_xLjgXgKkqgN3c1b75NBL-7TYR9hHiXX4kdw6p-QO07A-msC0ze0fDSeBviZgcaP3ccdPwUljX0r5TT7vyGKsV_0IpDMI8jR4evIKZ1c6prZv3t1oiU52C3VmVzdpsvSEzSYSGYlf7R2nOoOMrSw5MB71g0WNVFie1WFlRj8TLq0q4WgXmFOgEmsFBRiI3U9VrRcZXynkDkHbhpDQtSANLx0i1gUKIcYcVoP2-2dHlOLPATgkVbaPk"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 z-40 bg-slate-950/40 backdrop-blur-[20px] h-screen w-64 border-white/10 border-r-[1px] shadow-2xl pt-20">
+<nav class="flex-1 px-4 space-y-2">
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-400 border-r-2 border-blue-500 bg-blue-500/10 shadow-[inset_0_0_10px_rgba(59,130,246,0.2)] font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">edit_note</span>
+<span>MIS Entry</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">factory</span>
+<span>Operations</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">local_shipping</span>
+<span>Fleet Control</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">insights</span>
+<span>Intelligence</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 font-['Inter'] text-xs font-semibold uppercase tracking-widest ease-out duration-200 hover:translate-x-1 cursor-pointer">
+<span class="material-symbols-outlined">verified_user</span>
+<span>Compliance</span>
+</div>
+</nav>
+<div class="px-4 mt-auto space-y-2">
+<button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-primary-container to-secondary-container text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary-container/20 active:scale-95 transition-transform">Export Report</button>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 font-['Inter'] text-xs font-semibold uppercase tracking-widest">
+<span class="material-symbols-outlined">support_agent</span>
+<span>Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 pt-24 px-8 pb-12 relative z-10 max-w-[1600px]">
+<!-- Hero Section -->
+<section class="grid grid-cols-12 gap-6 mb-8">
+<!-- Map Card -->
+<div class="col-span-12 lg:col-span-8 glass-card rounded-2xl h-[500px] relative overflow-hidden group">
+<div class="absolute inset-0 grayscale opacity-40 group-hover:grayscale-0 transition-all duration-700">
+<img class="w-full h-full object-cover" data-alt="A highly detailed 3D topographic digital map of a futuristic industrial smart city with glowing blue logistics routes and neon orange vehicle markers. The aesthetic is dark and high-contrast with a technological overlay of grid lines and data nodes. Lighting is moody with a cool blue cybernetic glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAgxC0NzS-_On2BqXj-SZ5YijTEYxDaU2KHGhJm2_K13XL7hEiaygRZoxd3ErXXgAC47l7l5_atXdRNGm-16388KjZqa82jU3mJSf0QnLeCwAgISx-SMdSn7YluLIlN-dRR8Ls3YCsIibvVf7DaawjjqCNYX146Fu9jYZbb0dSxeMxrwf8ECsARxvaAsC5_EfVO9f5yP6-iKtyfWteX4qgVJEwHtvuLr7RtFevbKXAH5gRONf-aoxLjzE7Pjzt9FS2wFGvACPrtOo"/>
+</div>
+<!-- Map Overlay UI -->
+<div class="absolute top-6 left-6 flex flex-col gap-3">
+<div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></div>
+<span class="text-xs font-label-caps uppercase text-primary">Live Network Active</span>
+</div>
+</div>
+<!-- Network Pulse Overlay -->
+<div class="absolute bottom-6 right-6 glass-card p-6 rounded-2xl w-64">
+<h4 class="text-sm font-headline-md mb-4 text-white">Network Pulse</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-slate-400 uppercase">On-time Delivery</span>
+<span class="text-primary font-bold">94.2%</span>
+</div>
+<div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[94.2%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-slate-400 uppercase">Idle Assets</span>
+<span class="text-tertiary font-bold">08.5%</span>
+</div>
+<div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[8.5%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side Widgets -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<div class="glass-card p-6 rounded-2xl flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xs font-label-caps text-slate-400 uppercase tracking-widest">Avg Delivery Time</h3>
+<span class="material-symbols-outlined text-primary">timer</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg text-white font-display-lg">42.8</span>
+<span class="text-sm text-slate-400 font-medium">MINS</span>
+</div>
+</div>
+<div class="h-24 flex items-end gap-1.5">
+<div class="flex-1 bg-primary/20 h-1/2 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-2/3 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-1/3 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-4/5 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/100 h-full rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-1/2 rounded-t-sm"></div>
+<div class="flex-1 bg-primary/20 h-1/3 rounded-t-sm"></div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl flex-1">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xs font-label-caps text-slate-400 uppercase tracking-widest">Efficiency Card</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-headline-md text-white font-headline-md">+12.4%</span>
+<span class="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded uppercase font-bold">vs Last Week</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-tertiary">trending_up</span>
+</div>
+<div class="relative h-32 w-full">
+<!-- Simulated Line Chart -->
+<svg class="w-full h-full" viewbox="0 0 100 40">
+<path class="text-tertiary" d="M0 35 Q 20 30, 40 20 T 80 15 T 100 5" fill="none" stroke="currentColor" stroke-width="2"></path>
+<path d="M0 35 Q 20 30, 40 20 T 80 15 T 100 5 V 40 H 0 Z" fill="url(#grad-eff)" opacity="0.1"></path>
+<defs>
+<lineargradient id="grad-eff" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4cd7f6"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<!-- KPI Section -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="glass-card p-6 rounded-2xl border-l-4 border-primary">
+<p class="text-[10px] font-label-caps text-slate-400 uppercase mb-2">Total Production</p>
+<p class="text-headline-md font-display-lg text-white">1,284.5 <span class="text-sm font-normal text-slate-500">Tons</span></p>
+<div class="mt-4 flex items-center gap-2 text-[10px]">
+<span class="text-primary font-bold">↑ 4.2%</span>
+<span class="text-slate-500">FROM TARGET</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl border-l-4 border-tertiary">
+<p class="text-[10px] font-label-caps text-slate-400 uppercase mb-2">Total Disposal</p>
+<p class="text-headline-md font-display-lg text-white">942.2 <span class="text-sm font-normal text-slate-500">Tons</span></p>
+<div class="mt-4 flex items-center gap-2 text-[10px]">
+<span class="text-tertiary font-bold">↑ 1.1%</span>
+<span class="text-slate-500">STABLE OPS</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl border-l-4 border-secondary-container">
+<p class="text-[10px] font-label-caps text-slate-400 uppercase mb-2">Total Expense</p>
+<p class="text-headline-md font-display-lg text-white">$42,900</p>
+<div class="mt-4 flex items-center gap-2 text-[10px]">
+<span class="text-error font-bold">↓ 0.8%</span>
+<span class="text-slate-500">COST SAVINGS</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl border-l-4 border-on-primary-container">
+<p class="text-[10px] font-label-caps text-slate-400 uppercase mb-2">Cost per Ton</p>
+<p class="text-headline-md font-display-lg text-white">$33.40</p>
+<div class="mt-4 flex items-center gap-2 text-[10px]">
+<span class="text-primary font-bold">↑ 2.3%</span>
+<span class="text-slate-500">VAR EFFICIENCY</span>
+</div>
+</div>
+</section>
+<!-- Table Section -->
+<section class="glass-card rounded-2xl overflow-hidden mb-8">
+<div class="px-8 py-6 flex justify-between items-center border-b border-white/5">
+<h2 class="text-body-lg font-headline-md text-white">Fleet / Operations Overview</h2>
+<div class="flex gap-2">
+<button class="bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 transition-colors">Filters</button>
+<button class="bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 transition-colors">Export Table</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-white/5 text-[10px] font-label-caps text-slate-400 uppercase tracking-widest">
+<th class="px-8 py-4 font-semibold">ID</th>
+<th class="px-8 py-4 font-semibold">Operator</th>
+<th class="px-8 py-4 font-semibold">Vehicle</th>
+<th class="px-8 py-4 font-semibold">Status</th>
+<th class="px-8 py-4 font-semibold">Progress</th>
+<th class="px-8 py-4 font-semibold text-right">Efficiency %</th>
+</tr>
+</thead>
+<tbody class="text-xs text-slate-300 divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5 font-mono-data text-primary">#BM-7742</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-slate-700"></div>
+<span>Marcus Thorne</span>
+</div>
+</td>
+<td class="px-8 py-5">X-Heavy Hauler V2</td>
+<td class="px-8 py-5">
+<span class="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-tight">Active</span>
+</td>
+<td class="px-8 py-5">
+<div class="w-32 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[78%]"></div>
+</div>
+</td>
+<td class="px-8 py-5 text-right font-bold text-white">98.2%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5 font-mono-data text-primary">#BM-3211</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-slate-700"></div>
+<span>Sarah Chen</span>
+</div>
+</td>
+<td class="px-8 py-5">Bio-Excavator 300</td>
+<td class="px-8 py-5">
+<span class="bg-tertiary/10 text-tertiary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-tight">Loading</span>
+</td>
+<td class="px-8 py-5">
+<div class="w-32 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[45%]"></div>
+</div>
+</td>
+<td class="px-8 py-5 text-right font-bold text-white">82.1%</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5 font-mono-data text-primary">#BM-9004</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-slate-700"></div>
+<span>Elena Rodriguez</span>
+</div>
+</td>
+<td class="px-8 py-5">Heavy Sorter Prime</td>
+<td class="px-8 py-5">
+<span class="bg-secondary-container/10 text-secondary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-tight">On-Route</span>
+</td>
+<td class="px-8 py-5">
+<div class="w-32 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary-container h-full w-[15%]"></div>
+</div>
+</td>
+<td class="px-8 py-5 text-right font-bold text-white">91.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Chart Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="glass-card p-6 rounded-2xl">
+<h3 class="text-xs font-label-caps text-slate-400 uppercase tracking-widest mb-6">Disposal Breakdown</h3>
+<div class="flex justify-center items-center py-4 relative">
+<!-- Radial Gauge Visualization -->
+<svg class="w-40 h-40 transform -rotate-90">
+<circle cx="80" cy="80" fill="transparent" r="70" stroke="rgba(255,255,255,0.05)" stroke-width="12"></circle>
+<circle cx="80" cy="80" fill="transparent" r="70" stroke="url(#grad-pie)" stroke-dasharray="440" stroke-dashoffset="120" stroke-linecap="round" stroke-width="12"></circle>
+<defs>
+<lineargradient id="grad-pie" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#adc6ff"></stop>
+<stop offset="100%" stop-color="#4cd7f6"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-display-lg text-white font-display-lg">72%</span>
+<span class="text-[10px] text-slate-500 uppercase font-bold">In-Transit</span>
+</div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl col-span-1 lg:col-span-2">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xs font-label-caps text-slate-400 uppercase tracking-widest">Production Trend (Weekly)</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] text-slate-400">Production</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="text-[10px] text-slate-400">Target</span>
+</div>
+</div>
+</div>
+<div class="h-48 w-full">
+<!-- Complex Chart Visualization -->
+<svg class="w-full h-full" preserveaspectratio="none">
+<polyline fill="none" points="0,180 50,150 100,160 150,110 200,130 250,80 300,100 350,60 400,90 450,40 500,70 550,20 600,40 650,10 700,50 750,20 800,0" stroke="#adc6ff" stroke-width="3" vector-effect="non-scaling-stroke"></polyline>
+<polyline fill="none" points="0,180 50,170 100,175 150,160 200,165 250,150 300,155 350,140 400,145 450,130 500,135 550,120 600,125 650,110 700,115 750,100 800,105" stroke="#4cd7f6" stroke-dasharray="4,4" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
+</svg>
+</div>
+</div>
+</section>
+</main>
+</body></html>

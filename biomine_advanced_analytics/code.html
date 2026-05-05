@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioMine | Advanced Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#2e3544",
+                      "surface-dim": "#0c1321",
+                      "primary": "#adc6ff",
+                      "inverse-surface": "#dce2f6",
+                      "surface-container-lowest": "#070e1c",
+                      "surface-tint": "#adc6ff",
+                      "outline-variant": "#424754",
+                      "on-primary-container": "#00285d",
+                      "surface-container-high": "#232a39",
+                      "primary-fixed": "#d8e2ff",
+                      "on-surface": "#dce2f6",
+                      "secondary-fixed": "#f0dbff",
+                      "on-background": "#dce2f6",
+                      "tertiary-container": "#009eb9",
+                      "on-error": "#690005",
+                      "outline": "#8c909f",
+                      "surface-container-low": "#151b2a",
+                      "tertiary": "#4cd7f6",
+                      "secondary": "#ddb7ff",
+                      "on-surface-variant": "#c2c6d6",
+                      "error-container": "#93000a",
+                      "primary-container": "#4d8eff",
+                      "on-tertiary": "#003640",
+                      "on-primary": "#002e6a",
+                      "error": "#ffb4ab",
+                      "tertiary-fixed-dim": "#4cd7f6",
+                      "inverse-primary": "#005ac2",
+                      "surface-bright": "#323949",
+                      "primary-fixed-dim": "#adc6ff",
+                      "on-secondary-fixed-variant": "#6900b3",
+                      "on-secondary-fixed": "#2c0051",
+                      "surface-container-highest": "#2e3544",
+                      "secondary-container": "#6f00be",
+                      "secondary-fixed-dim": "#ddb7ff",
+                      "on-tertiary-fixed-variant": "#004e5c",
+                      "on-tertiary-fixed": "#001f26",
+                      "on-secondary": "#490080",
+                      "on-primary-fixed-variant": "#004395",
+                      "inverse-on-surface": "#2a3040",
+                      "surface-container": "#19202e",
+                      "on-tertiary-container": "#002f38",
+                      "background": "#0c1321",
+                      "surface": "#0c1321",
+                      "on-secondary-container": "#d6a9ff",
+                      "on-primary-fixed": "#001a42",
+                      "tertiary-fixed": "#acedff",
+                      "on-error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-md": "16px",
+                      "stack-lg": "32px",
+                      "unit": "8px",
+                      "container-padding": "32px"
+              },
+              "fontFamily": {
+                      "mono-data": ["monospace"],
+                      "display-xl": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "mono-data": ["14px", {"lineHeight": "1", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "display-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "600"}],
+                      "display-lg": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(12, 19, 33, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-border-hover:hover {
+            border-image: linear-gradient(to right, #adc6ff, #4cd7f6) 1;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #adc6ff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-slate-950/60 backdrop-blur-[20px] border-white/10 border-b-[1px] shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+<div class="flex items-center gap-8">
+<h1 class="text-xl font-black tracking-tighter text-white uppercase font-display-xl">BioMine</h1>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200 font-['Inter'] tracking-tight text-sm" href="#">Dashboard</a>
+<a class="text-blue-400 font-bold hover:bg-white/5 transition-all duration-200 font-['Inter'] tracking-tight text-sm" href="#">Intelligence</a>
+<a class="text-slate-400 hover:bg-white/5 hover:text-blue-400 transition-all duration-200 font-['Inter'] tracking-tight text-sm" href="#">Operations</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="bg-surface-container border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all outline-none text-on-surface" placeholder="Global Search Intelligence..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors scale-95 active:scale-90"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors scale-95 active:scale-90"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors scale-95 active:scale-90"><span class="material-symbols-outlined">help</span></button>
+</div>
+<img alt="Executive Profile" class="w-8 h-8 rounded-full border border-primary/30" data-alt="A professional headshot of a corporate executive in a dark tailored suit, captured with sharp dramatic lighting. The background is a blurred high-tech control room with soft blue and cyan ambient glows. The executive has a focused, intelligent expression, reflecting the sophisticated and sovereign identity of the BioMine platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6LRJT_AP8DVerQDPfIM_uq1XQ8BrJ-lXzDQ-Ho4UYGH1bJDC-3CW4OmMULUh6yFv5F_17CCjjAPqzfZYQWDpxfos7vgPu-Qg_-lsWlw873PHGsox7Qlj719hZmCMhxQ0SF31Its9JOkg78rPEqUZUN0zmTqeOhVRGvgl2hfxE512Ru7LVkpfYGv8l_pmr0kRe0wwGnWtT7K3G79YjJU8TKLuDEUxKZ9fs0hXfy9eI6juCj-tEQwP6lpax4aRrNfcH1lUweVAHF2Y"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 z-40 bg-slate-950/40 backdrop-blur-[20px] h-screen w-64 border-r border-white/10 border-r-[1px] pt-20 shadow-2xl">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="font-display-lg text-lg font-black text-white">BioMine</span>
+</div>
+<p class="font-['Inter'] text-xs font-semibold uppercase tracking-widest text-slate-500">Intelligence Suite</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">MIS Entry</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">factory</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">Operations</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">Fleet Control</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-blue-400 border-r-2 border-blue-500 bg-blue-500/10 shadow-[inset_0_0_10px_rgba(59,130,246,0.2)] transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">Intelligence</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-slate-500 hover:text-slate-300 hover:backdrop-blur-3xl hover:bg-white/5 transition-all duration-300 ease-out hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-['Inter'] text-xs font-semibold uppercase tracking-widest">Compliance</span>
+</a>
+</nav>
+<div class="mt-auto px-4 pb-4 border-t border-white/10 pt-4 flex flex-col gap-2">
+<button class="w-full py-3 bg-gradient-to-r from-primary-container to-tertiary-container rounded-lg text-white font-bold text-sm tracking-tight shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-95 active:scale-90 transition-transform">
+                Export Report
+            </button>
+<div class="flex justify-around mt-4">
+<button class="text-slate-500 hover:text-primary"><span class="material-symbols-outlined">support_agent</span></button>
+<button class="text-slate-500 hover:text-primary"><span class="material-symbols-outlined">person</span></button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen flex">
+<!-- Left Analysis Pane -->
+<div class="flex-1 p-8 space-y-8 max-w-[1200px]">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg text-white mb-2">Advanced Analytics</h2>
+<p class="text-on-surface-variant font-body-md">Operational density and multi-site site performance benchmarking.</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel flex items-center px-4 py-2 rounded-xl border border-white/10">
+<span class="material-symbols-outlined text-primary text-sm mr-2">calendar_today</span>
+<span class="text-xs font-mono-data text-on-surface-variant">OCT 01, 2023 - OCT 28, 2023</span>
+</div>
+<button class="bg-surface-container-highest px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-primary border border-primary/20 hover:bg-primary/10 transition-colors">
+                        Generate Insights
+                    </button>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Main Comparison Chart -->
+<div class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="font-headline-md text-white">Site Comparison</h3>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest font-label-caps mt-1">Resource Utilization Benchmarking</p>
+</div>
+<div class="flex gap-2">
+<span class="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_#adc6ff]"></span>
+<span class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_8px_#4cd7f6]"></span>
+<span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_8px_#ddb7ff]"></span>
+</div>
+</div>
+<div class="h-[300px] flex items-end justify-between gap-2 px-4 relative">
+<!-- Simulated Chart Grid -->
+<div class="absolute inset-0 border-b border-white/10 flex flex-col justify-between pointer-events-none">
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+<div class="border-b border-white/5 w-full h-0"></div>
+</div>
+<!-- Multi-Line Chart Simulation (SVG) -->
+<svg class="absolute inset-0 w-full h-full p-4" preserveaspectratio="none" viewbox="0 0 800 300">
+<defs>
+<lineargradient id="grad1" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" style="stop-color:#adc6ff;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#4cd7f6;stop-opacity:1"></stop>
+</lineargradient>
+</defs>
+<path class="drop-shadow-[0_0_8px_rgba(173,198,255,0.4)]" d="M0,200 Q100,50 200,180 T400,100 T600,220 T800,40" fill="none" stroke="url(#grad1)" stroke-linecap="round" stroke-width="4"></path>
+<path d="M0,250 Q150,150 300,200 T500,50 T800,180" fill="none" stroke="#ddb7ff" stroke-dasharray="8 4" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<!-- X-Axis Labels -->
+<div class="absolute bottom-[-24px] left-0 w-full flex justify-between px-4 text-[10px] font-mono-data text-slate-500">
+<span>01 OCT</span>
+<span>07 OCT</span>
+<span>14 OCT</span>
+<span>21 OCT</span>
+<span>28 OCT</span>
+</div>
+</div>
+</div>
+<!-- Metrics Sidebar (Bento) -->
+<div class="col-span-12 lg:col-span-4 grid grid-cols-1 gap-6">
+<div class="glass-panel p-6 rounded-2xl border-l-4 border-l-primary">
+<div class="flex justify-between mb-4">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="text-xs font-mono-data text-primary">+12.4%</span>
+</div>
+<p class="text-xs text-on-surface-variant font-label-caps uppercase tracking-widest">Aggregate Efficiency</p>
+<h4 class="font-display-lg text-display-lg text-white">94.2%</h4>
+</div>
+<div class="glass-panel p-6 rounded-2xl border-l-4 border-l-tertiary">
+<div class="flex justify-between mb-4">
+<span class="material-symbols-outlined text-tertiary">speed</span>
+<span class="text-xs font-mono-data text-tertiary">-2.1%</span>
+</div>
+<p class="text-xs text-on-surface-variant font-label-caps uppercase tracking-widest">Mean Cycle Time</p>
+<h4 class="font-display-lg text-display-lg text-white">18.5m</h4>
+</div>
+</div>
+<!-- Operational Density Heatmap -->
+<div class="col-span-12 lg:col-span-7 glass-panel p-6 rounded-2xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-white">Operational Density</h3>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-500 font-mono-data">LOW</span>
+<div class="flex h-2 w-24 rounded-full overflow-hidden">
+<div class="bg-primary/20 w-1/4"></div>
+<div class="bg-primary/40 w-1/4"></div>
+<div class="bg-primary/70 w-1/4"></div>
+<div class="bg-primary w-1/4"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-mono-data">PEAK</span>
+</div>
+</div>
+<div class="grid grid-cols-24 gap-1 h-48">
+<!-- Simulated Heatmap Grid -->
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div>
+<div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/40 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div>
+<!-- ... more cells repeated to fill grid ... -->
+<div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+<div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/10 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div><div class="bg-primary/40 rounded-sm"></div>
+<div class="bg-primary/60 rounded-sm"></div><div class="bg-primary/90 rounded-sm"></div><div class="bg-primary/80 rounded-sm"></div><div class="bg-primary/20 rounded-sm"></div>
+</div>
+</div>
+<!-- Trend Analysis -->
+<div class="col-span-12 lg:col-span-5 glass-panel p-6 rounded-2xl overflow-hidden relative">
+<h3 class="font-headline-md text-white mb-6">Trend Forecasting</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 group hover:border-primary/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-lg bg-primary/10"><span class="material-symbols-outlined text-primary">trending_up</span></div>
+<div>
+<p class="text-sm font-semibold text-white">Capacity Growth</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Forecasted for Q4 2023</p>
+</div>
+</div>
+<span class="font-mono-data text-primary">+18%</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 group hover:border-tertiary/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-lg bg-tertiary/10"><span class="material-symbols-outlined text-tertiary">warning</span></div>
+<div>
+<p class="text-sm font-semibold text-white">Maintenance Drift</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Predictive alert for Site A</p>
+</div>
+</div>
+<span class="font-mono-data text-error">-4.2d</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 group hover:border-secondary/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-lg bg-secondary/10"><span class="material-symbols-outlined text-secondary">eco</span></div>
+<div>
+<p class="text-sm font-semibold text-white">Carbon Index</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Sustainability score optimization</p>
+</div>
+</div>
+<span class="font-mono-data text-secondary">A+</span>
+</div>
+</div>
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 blur-3xl rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Right Side: Site Selector Sidebar -->
+<aside class="w-80 border-l border-white/10 bg-slate-950/20 backdrop-blur-[10px] p-6 space-y-6 flex flex-col h-[calc(100vh-64px)] custom-scrollbar overflow-y-auto">
+<div>
+<h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Site Selection</h4>
+<div class="space-y-2">
+<label class="flex items-center gap-3 p-3 rounded-xl border border-primary/40 bg-primary/10 group cursor-pointer">
+<input checked="" class="rounded border-primary bg-transparent text-primary focus:ring-0" type="checkbox"/>
+<span class="flex-1 text-sm font-semibold text-white">BioMine North Central</span>
+<div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#adc6ff]"></div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer">
+<input checked="" class="rounded border-slate-600 bg-transparent text-tertiary focus:ring-0" type="checkbox"/>
+<span class="flex-1 text-sm text-slate-400 group-hover:text-white">Eastern Hub Main</span>
+<div class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_#4cd7f6]"></div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer">
+<input class="rounded border-slate-600 bg-transparent text-secondary focus:ring-0" type="checkbox"/>
+<span class="flex-1 text-sm text-slate-400 group-hover:text-white">South Corridor Annex</span>
+<div class="w-2 h-2 rounded-full bg-slate-700"></div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors group cursor-pointer">
+<input class="rounded border-slate-600 bg-transparent text-primary focus:ring-0" type="checkbox"/>
+<span class="flex-1 text-sm text-slate-400 group-hover:text-white">Western Ridge Depot</span>
+<div class="w-2 h-2 rounded-full bg-slate-700"></div>
+</label>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Quick Filters</h4>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full bg-surface-container border border-white/10 text-[10px] font-bold text-slate-400 hover:border-primary transition-colors">ACTIVE FLEET</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container border border-white/10 text-[10px] font-bold text-slate-400 hover:border-primary transition-colors">IDLE UNITS</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container border border-white/10 text-[10px] font-bold text-slate-400 hover:border-primary transition-colors">MAINTENANCE</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container border border-white/10 text-[10px] font-bold text-slate-400 hover:border-primary transition-colors">EMERGENCY</button>
+</div>
+</div>
+<div class="mt-auto space-y-4">
+<div class="p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20">
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Live Insight</p>
+<p class="text-xs text-on-surface leading-relaxed italic">"North Central site shows a 15% deviation in operational sync compared to the hub average. Recommend load balancing by 08:00 UTC."</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-surface-container-highest border border-white/10 text-white font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-sm">download</span>
+                    PDF Snapshot
+                </button>
+</div>
+</aside>
+</main>
+<!-- Map View Background Detail (Subtle) -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-20 grayscale invert">
+<img alt="Operational Map" class="w-full h-full object-cover" data-alt="A dark, high-contrast satellite topographical map showing a complex network of industrial facilities and transport routes. The style is minimalist with deep navy and black tones, highlighted by faint cyan linework representing infrastructure connections. The mood is clinical and vast, suggesting the large-scale operational territory of BioMine." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1CtZm-l1FQLR7ojWzCUGc0K477BYtPr6a9h19s3TP38zz2whTVJKloEkSQYm1GtJ3GBL2FwyaWkS7E8xzlcuZbTomTQibZUt1d3QNEoc8C8qy0LiH4dZgbS0tFsXjl6_u9qNzfvFzJypNCn4_LPBQK6NRfDrNK-HQ70YNyqAKO4Xr_zvThAe0h0j-o1Dc8LSDyOnOmODtFExCowLRc4Dv4WLi917eqp5QakRs-QfB2UalnqBlcedU8MOOEGIg1cHPbT3XhzrBgco"/>
+</div>
+</body></html>
