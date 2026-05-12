@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/motion.css";
 
 @theme {
   --color-dark-bg: #0f172a;
@@ -18,37 +19,173 @@
   :root {
     --background: var(--color-dark-bg);
     --foreground: #f8fafc;
+    
+    /* Dynamically Controlled Appearance Vectors */
+    --glass-blur: 16px;
+    --glass-opacity: 0.4;
+    --glass-border-opacity: 0.03;
+    --glass-reflection: 0.05;
+    --glass-shadow: 0.25;
+    
+    /* Dynamic Spacing Multipliers */
+    --space-factor: 1;
   }
+  
+  /* Informational Density Engine */
+  html.compact-density {
+    --space-factor: 0.7;
+  }
+  html.comfortable-density {
+    --space-factor: 1;
+  }
+
+  /* Atmospheric Motion Suspension (Reduce Motion) */
+  html.reduce-motion *,
+  html.reduce-motion *::before,
+  html.reduce-motion *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    transform: none !important;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    transition: font-size 0.2s ease;
   }
 }
 
 @layer utilities {
   .glass-card {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: rgba(15, 23, 42, var(--glass-opacity));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, var(--glass-reflection)), 0 4px 20px rgba(0, 0, 0, var(--glass-shadow));
+    transition: backdrop-filter 0.3s ease, background 0.3s ease, border 0.3s ease;
   }
   
   .glass-button {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(139, 92, 246, 0.8) 100%);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(37, 99, 235, 0.25);
+    transition: all 0.15s ease;
   }
   
   .glass-button:hover {
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
   }
 
   .neon-text {
-    text-shadow: 0 0 10px rgba(14, 165, 233, 0.5), 0 0 20px rgba(14, 165, 233, 0.3);
+    text-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
+  }
+
+  /* Metallic Typography Gradients */
+  .metallic-gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    color: transparent;
+  }
+  
+  .primary-gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Premium Hover Animations - Toned Down for Performance */
+  .hover-lift {
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .hover-glow {
+    transition: all 0.15s ease-out;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 12px rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.2);
+  }
+
+  /* Interactive Sidebar Item */
+  .sidebar-item-hover {
+    transition: all 0.12s ease-out;
+  }
+  
+  .sidebar-item-hover:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.04);
+    transform: translateX(2px);
+  }
+}
+
+/* Density Utility Cascade Layer overrides to affect sizing safely globally without breaking grid structures */
+@layer components {
+  /* Compact Adjustments override utility classes dynamically */
+  html.compact-density .p-6 { padding: calc(1.5rem * 0.6); }
+  html.compact-density .p-4 { padding: calc(1rem * 0.65); }
+  html.compact-density .p-5 { padding: calc(1.25rem * 0.65); }
+  html.compact-density .gap-6 { gap: calc(1.5rem * 0.65); }
+  html.compact-density .gap-4 { gap: calc(1rem * 0.65); }
+  html.compact-density .py-12 { padding-top: calc(3rem * 0.6); padding-bottom: calc(3rem * 0.6); }
+  html.compact-density .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(1.5rem * 0.6); }
+  
+  /* Dynamic adjustments for Table density */
+  html.compact-density td, 
+  html.compact-density th {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  /* Form and component density tightening */
+  html.compact-density input, 
+  html.compact-density select {
+    height: 2.25rem !important;
+    font-size: 0.8rem;
+  }
+  
+  html.compact-density button:not(.h-7):not(.h-8):not(.h-9) {
+    height: auto;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+}
+
+@layer utilities {
+  /* Button Icon Micro-interactions */
+  button svg {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease-out;
+  }
+  button:hover svg {
+    transform: scale(1.06) translateY(-0.5px);
+  }
+  button:active svg {
+    transform: scale(0.95);
+  }
+
+  /* Cross-browser invisible scroll utility */
+  .scrollbar-none {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none !important;  /* WebKit (Chrome, Safari, Opera) */
+    width: 0 !important;
+    height: 0 !important;
   }
 }
 
@@ -67,3 +204,197 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
 }
+
+/* ==========================================
+   PERSISTENT ENTERPRISE LIGHT MODE OVERRIDES
+   ========================================== */
+
+/* Butter-smooth transition on key properties to prevent flashing */
+*, *::before, *::after {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease, box-shadow 0.25s ease;
+}
+
+:root.light {
+  --background: #f4f7fb;
+  --foreground: #0f172a;
+}
+
+:root.light body {
+  background-color: #f4f7fb !important;
+  color: #0f172a !important;
+}
+
+/* Sidebar Adaptations (Premium Matte White Panel) */
+:root.light aside {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02) !important;
+}
+
+:root.light aside div,
+:root.light aside button {
+  border-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+:root.light aside * {
+  color: #475569 !important;
+}
+
+:root.light aside .active {
+  background-color: rgba(59, 130, 246, 0.06) !important;
+  border: 1px solid rgba(59, 130, 246, 0.1) !important;
+}
+
+:root.light aside .active * {
+  color: #2563eb !important;
+}
+
+/* Active sidebar neon line override */
+:root.light aside .absolute.bg-primary {
+  background-color: #2563eb !important;
+  box-shadow: none !important;
+}
+
+/* Header Adaptations (Soft Frosted White Glass) */
+:root.light header {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+:root.light header * {
+  color: #0f172a !important;
+}
+
+:root.light header span.text-slate-400,
+:root.light header span.text-gray-400 {
+  color: #64748b !important;
+}
+
+:root.light header .text-primary {
+  color: #2563eb !important;
+}
+
+/* Glass Cards and Main Dashboard Cards (Elevated Pure White) */
+:root.light .glass-card,
+:root.light div.rounded-xl.border.border-white\/5,
+:root.light div.rounded-2xl.border.border-white\/5 {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.01), 0 4px 12px rgba(15, 23, 42, 0.02) !important;
+  backdrop-filter: none !important;
+}
+
+:root.light .glass-card *,
+:root.light div.rounded-xl.border.border-white\/5 *,
+:root.light div.rounded-2xl.border.border-white\/5 * {
+  color: #1e293b !important;
+}
+
+:root.light .glass-card span.text-primary,
+:root.light div.rounded-xl.border.border-white\/5 span.text-primary,
+:root.light div.rounded-2xl.border.border-white\/5 span.text-primary,
+:root.light .text-primary {
+  color: #2563eb !important;
+}
+
+:root.light .text-gray-400,
+:root.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+:root.light .text-gray-500,
+:root.light .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* KPI Card Spacers and Typography Polish */
+:root.light .glass-card h3,
+:root.light div.rounded-xl.border.border-white\/5 h3 {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+:root.light .glass-card p.text-3xl,
+:root.light div.rounded-xl.border.border-white\/5 p.text-3xl {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+/* Inputs, Textareas and Dropdowns (Polished White Surface) */
+:root.light input,
+:root.light select,
+:root.light textarea {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+}
+
+/* Tables in Light Mode */
+:root.light table {
+  color: #1e293b !important;
+}
+
+:root.light th {
+  background-color: rgba(15, 23, 42, 0.02) !important;
+  color: #475569 !important;
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+:root.light td {
+  border-bottom-color: rgba(15, 23, 42, 0.04) !important;
+}
+
+:root.light tr:hover {
+  background-color: rgba(15, 23, 42, 0.01) !important;
+}
+
+/* Floating Modals & Avatar Dropdowns (Level 4 Floating Elevation) */
+:root.light div.absolute.rounded-xl.bg-slate-950,
+:root.light div.absolute.rounded-lg.bg-slate-950,
+:root.light div.absolute.rounded-xl.bg-slate-950\/95,
+:root.light div.absolute.rounded-lg.bg-slate-950\/95 {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
+}
+
+:root.light div.absolute.rounded-xl.bg-slate-950 *,
+:root.light div.absolute.rounded-lg.bg-slate-950 * {
+  color: #334155 !important;
+}
+
+:root.light div.absolute.rounded-xl.bg-slate-950 button:hover,
+:root.light div.absolute.rounded-lg.bg-slate-950 button:hover {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+  color: #0f172a !important;
+}
+
+/* Chart & Analytics Adaptation */
+:root.light .recharts-cartesian-grid-horizontal line,
+:root.light .recharts-cartesian-grid-vertical line {
+  stroke: rgba(15, 23, 42, 0.06) !important;
+  stroke-dasharray: 2 2 !important;
+}
+
+:root.light .recharts-text {
+  fill: #475569 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+}
+
+:root.light .recharts-legend-item-text {
+  color: #475569 !important;
+}
+
+/* Scrollbars for Light Mode */
+:root.light ::-webkit-scrollbar-track {
+  background: #f4f7fb;
+}
+:root.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+

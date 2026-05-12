@@ -1,378 +1,125 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Shield, Bell, Database, Edit2, Trash2, X, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { 
+  Target, MapPin, Wifi, Database, Palette, ShieldCheck, 
+  ChevronRight, Settings as SettingsIcon
+} from "lucide-react";
 import { Card } from "../components/ui/Card";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "../lib/AuthContext";
 
-const ALL_MODULES = ["Dashboard", "MIS Entry", "Operations", "Fleet Control", "Inventory", "Analytics", "Reports", "Settings"];
+// Lazy Load Settings Modules for peak performance
+const OperationalTargets = lazy(() => import("../components/settings/OperationalTargets"));
+const SiteConfiguration = lazy(() => import("../components/settings/SiteConfiguration"));
+const PWAOffline = lazy(() => import("../components/settings/PWAOffline"));
+const BackupRecovery = lazy(() => import("../components/settings/BackupRecovery"));
+const Appearance = lazy(() => import("../components/settings/Appearance"));
+const Security = lazy(() => import("../components/settings/Security"));
+
+const TABS = [
+  { id: "targets", label: "Operational Targets", icon: Target, component: OperationalTargets, desc: "Intelligence & Quotas" },
+  { id: "infrastructure", label: "Site Configuration", icon: MapPin, component: SiteConfiguration, desc: "Zone & Fleet Nodes" },
+  { id: "uplink", label: "PWA & Offline", icon: Wifi, component: PWAOffline, desc: "Sync & Cache Health" },
+  { id: "governance", label: "Backup & Recovery", icon: Database, component: BackupRecovery, desc: "State Archival" },
+  { id: "optics", label: "Appearance", icon: Palette, component: Appearance, desc: "Theme & Optics" },
+  { id: "protocol", label: "Security", icon: ShieldCheck, component: Security, desc: "Auth & Session Audit" },
+];
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState("roles");
-  const [roles, setRoles] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState(null);
-  
-  // Modals state
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState(null);
-  const [roleForm, setRoleForm] = useState({ name: "", permissions: [] });
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [roleToDelete, setRoleToDelete] = useState(null);
+  const [activeTab, setActiveTab] = useState("targets");
 
-  const { refreshUser } = useAuth();
-
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [rolesRes, usersRes] = await Promise.all([
-        supabase.from("roles").select("*").order("created_at", { ascending: true }),
-        supabase.from("users").select("*, roles(name)").order("name", { ascending: true })
-      ]);
-      if (rolesRes.error) throw rolesRes.error;
-      if (usersRes.error) throw usersRes.error;
-      
-      setRoles(rolesRes.data || []);
-      setUsers(usersRes.data || []);
-    } catch (err) {
-      console.error(err);
-      showToast(err.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // ROLE MANAGEMENT
-  const openRoleModal = (role = null) => {
-    if (role) {
-      setEditingRole(role);
-      setRoleForm({ name: role.name, permissions: role.permissions || [] });
-    } else {
-      setEditingRole(null);
-      setRoleForm({ name: "", permissions: [] });
-    }
-    setIsRoleModalOpen(true);
-  };
-
-  const togglePermission = (module) => {
-    const isSelected = roleForm.permissions.includes(module);
-    if (module === "All Modules") {
-      setRoleForm({ ...roleForm, permissions: isSelected ? [] : ["All Modules"] });
-      return;
-    }
-
-    let newPerms = isSelected 
-      ? roleForm.permissions.filter(p => p !== module)
-      : [...roleForm.permissions.filter(p => p !== "All Modules"), module];
-      
-    if (newPerms.length === ALL_MODULES.length) {
-      newPerms = ["All Modules"];
-    }
-    setRoleForm({ ...roleForm, permissions: newPerms });
-  };
-
-  const saveRole = async () => {
-    if (!roleForm.name.trim()) {
-      showToast("Role name is required", "error");
-      return;
-    }
-    try {
-      if (editingRole) {
-        const { error } = await supabase.from("roles").update({
-          name: roleForm.name,
-          permissions: roleForm.permissions
-        }).eq("id", editingRole.id);
-        if (error) throw error;
-        showToast("Role updated successfully");
-      } else {
-        const { error } = await supabase.from("roles").insert([{
-          name: roleForm.name,
-          permissions: roleForm.permissions
-        }]);
-        if (error) throw error;
-        showToast("Role created successfully");
-      }
-      setIsRoleModalOpen(false);
-      fetchData();
-      refreshUser(); // Refresh current user's permissions in case their role changed
-    } catch (err) {
-      showToast(err.message, "error");
-    }
-  };
-
-  const confirmDeleteRole = (role) => {
-    setRoleToDelete(role);
-    setIsDeleteModalOpen(true);
-  };
-
-  const deleteRole = async () => {
-    try {
-      const { error } = await supabase.from("roles").delete().eq("id", roleToDelete.id);
-      if (error) throw error;
-      showToast("Role deleted successfully");
-      setIsDeleteModalOpen(false);
-      fetchData();
-    } catch (err) {
-      showToast(err.message, "error");
-    }
-  };
-
-  // USER MANAGEMENT
-  const assignUserRole = async (userId, roleId) => {
-    try {
-      const { error } = await supabase.from("users").update({ role_id: roleId }).eq("id", userId);
-      if (error) throw error;
-      showToast("User role updated");
-      fetchData();
-      refreshUser();
-    } catch (err) {
-      showToast(err.message, "error");
-    }
-  };
+  const ActiveComponent = TABS.find(t => t.id === activeTab)?.component || OperationalTargets;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="space-y-6 max-w-5xl mx-auto relative"
-    >
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg ${
-              toast.type === "success" ? "bg-success text-white" : "bg-danger text-white"
-            }`}
-          >
-            {toast.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-            <span className="font-medium">{toast.message}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-white">Platform Settings</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="md:col-span-1 space-y-2">
-          <button 
-            onClick={() => setActiveTab("roles")}
-            className={`w-full flex items-center gap-3 p-3 rounded-xl font-medium text-left transition-colors ${activeTab === 'roles' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:bg-dark-border/50 hover:text-white'}`}
-          >
-            <Shield size={20} /> Roles & Permissions
-          </button>
-          <button 
-            onClick={() => setActiveTab("users")}
-            className={`w-full flex items-center gap-3 p-3 rounded-xl font-medium text-left transition-colors ${activeTab === 'users' ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:bg-dark-border/50 hover:text-white'}`}
-          >
-            <UserPlus size={20} /> User Management
-          </button>
-          <button 
-            onClick={() => showToast("Notifications module coming soon", "error")}
-            className="w-full flex items-center gap-3 p-3 rounded-xl text-gray-400 hover:bg-dark-border/50 hover:text-white font-medium text-left transition-colors"
-          >
-            <Bell size={20} /> Notifications
-          </button>
-          <button 
-            onClick={() => showToast("Backups module coming soon", "error")}
-            className="w-full flex items-center gap-3 p-3 rounded-xl text-gray-400 hover:bg-dark-border/50 hover:text-white font-medium text-left transition-colors"
-          >
-            <Database size={20} /> Data Backups
-          </button>
-        </div>
-
-        <div className="md:col-span-3">
-          {activeTab === "roles" && (
-            <Card>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-white">Roles & Access Control</h3>
-                <Button onClick={() => openRoleModal()} variant="primary" size="sm" className="gap-2 text-xs">
-                  <Shield size={14} /> Add Role
-                </Button>
-              </div>
-              
-              {loading ? (
-                <div className="space-y-4">
-                  {[1,2,3].map(i => <div key={i} className="h-24 bg-dark-bg/50 animate-pulse rounded-xl"></div>)}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {roles.map(role => (
-                    <div key={role.id} className="p-4 rounded-xl border border-dark-border bg-dark-bg/30 relative group">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-bold text-white">{role.name}</div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-400 font-medium px-2 py-1 bg-dark-bg rounded-full border border-dark-border">
-                            {users.filter(u => u.role_id === role.id).length} Users
-                          </span>
-                          <button onClick={() => openRoleModal(role)} className="p-1.5 text-gray-400 hover:text-primary transition-colors opacity-0 group-hover:opacity-100 bg-dark-bg rounded">
-                            <Edit2 size={14} />
-                          </button>
-                          <button onClick={() => confirmDeleteRole(role)} className="p-1.5 text-gray-400 hover:text-danger transition-colors opacity-0 group-hover:opacity-100 bg-dark-bg rounded">
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {role.permissions?.map(perm => (
-                          <span key={perm} className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-1 text-gray-300">
-                            {perm}
-                          </span>
-                        ))}
-                        {(!role.permissions || role.permissions.length === 0) && (
-                          <span className="text-xs text-gray-500 italic">No permissions assigned</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {roles.length === 0 && <div className="text-center text-gray-500 py-8">No roles found</div>}
-                </div>
-              )}
-            </Card>
-          )}
-
-          {activeTab === "users" && (
-            <Card>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-white">User Management</h3>
-              </div>
-              
-              {loading ? (
-                <div className="space-y-4">
-                  {[1,2,3].map(i => <div key={i} className="h-16 bg-dark-bg/50 animate-pulse rounded-xl"></div>)}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {users.map(user => (
-                    <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg bg-dark-bg/50 border border-dark-border gap-4">
-                      <div className="flex items-center gap-3">
-                        <img src={user.avatar_url || "https://i.pravatar.cc/150"} alt={user.name} className="w-10 h-10 rounded-full object-cover border border-dark-border" />
-                        <div>
-                          <div className="font-medium text-sm text-white">{user.name}</div>
-                          <div className="text-xs text-gray-400">{user.email}</div>
-                        </div>
-                      </div>
-                      <div className="w-full sm:w-48">
-                        <select
-                          value={user.role_id || ""}
-                          onChange={(e) => assignUserRole(user.id, e.target.value)}
-                          className="w-full h-9 rounded-lg border border-dark-border bg-dark-bg/80 px-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
-                        >
-                          <option value="" disabled>Select Role</option>
-                          {roles.map(r => (
-                            <option key={r.id} value={r.id}>{r.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  ))}
-                  {users.length === 0 && <div className="text-center text-gray-500 py-8">No users found</div>}
-                </div>
-              )}
-            </Card>
-          )}
+    <div className="h-[calc(100vh-120px)] flex flex-col overflow-hidden">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <div className="p-2 bg-white/5 border border-white/10 rounded-xl">
+              <SettingsIcon size={22} className="text-slate-400" />
+            </div>
+            Enterprise Operational Configuration
+          </h1>
+          <p className="text-slate-400 text-sm ml-14 -mt-1 font-medium">Master governance matrix and infrastructure tuning.</p>
         </div>
       </div>
 
-      {/* MODALS */}
-      <AnimatePresence>
-        {isRoleModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-dark-card border border-dark-border rounded-2xl shadow-xl overflow-hidden"
-            >
-              <div className="flex items-center justify-between p-5 border-b border-dark-border">
-                <h3 className="text-lg font-bold text-white">{editingRole ? "Edit Role" : "Create New Role"}</h3>
-                <button onClick={() => setIsRoleModalOpen(false)} className="text-gray-400 hover:text-white transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="p-5 space-y-5">
-                <div>
-                  <label className="text-sm font-medium text-gray-400 mb-1 block">Role Name</label>
-                  <Input 
-                    value={roleForm.name} 
-                    onChange={(e) => setRoleForm({...roleForm, name: e.target.value})}
-                    placeholder="e.g. Site Manager" 
-                    className="bg-dark-bg/80" 
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-400 mb-3 block">Permissions (Modules)</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input 
-                        type="checkbox" 
-                        checked={roleForm.permissions.includes("All Modules")}
-                        onChange={() => togglePermission("All Modules")}
-                        className="rounded border-dark-border bg-dark-bg text-primary focus:ring-primary/50" 
-                      />
-                      <span className="text-sm text-gray-300 group-hover:text-white transition-colors">All Modules (Admin)</span>
-                    </label>
-                    {ALL_MODULES.map(mod => (
-                      <label key={mod} className={`flex items-center gap-2 cursor-pointer group ${roleForm.permissions.includes("All Modules") ? "opacity-50" : ""}`}>
-                        <input 
-                          type="checkbox" 
-                          checked={roleForm.permissions.includes(mod) || roleForm.permissions.includes("All Modules")}
-                          onChange={() => togglePermission(mod)}
-                          disabled={roleForm.permissions.includes("All Modules")}
-                          className="rounded border-dark-border bg-dark-bg text-primary focus:ring-primary/50" 
-                        />
-                        <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{mod}</span>
-                      </label>
-                    ))}
+      <div className="flex flex-1 gap-6 overflow-hidden">
+        {/* Sidebar Navigation */}
+        <Card className="w-72 p-3 flex flex-col overflow-y-auto scrollbar-none bg-slate-950/20 backdrop-blur-md border-white/5 h-full shrink-0">
+          <nav className="space-y-1">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full group relative flex items-center gap-3.5 p-3 rounded-xl text-left transition-all duration-200 ${
+                    isActive 
+                      ? "bg-blue-600/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" 
+                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeIndicator"
+                      className="absolute inset-0 border border-blue-500/30 rounded-xl bg-[linear-gradient(110deg,transparent,rgba(59,130,246,0.05),transparent)] pointer-events-none"
+                    />
+                  )}
+                  {isActive && (
+                    <motion.div 
+                      layoutId="activeAccentLine"
+                      className="absolute left-0 top-3 bottom-3 w-[3px] bg-blue-500 rounded-full"
+                    />
+                  )}
+
+                  <div className={`p-2 rounded-lg transition-all ${
+                    isActive ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)]" : "bg-slate-900 text-slate-500 group-hover:bg-slate-800 group-hover:text-slate-300"
+                  }`}>
+                    <Icon size={16} />
                   </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-end gap-3 p-5 border-t border-dark-border bg-dark-bg/30">
-                <Button onClick={() => setIsRoleModalOpen(false)} variant="outline">Cancel</Button>
-                <Button onClick={saveRole} variant="primary">Save Role</Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
 
-        {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-dark-card border border-dark-border rounded-2xl shadow-xl overflow-hidden p-6 text-center"
-            >
-              <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="text-danger" size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Delete Role?</h3>
-              <p className="text-sm text-gray-400 mb-6">
-                Are you sure you want to delete the <span className="text-white font-medium">{roleToDelete?.name}</span> role? Users assigned to this role may lose access. This action cannot be undone.
-              </p>
-              <div className="flex gap-3">
-                <Button onClick={() => setIsDeleteModalOpen(false)} variant="outline" className="flex-1">Cancel</Button>
-                <Button onClick={deleteRole} className="flex-1 bg-danger hover:bg-danger/90 text-white">Delete</Button>
-              </div>
-            </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold tracking-wide truncate uppercase">{tab.label}</p>
+                    <p className={`text-[10px] truncate ${isActive ? "text-blue-400" : "text-slate-600"}`}>{tab.desc}</p>
+                  </div>
+
+                  <ChevronRight size={14} className={`transition-transform duration-200 ${
+                    isActive ? "opacity-100 translate-x-0 text-blue-400" : "opacity-0 -translate-x-2 text-slate-600"
+                  }`} />
+                </button>
+              );
+            })}
+          </nav>
+          
+          <div className="mt-auto pt-6 border-t border-white/5 px-3 pb-2 text-center">
+            <div className="text-[10px] text-slate-600 uppercase tracking-widest font-mono mb-1">Kernel Release</div>
+            <div className="text-xs font-bold text-slate-500">BM-SYS // STABLE 2.4.1</div>
           </div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        </Card>
+
+        {/* Content Space */}
+        <div className="flex-1 overflow-y-auto scrollbar-none relative h-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="pb-12"
+            >
+              <Suspense fallback={
+                <div className="h-full flex flex-col items-center justify-center pt-20 gap-4">
+                  <div className="w-10 h-10 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                  <p className="text-xs font-mono tracking-widest text-slate-500 uppercase">Decrypting Panel Sequence...</p>
+                </div>
+              }>
+                <ActiveComponent />
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
   );
 }
