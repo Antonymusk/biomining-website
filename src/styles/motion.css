@@ -1,0 +1,88 @@
+:root {
+  /* Centralized Easing Curves (Linear, Vercel, and Stripe style) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+
+  /* Centralized Durations */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+}
+
+/* Reusable Transition Presets */
+.transition-premium {
+  transition-property: transform, opacity, background-color, border-color, box-shadow;
+  transition-timing-function: var(--ease-out-expo);
+  transition-duration: var(--duration-normal);
+  will-change: transform, opacity;
+}
+
+/* GPU-friendly Skeleton Loader with Hardware Acceleration */
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.skeleton-shimmer-container {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.skeleton-shimmer-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.6s infinite ease-in-out;
+  will-change: transform;
+}
+
+/* Soft status pulsing micro-interaction */
+@keyframes status-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+.pulse-soft {
+  animation: status-pulse 2s infinite ease-in-out;
+}
+
+/* Hardware accelerated smooth hover states */
+.hover-premium {
+  transition: transform 0.18s var(--ease-out-expo), border-color 0.18s var(--ease-out-expo), box-shadow 0.18s var(--ease-out-expo);
+  will-change: transform, box-shadow;
+}
+
+.hover-premium:hover {
+  transform: translateY(-1.5px) translateZ(0);
+}
+
+/* Row hover highlight glow */
+.row-hover-glow {
+  transition: background-color 0.15s var(--ease-out-cubic), box-shadow 0.15s var(--ease-out-cubic);
+}
+
+.row-hover-glow:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+  box-shadow: inset 2px 0 0 var(--color-primary);
+}
