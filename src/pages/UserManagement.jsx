@@ -24,7 +24,7 @@ export default function UserManagement() {
     setLoading(true);
     try {
       // 1. Fetch sites
-      const { data: sitesData } = await supabase.from("inventory_sites").select("*");
+      const { data: sitesData } = await supabase.from("sites").select("*");
       setSites(sitesData || []);
 
       // 2. Load user roles from local storage / Supabase
