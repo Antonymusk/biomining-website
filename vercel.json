@@ -1,4 +1,7 @@
 {
+  "buildCommand": "cd biomine-app && npm install && npm run build",
+  "outputDirectory": "biomine-app/dist",
+  "installCommand": "echo 'Installing via build script'",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
