@@ -210,20 +210,21 @@
    ========================================== */
 
 :root.light {
-  --background: #eef2f6;
+  --background: #f4f6f9;
   --foreground: #121926;
-  --color-dark-bg: #eef2f6;
+  --color-dark-bg: #f4f6f9;
 }
 
 :root.light body {
-  background-color: #eef2f6 !important;
+  background-color: #f4f6f9 !important;
+  background-image: linear-gradient(135deg, #fcfdfe 0%, #eef2f6 100%) !important;
   color: #121926 !important;
-  background-image: none !important;
 }
 
 /* 1. CINEMATIC FLOATING LAYOUT ENGINE */
 :root.light div.flex.h-screen.w-full {
-  background-color: #eef2f6 !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(135deg, #fcfdfe 0%, #eef2f6 100%) !important;
 }
 
 /* Sidebar Wrapper (Floating Matte White Block) */
@@ -257,6 +258,7 @@
 :root.light header h1,
 :root.light header h2,
 :root.light header div,
+:root.light header span,
 :root.light header button {
   color: #121926 !important;
 }
@@ -264,7 +266,7 @@
 /* Main Dashboard Scroll View padding adjustment to line up with headers */
 :root.light main {
   padding-top: 16px !important;
-  background-color: #eef2f6 !important;
+  background-color: transparent !important;
 }
 
 /* 2. BERRY ACTIVE ELEMENTS (LAVENDER THEME) */
@@ -563,6 +565,109 @@
   border-radius: 8px;
 }
 
+/* 5. BERRY PREMIUM CONTRAST HARDENING (USER ENHANCED) */
+
+/* Custom Elevated Shadow for all Cards to pop on gradient bg */
+:root.light .glass-card,
+:root.light div.rounded-xl.border.border-white\/5,
+:root.light div.rounded-2xl.border.border-white\/5 {
+  box-shadow: 0 8px 30px rgba(94, 53, 177, 0.04), 0 1px 2px rgba(94, 53, 177, 0.03) !important;
+}
+
+/* High-Contrast Profile Menu Dropdown */
+:root.light .profile-dropdown {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(94, 53, 177, 0.15) !important;
+  box-shadow: 0 16px 45px rgba(94, 53, 177, 0.12) !important;
+  backdrop-filter: none !important;
+}
+
+:root.light .profile-dropdown *,
+:root.light .profile-dropdown div {
+  color: #364152 !important;
+}
+
+:root.light .profile-dropdown div.border-b,
+:root.light .profile-dropdown div.h-px {
+  background-color: #eef2f6 !important;
+  border-color: #eef2f6 !important;
+}
+
+:root.light .profile-dropdown button {
+  color: #364152 !important;
+}
+
+:root.light .profile-dropdown button:hover {
+  background-color: #ede7f6 !important;
+  color: #5e35b1 !important;
+}
+
+:root.light .profile-dropdown button.text-danger {
+  color: #ef4444 !important;
+}
+
+:root.light .profile-dropdown button.text-danger:hover {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* Target nested theme segmented control in Profile menu */
+:root.light .profile-dropdown .bg-slate-900\/60 {
+  background-color: #f8fafc !important;
+  border: 1px solid #eef2f6 !important;
+}
+
+:root.light .profile-dropdown button span.text-xs + span {
+  color: #364152 !important;
+}
+
+/* Inner Alarm & Predictive Risk Container Deep Fix */
+:root.light div.bg-slate-950\/60 {
+  background-color: #ffffff !important;
+  border: 1px solid #eef2f6 !important;
+  box-shadow: 0 4px 12px rgba(32, 40, 45, 0.02) !important;
+}
+
+/* Predictive Risk (Amber Variant) Alert Box */
+:root.light div.border-amber-500\/30 {
+  background-color: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+}
+
+:root.light div.border-amber-500\/30 h4,
+:root.light div.border-amber-500\/30 p,
+:root.light div.border-amber-500\/30 span {
+  color: #92400e !important;
+}
+
+/* Predictive Risk (Red Variant) Alert Box */
+:root.light div.border-red-500\/30 {
+  background-color: #fff5f5 !important;
+  border: 1px solid #fecaca !important;
+}
+
+:root.light div.border-red-500\/30 h4,
+:root.light div.border-red-500\/30 p,
+:root.light div.border-red-500\/30 span {
+  color: #c53030 !important;
+}
+
+/* Text Safety Override inside Predictive Risk Cards */
+:root.light div.bg-red-950\/10 {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(94, 53, 177, 0.08) !important;
+}
+
+:root.light div.bg-red-950\/10 h3 {
+  color: #121926 !important;
+}
+
+/* Absolute Global Cleanup for any lingering "text-white" utility issues in Light mode */
+:root.light h3.text-white,
+:root.light h4.text-white {
+  color: #121926 !important;
+}
+
 :root.light ::-webkit-scrollbar-thumb:hover {
   background: #90a4ae;
 }
@@ -718,6 +823,159 @@
   66% { transform: translate(8px, -5px) scale(1.02) rotate(-2deg); }
   100% { transform: translate(0, 0) scale(1) rotate(0deg); }
 }
+
+/* 6. AI COPILOT LIGHT THEME ENGINE */
+:root.light .ai-copilot-window {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(94, 53, 177, 0.12) !important;
+  box-shadow: 0 20px 50px rgba(94, 53, 177, 0.1) !important;
+  backdrop-filter: none !important;
+}
+
+:root.light .ai-header {
+  background-image: linear-gradient(to right, rgba(94, 53, 177, 0.04), rgba(33, 150, 243, 0.02)) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:root.light .ai-header h3 {
+  color: #121926 !important;
+}
+
+:root.light .ai-messages-box {
+  background-color: #fcfcfd !important;
+}
+
+:root.light .ai-bubble-bot {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #364152 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+}
+
+:root.light .ai-bubble-bot strong,
+:root.light .ai-bubble-bot b {
+  color: #121926 !important;
+}
+
+:root.light .ai-input-field {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #121926 !important;
+}
+
+:root.light .ai-input-field:focus {
+  border-color: #5e35b1 !important;
+}
+
+:root.light form.border-t {
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background-color: #ffffff !important;
+}
+
+:root.light button.rounded-2xl.shadow-\[0_8px_30px_rgb\(94\,53\,177\,0\.3\)\] {
+  box-shadow: 0 8px 25px rgba(94, 53, 177, 0.25) !important;
+}
+
+/* 7. SYSTEM ERROR & RESTRICTION SCREENS (PROTECTED ROUTE ENGINE) */
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg {
+  background-color: #f4f6f9 !important;
+  background-image: linear-gradient(135deg, #fcfdfe 0%, #eef2f6 100%) !important;
+}
+
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg .glass-card {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(94, 53, 177, 0.08) !important;
+  box-shadow: 0 20px 40px rgba(94, 53, 177, 0.06) !important;
+  backdrop-filter: none !important;
+}
+
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg .glass-card h2 {
+  color: #121926 !important;
+}
+
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg .glass-card p {
+  color: #697586 !important;
+}
+
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg .glass-card .bg-dark-bg\/40 {
+  background-color: #f8fafc !important;
+  border: 1px solid #eef2f6 !important;
+}
+
+:root.light div.h-screen.w-screen.flex-col.bg-dark-bg .glass-card .bg-dark-bg\/40 * {
+  color: #364152 !important;
+}
+
+/* Handle local page access restriction cards within standard layout */
+:root.light div.h-\[70vh\].bg-dark-card\/50 {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(94, 53, 177, 0.08) !important;
+  box-shadow: 0 8px 30px rgba(94, 53, 177, 0.04) !important;
+}
+
+:root.light div.h-\[70vh\].bg-dark-card\/50 h2 {
+  color: #121926 !important;
+}
+
+:root.light div.h-\[70vh\].bg-dark-card\/50 p,
+:root.light div.h-\[70vh\].bg-dark-card\/50 span.text-gray-400 {
+  color: #697586 !important;
+}
+
+:root.light div.h-\[70vh\].bg-dark-card\/50 span.text-white {
+  color: #121926 !important;
+}
+
+/* 8. ELITE INTERACTIVE GLOW ENGINE */
+.glass-card,
+.bg-dark-card {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.glass-card::after,
+.bg-dark-card::after {
+  content: "";
+  position: absolute;
+  inset: -0.5px;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: linear-gradient(135deg, #5e35b1, #2196f3, #00e676, #5e35b1);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+.glass-card:hover,
+.bg-dark-card:hover {
+  box-shadow: 0 20px 40px rgba(94, 53, 177, 0.08) !important;
+}
+
+.glass-card:hover::after,
+.bg-dark-card:hover::after {
+  opacity: 0.4;
+  animation: glow-boundary-spin 4s ease infinite;
+}
+
+/* High-contrast gentle pulse for Light Mode cards on hover */
+:root.light .glass-card:hover::after,
+:root.light .bg-dark-card:hover::after {
+  opacity: 0.3;
+  background: linear-gradient(135deg, #5e35b1, #6200ea, #0288d1, #5e35b1);
+}
+
+@keyframes glow-boundary-spin {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
 
 
 

@@ -80,25 +80,78 @@ export default function Reports() {
             <head>
               <title>MIS Report - ${selectedSite === 'all' ? 'All Sites' : selectedSite}</title>
               <style>
-                body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; background-color: #ffffff; color: #1e293b; line-height: 1.5; }
-                h1 { color: #0f172a; border-bottom: 2px solid #3b82f6; padding-bottom: 12px; margin-bottom: 5px; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
-                .meta { margin-bottom: 30px; font-size: 13px; color: #64748b; background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
-                .meta p { margin: 4px 0; }
-                .site-header { font-size: 18px; font-weight: bold; margin-top: 30px; margin-bottom: 12px; color: #1e3a8a; text-transform: uppercase; border-bottom: 1px solid #bfdbfe; padding-bottom: 6px; }
-                .section-title { font-size: 14px; font-weight: bold; margin-top: 20px; margin-bottom: 8px; color: #3b82f6; text-transform: uppercase; }
-                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-                th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
-                th { background-color: #f1f5f9; font-weight: 600; color: #334155; }
-                .totals { font-weight: bold; background-color: #f8fafc; }
+                body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; background-color: #ffffff; color: #364152; line-height: 1.6; }
+                .branding-header { 
+                  background: linear-gradient(135deg, #5e35b1 0%, #3949ab 100%);
+                  color: white;
+                  padding: 30px;
+                  border-radius: 16px;
+                  margin-bottom: 30px;
+                  box-shadow: 0 10px 20px rgba(94, 53, 177, 0.15);
+                }
+                .branding-header h1 { 
+                  margin: 0; 
+                  font-size: 22px; 
+                  text-transform: uppercase; 
+                  letter-spacing: 1px; 
+                  font-weight: 800; 
+                }
+                .branding-header p {
+                  margin: 5px 0 0 0;
+                  opacity: 0.8;
+                  font-size: 12px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                }
+                .meta-container { 
+                  display: flex; 
+                  justify-content: space-between; 
+                  margin-bottom: 30px; 
+                  font-size: 12px; 
+                  background-color: #fcfdfe; 
+                  padding: 15px 20px; 
+                  border-radius: 12px; 
+                  border: 1px solid #eef2f6; 
+                }
+                .meta-item strong { color: #121926; }
+                .site-header { 
+                  font-size: 16px; 
+                  font-weight: 800; 
+                  margin-top: 35px; 
+                  margin-bottom: 15px; 
+                  color: #5e35b1; 
+                  text-transform: uppercase; 
+                  border-bottom: 2px solid #ede7f6; 
+                  padding-bottom: 8px; 
+                }
+                .section-title { 
+                  font-size: 13px; 
+                  font-weight: 700; 
+                  margin-top: 20px; 
+                  margin-bottom: 10px; 
+                  color: #3949ab; 
+                  background: #e8eaf6;
+                  padding: 4px 12px;
+                  border-radius: 6px;
+                  display: inline-block;
+                }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 11.5px; border-radius: 8px; overflow: hidden; }
+                th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+                th { background-color: #f8fafc; font-weight: 700; color: #4b5563; font-size: 11px; text-transform: uppercase; }
+                tr:nth-child(even) td { background-color: #fafafa; }
+                .totals { font-weight: bold; background-color: #f5f3ff !important; color: #5e35b1 !important; border-top: 2px solid #ede7f6; }
                 .page-break { page-break-after: always; }
               </style>
             </head>
             <body>
-              <h1>BIOMINE OPERATIONAL INTELLIGENCE REPORT</h1>
-              <div class="meta">
-                <p><strong>Site Mode:</strong> ${selectedSite === 'all' ? 'Consolidated (All Sites)' : selectedSite}</p>
-                <p><strong>Date Range:</strong> ${startDate} to ${endDate}</p>
-                <p><strong>Exported On:</strong> ${new Date().toLocaleDateString()}</p>
+              <div class="branding-header">
+                <h1>BioMine Operational Intelligence Core</h1>
+                <p>Executive Summary Performance Document</p>
+              </div>
+              <div class="meta-container">
+                <div class="meta-item"><strong>Mode:</strong> ${selectedSite === 'all' ? 'Consolidated Network' : selectedSite}</div>
+                <div class="meta-item"><strong>Interval:</strong> ${startDate} — ${endDate}</div>
+                <div class="meta-item"><strong>Issued:</strong> ${new Date().toLocaleDateString()}</div>
               </div>
         `;
 

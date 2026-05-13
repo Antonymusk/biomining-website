@@ -217,7 +217,7 @@ export const TopHeader = React.memo(function TopHeader({ setIsMobileOpen, title 
                 initial={{ opacity: 0, y: 8, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                className="absolute right-0 mt-2 w-48 rounded-lg border border-white/5 bg-slate-950/95 backdrop-blur-xl shadow-xl z-[100] p-1"
+                className="absolute right-0 mt-2 w-48 rounded-lg border border-white/5 bg-slate-950/95 backdrop-blur-xl shadow-xl z-[100] p-1 profile-dropdown"
               >
                 <div className="p-2 border-b border-white/5 sm:hidden">
                   <p className="text-sm font-medium text-white">{user?.name || "Guest User"}</p>

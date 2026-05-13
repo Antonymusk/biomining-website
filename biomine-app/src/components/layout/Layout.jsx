@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { TopHeader } from "./TopHeader";
 import { Search, Command, CornerDownLeft, Activity } from "lucide-react";
+import { AICopilot } from "./AICopilot";
 
 export function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -208,6 +209,7 @@ export function Layout() {
           </div>
         )}
       </AnimatePresence>
+      <AICopilot />
     </div>
   );
 }
