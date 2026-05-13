@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { AuthProvider } from './lib/AuthContext'
 import { AppearanceProvider } from './lib/AppearanceContext'
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Analytics } from "@vercel/analytics/react"
 
 // Developer Console Utility: Safe Service Worker Unregister Logic
 window.unregisterBioMineSW = async () => {
@@ -73,6 +74,7 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <AppearanceProvider>
         <App />
+        <Analytics />
         <SpeedInsights />
       </AppearanceProvider>
     </AuthProvider>
