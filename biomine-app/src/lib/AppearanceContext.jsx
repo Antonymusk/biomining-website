@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AppearanceContext = createContext();
 
 const DEFAULT_SETTINGS = {
-  theme: "dark",
+  theme: "light",
   density: "comfortable",
   reduceMotion: false,
   glassIntensity: 16,

@@ -94,10 +94,10 @@ export function Layout() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-dark-bg text-foreground relative">
-      {/* Background Animated Rich Gradient Blobs */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[130px] animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-accent/8 blur-[160px] animate-pulse" style={{ animationDuration: '12s' }} />
+      {/* Background Animated Rich Cinematic Gradient Blobs */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-80">
+        <div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[140px] animate-ambient-1" />
+        <div className="absolute -bottom-40 -right-40 h-[700px] w-[700px] rounded-full bg-accent/8 blur-[160px] animate-ambient-2" />
       </div>
 
       <Sidebar 
