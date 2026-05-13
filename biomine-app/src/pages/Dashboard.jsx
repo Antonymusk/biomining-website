@@ -71,6 +71,31 @@ const TargetGauge = ({ current, target, title="Achieved", size=44, scoreMode=fal
   );
 };
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.05 }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: "spring", stiffness: 100, damping: 16 } 
+  }
+};
+
+const cardHoverState = {
+  y: -6,
+  scale: 1.012,
+  boxShadow: "0 20px 30px -10px rgba(0,0,0,0.08)",
+  transition: { type: "spring", stiffness: 400, damping: 25 }
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -147,7 +172,6 @@ export default function Dashboard() {
 
       // 2. Fetch Alerts
       let alertQuery = supabase.from('operational_alerts').select('*').eq('status', 'active');
-      // Only filter alerts by site if not global view
       if (!isGlobal) alertQuery = alertQuery.eq('site', selectedSite);
       
       const { data: alertData } = await alertQuery.order('created_at', { ascending: false });
@@ -195,33 +219,26 @@ export default function Dashboard() {
   const targetEfficiency = Number(siteTargets.fuelEfficiency || 0.6);
   const efficiency = currentDisposal > 0 ? (currentDiesel / currentDisposal) : 0;
 
-  // -------------------------------------------------
-  // CORE ENTERPRISE FEATURE: SITE HEALTH SCORE (0-100)
-  // -------------------------------------------------
   const calculateHealthScore = () => {
      let score = 100;
      
-     // 1. Target Disposal Efficiency (Weight: 40%)
      const disposalPct = Math.min(100, (currentDisposal / targetDisposal) * 100);
      score -= (100 - disposalPct) * 0.4;
 
-     // 2. Fuel Performance (Weight: 20%)
      if (efficiency > targetEfficiency) {
         const variance = (efficiency - targetEfficiency) / targetEfficiency;
-        score -= Math.min(20, variance * 50); // Drop up to 20 pts for fuel variance
+        score -= Math.min(20, variance * 50);
      }
 
-     // 3. Alert Deduction (Weight: 20%)
      const siteAlertsCount = alerts.length; 
      score -= Math.min(20, siteAlertsCount * 5);
 
-     // 4. Fleet Uptime (Weight: 20%)
      const totalFleet = fleetStats.active + fleetStats.maintenance + fleetStats.idle + fleetStats.offline;
      if (totalFleet > 0) {
         const uptimePct = (fleetStats.active / totalFleet) * 100;
         score -= (100 - uptimePct) * 0.2;
      } else {
-        score -= 5; // Penalty for no fleet visibility
+        score -= 5;
      }
 
      return Math.max(0, Math.round(score));
@@ -239,10 +256,18 @@ export default function Dashboard() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pb-12">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 pb-12"
+    >
       
       {/* HEADER: SITE-CENTRIC GOVERNANCE */}
-      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-white/5 pb-5">
+      <motion.div 
+        variants={cardVariants}
+        className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-white/5 pb-5"
+      >
         <div>
           <div className="flex items-center gap-2 text-[10px] font-bold text-cyan-500 uppercase tracking-widest">
             <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-ping"></div>
@@ -279,158 +304,176 @@ export default function Dashboard() {
             <Plus size={14} /> Log Ops
           </Button>
         </div>
-      </div>
+      </motion.div>
 
       {/* LAYER 1: EXECUTIVE METRICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <motion.div variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* SITE HEALTH SCORE */}
-        <Card className="lg:col-span-4 relative overflow-hidden bg-slate-950 flex flex-col justify-center items-center p-6 border-white/10">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-500 to-emerald-500 opacity-50" />
-          <h3 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">
-             {selectedSite === 'ALL_SITES_GLOBAL' ? 'Executive Enterprise Health' : 'Overall Site Health'}
-          </h3>
-          
-          <TargetGauge current={healthScore} target={100} title="Score" scoreMode={true} size={44} />
-          
-          <div className="mt-4 text-center">
-             <div className={`text-xs font-black uppercase tracking-widest ${healthScore > 80 ? 'text-emerald-500' : healthScore > 50 ? 'text-warning' : 'text-danger'}`}>
-                {healthScore > 80 ? 'Nominal Status' : healthScore > 50 ? 'Degraded Performance' : 'Critical Operations'}
-             </div>
-             <p className="text-[9px] text-gray-500 mt-1">Real-time composite of disposal, fuel, & fleet telemetry.</p>
-          </div>
-        </Card>
+        <motion.div 
+          className="lg:col-span-4"
+          variants={cardVariants}
+          whileHover={cardHoverState}
+        >
+          <Card className="h-full relative overflow-hidden bg-slate-950 flex flex-col justify-center items-center p-6 border-white/10 cursor-pointer">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-cyan-500 to-emerald-500 opacity-50" />
+            <h3 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">
+               {selectedSite === 'ALL_SITES_GLOBAL' ? 'Executive Enterprise Health' : 'Overall Site Health'}
+            </h3>
+            
+            <TargetGauge current={healthScore} target={100} title="Score" scoreMode={true} size={44} />
+            
+            <div className="mt-4 text-center">
+               <div className={`text-xs font-black uppercase tracking-widest ${healthScore > 80 ? 'text-emerald-500' : healthScore > 50 ? 'text-warning' : 'text-danger'}`}>
+                  {healthScore > 80 ? 'Nominal Status' : healthScore > 50 ? 'Degraded Performance' : 'Critical Operations'}
+               </div>
+               <p className="text-[9px] text-gray-500 mt-1">Real-time composite of disposal, fuel, & fleet telemetry.</p>
+            </div>
+          </Card>
+        </motion.div>
 
         {/* PRODUCTION DIRECTIVE HERO */}
-        <Card className="lg:col-span-8 relative bg-[#0D1117] border-emerald-500/10 flex flex-col md:flex-row gap-6 p-6 overflow-hidden">
-           <div className="absolute -right-20 -bottom-20 opacity-5 text-emerald-500"><Target size={250} /></div>
-           
-           <div className="flex-1 flex flex-col justify-between">
-              <div>
-                 <h3 className="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-1">Operational Targets</h3>
-                 <h2 className="text-2xl font-extrabold text-white tracking-tight">Shift Disposal Pipeline</h2>
-              </div>
+        <motion.div 
+          className="lg:col-span-8"
+          variants={cardVariants}
+          whileHover={cardHoverState}
+        >
+          <Card className="h-full relative bg-[#0D1117] border-emerald-500/10 flex flex-col md:flex-row gap-6 p-6 overflow-hidden cursor-pointer">
+             <div className="absolute -right-20 -bottom-20 opacity-5 text-emerald-500"><Target size={250} /></div>
+             
+             <div className="flex-1 flex flex-col justify-between">
+                <div>
+                   <h3 className="text-[11px] font-black text-emerald-500 uppercase tracking-widest mb-1">Operational Targets</h3>
+                   <h2 className="text-2xl font-extrabold text-white tracking-tight">Shift Disposal Pipeline</h2>
+                </div>
 
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                 <div>
-                    <div className="text-[10px] font-bold text-gray-500 uppercase">Directive</div>
-                    <div className="text-2xl font-black text-white font-mono">{targetDisposal} <span className="text-[10px] font-normal text-gray-500">T</span></div>
-                 </div>
-                 <div>
-                    <div className="text-[10px] font-bold text-emerald-500 uppercase">Achieved</div>
-                    <div className="text-2xl font-black text-emerald-400 font-mono">{currentDisposal} <span className="text-[10px] font-normal text-gray-500">T</span></div>
-                 </div>
-                 <div>
-                    <div className="text-[10px] font-bold text-cyan-500 uppercase">Remaining</div>
-                    <div className="text-2xl font-black text-cyan-400 font-mono">{remainingTarget} <span className="text-[10px] font-normal text-gray-500">T</span></div>
-                 </div>
-              </div>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                   <div>
+                      <div className="text-[10px] font-bold text-gray-500 uppercase">Directive</div>
+                      <div className="text-2xl font-black text-white font-mono">{targetDisposal} <span className="text-[10px] font-normal text-gray-500">T</span></div>
+                   </div>
+                   <div>
+                      <div className="text-[10px] font-bold text-emerald-500 uppercase">Achieved</div>
+                      <div className="text-2xl font-black text-emerald-400 font-mono">{currentDisposal} <span className="text-[10px] font-normal text-gray-500">T</span></div>
+                   </div>
+                   <div>
+                      <div className="text-[10px] font-bold text-cyan-500 uppercase">Remaining</div>
+                      <div className="text-2xl font-black text-cyan-400 font-mono">{remainingTarget} <span className="text-[10px] font-normal text-gray-500">T</span></div>
+                   </div>
+                </div>
 
-              <div className="mt-6 bg-white/5 p-3 rounded-lg flex items-center gap-3 border border-white/5">
-                 <div className={`p-2 rounded-md ${remainingTarget === 0 ? 'bg-emerald-500/20' : 'bg-cyan-500/20'}`}>
-                    {remainingTarget === 0 ? <CheckCircle2 className="text-emerald-400" size={16} /> : <Clock className="text-cyan-400" size={16} />}
-                 </div>
-                 <div className="text-xs text-gray-300">
-                    {remainingTarget === 0 
-                       ? <b className="text-emerald-400">Production cycle finalized.</b> 
-                       : <span>Active Shift. <b>{remainingTarget} Tons</b> left to capture today.</span>}
-                 </div>
-              </div>
-           </div>
+                <div className="mt-6 bg-white/5 p-3 rounded-lg flex items-center gap-3 border border-white/5">
+                   <div className={`p-2 rounded-md ${remainingTarget === 0 ? 'bg-emerald-500/20' : 'bg-cyan-500/20'}`}>
+                      {remainingTarget === 0 ? <CheckCircle2 className="text-emerald-400" size={16} /> : <Clock className="text-cyan-400" size={16} />}
+                   </div>
+                   <div className="text-xs text-gray-300">
+                      {remainingTarget === 0 
+                         ? <b className="text-emerald-400">Production cycle finalized.</b> 
+                         : <span>Active Shift. <b>{remainingTarget} Tons</b> left to capture today.</span>}
+                   </div>
+                </div>
+             </div>
 
-           <div className="shrink-0 flex items-center justify-center md:border-l md:border-white/5 md:pl-6">
-              <TargetGauge current={currentDisposal} target={targetDisposal} size={32} />
-           </div>
-        </Card>
-      </div>
+             <div className="shrink-0 flex items-center justify-center md:border-l md:border-white/5 md:pl-6">
+                <TargetGauge current={currentDisposal} target={targetDisposal} size={32} />
+             </div>
+          </Card>
+        </motion.div>
+      </motion.div>
 
       {/* LAYER 2: INTELLIGENCE GRID */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <motion.div variants={containerVariants} className="grid grid-cols-1 xl:grid-cols-3 gap-6">
          
          {/* PREDICTIVE RISKS */}
-         <Card className="p-5 border-red-500/20 bg-red-950/10">
-            <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-               <AlertTriangle size={16} className="text-red-400" /> Predictive Risks
-            </h3>
-            <div className="space-y-3 h-[180px] overflow-y-auto custom-scrollbar pr-1">
-               {efficiency > targetEfficiency * 1.15 && (
-                  <div className="p-3 bg-slate-950/60 border border-amber-500/30 rounded-xl flex gap-3 animate-pulse">
-                     <Droplets className="text-amber-400 shrink-0" size={16} />
-                     <div>
-                        <h4 className="text-[11px] font-bold text-white">Abnormal Fuel Variance</h4>
-                        <p className="text-[9px] text-gray-400">Ratio ({efficiency.toFixed(2)}) exceeds by +{Math.round(((efficiency-targetEfficiency)/targetEfficiency)*100)}%.</p>
-                     </div>
-                  </div>
-               )}
-               {currentDisposal === 0 && !dashboardLoading && (
-                  <div className="p-3 bg-slate-950/60 border border-red-500/30 rounded-xl flex gap-3">
-                     <Clock className="text-red-400 shrink-0" size={16} />
-                     <div>
-                        <h4 className="text-[11px] font-bold text-white">Operational Stagnation</h4>
-                        <p className="text-[9px] text-gray-400">No shift data injected.</p>
-                     </div>
-                  </div>
-               )}
-               {efficiency <= targetEfficiency && currentDisposal > 0 && (
-                  <div className="h-full flex flex-col items-center justify-center opacity-40">
-                     <CheckCircle2 size={32} className="text-emerald-500 mb-2" />
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Grid Nominal</p>
-                  </div>
-               )}
-            </div>
-         </Card>
+         <motion.div variants={cardVariants} whileHover={cardHoverState}>
+           <Card className="h-full p-5 border-red-500/20 bg-red-950/10 cursor-pointer">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                 <AlertTriangle size={16} className="text-red-400" /> Predictive Risks
+              </h3>
+              <div className="space-y-3 h-[180px] overflow-y-auto custom-scrollbar pr-1">
+                 {efficiency > targetEfficiency * 1.15 && (
+                    <div className="p-3 bg-slate-950/60 border border-amber-500/30 rounded-xl flex gap-3 animate-pulse">
+                       <Droplets className="text-amber-400 shrink-0" size={16} />
+                       <div>
+                          <h4 className="text-[11px] font-bold text-white">Abnormal Fuel Variance</h4>
+                          <p className="text-[9px] text-gray-400">Ratio ({efficiency.toFixed(2)}) exceeds by +{Math.round(((efficiency-targetEfficiency)/targetEfficiency)*100)}%.</p>
+                       </div>
+                    </div>
+                 )}
+                 {currentDisposal === 0 && !dashboardLoading && (
+                    <div className="p-3 bg-slate-950/60 border border-red-500/30 rounded-xl flex gap-3">
+                       <Clock className="text-red-400 shrink-0" size={16} />
+                       <div>
+                          <h4 className="text-[11px] font-bold text-white">Operational Stagnation</h4>
+                          <p className="text-[9px] text-gray-400">No shift data injected.</p>
+                       </div>
+                    </div>
+                 )}
+                 {efficiency <= targetEfficiency && currentDisposal > 0 && (
+                    <div className="h-full flex flex-col items-center justify-center opacity-40">
+                       <CheckCircle2 size={32} className="text-emerald-500 mb-2" />
+                       <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Grid Nominal</p>
+                    </div>
+                 )}
+              </div>
+           </Card>
+         </motion.div>
 
          {/* FLEET ACTIVITY BOARD */}
-         <Card className="p-5 border-white/10 bg-slate-950 relative overflow-hidden">
-            <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-               <Activity size={16} className="text-primary" /> Fleet Activity Board
-            </h3>
-            <div className="grid grid-cols-2 gap-3 mt-2">
-               <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
-                  <span className="text-[9px] font-black text-emerald-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active</span>
-                  <span className="text-2xl font-black text-white font-mono">{fleetStats.active}</span>
-               </div>
-               <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
-                  <span className="text-[9px] font-black text-cyan-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-cyan-500"></span> Idle</span>
-                  <span className="text-2xl font-black text-white font-mono">{fleetStats.idle}</span>
-               </div>
-               <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
-                  <span className="text-[9px] font-black text-warning uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-warning"></span> Repair</span>
-                  <span className="text-2xl font-black text-white font-mono">{fleetStats.maintenance}</span>
-               </div>
-               <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
-                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-gray-500"></span> Offline</span>
-                  <span className="text-2xl font-black text-white font-mono">{fleetStats.offline}</span>
-               </div>
-            </div>
-         </Card>
+         <motion.div variants={cardVariants} whileHover={cardHoverState}>
+           <Card className="h-full p-5 border-white/10 bg-slate-950 relative overflow-hidden cursor-pointer">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                 <Activity size={16} className="text-primary" /> Fleet Activity Board
+              </h3>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                 <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
+                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active</span>
+                    <span className="text-2xl font-black text-white font-mono">{fleetStats.active}</span>
+                 </div>
+                 <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
+                    <span className="text-[9px] font-black text-cyan-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-cyan-500"></span> Idle</span>
+                    <span className="text-2xl font-black text-white font-mono">{fleetStats.idle}</span>
+                 </div>
+                 <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
+                    <span className="text-[9px] font-black text-warning uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-warning"></span> Repair</span>
+                    <span className="text-2xl font-black text-white font-mono">{fleetStats.maintenance}</span>
+                 </div>
+                 <div className="bg-slate-900/50 p-3 rounded-lg border border-white/5 flex flex-col">
+                    <span className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-gray-500"></span> Offline</span>
+                    <span className="text-2xl font-black text-white font-mono">{fleetStats.offline}</span>
+                 </div>
+              </div>
+           </Card>
+         </motion.div>
 
          {/* FUEL EFFICIENCY */}
-         <Card className={`p-5 border-t-4 border-t-emerald-500 bg-slate-950`}>
-            <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-               <Droplets size={16} className="text-emerald-500" /> Ratio Threshold
-            </h3>
-            <div className="flex flex-col items-center justify-center py-2 space-y-1">
-               <div className="text-4xl font-black text-white font-mono">
-                  {efficiency.toFixed(2)}
-                  <span className="text-xs font-normal text-gray-500 ml-1">L/T</span>
-               </div>
-               <div className="text-[9px] font-bold text-gray-500 uppercase">Ceiling: {targetEfficiency.toFixed(2)} L/T</div>
-            </div>
-            <div className="mt-6 border-t border-white/5 pt-4">
-               <div className="flex justify-between text-[10px] mb-2 text-gray-400">
-                  <span>Diesel Input:</span>
-                  <span className="text-white font-black">{currentDiesel.toLocaleString()} L</span>
-               </div>
-               <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                  <div 
-                     className={`h-full ${efficiency > targetEfficiency ? 'bg-red-500' : 'bg-emerald-500'}`}
-                     style={{ width: `${Math.min(100, (efficiency / targetEfficiency) * 100)}%`, transition: 'width 1s' }}
-                  />
-               </div>
-            </div>
-         </Card>
-      </div>
+         <motion.div variants={cardVariants} whileHover={cardHoverState}>
+           <Card className={`h-full p-5 border-t-4 border-t-emerald-500 bg-slate-950 cursor-pointer`}>
+              <h3 className="text-sm font-black text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                 <Droplets size={16} className="text-emerald-500" /> Ratio Threshold
+              </h3>
+              <div className="flex flex-col items-center justify-center py-2 space-y-1">
+                 <div className="text-4xl font-black text-white font-mono">
+                    {efficiency.toFixed(2)}
+                    <span className="text-xs font-normal text-gray-500 ml-1">L/T</span>
+                 </div>
+                 <div className="text-[9px] font-bold text-gray-500 uppercase">Ceiling: {targetEfficiency.toFixed(2)} L/T</div>
+              </div>
+              <div className="mt-6 border-t border-white/5 pt-4">
+                 <div className="flex justify-between text-[10px] mb-2 text-gray-400">
+                    <span>Diesel Input:</span>
+                    <span className="text-white font-black">{currentDiesel.toLocaleString()} L</span>
+                 </div>
+                 <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                    <div 
+                       className={`h-full ${efficiency > targetEfficiency ? 'bg-red-500' : 'bg-emerald-500'}`}
+                       style={{ width: `${Math.min(100, (efficiency / targetEfficiency) * 100)}%`, transition: 'width 1s' }}
+                    />
+                 </div>
+              </div>
+           </Card>
+         </motion.div>
+      </motion.div>
     </motion.div>
   );
 }

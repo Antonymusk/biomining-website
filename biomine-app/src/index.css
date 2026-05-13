@@ -332,7 +332,7 @@
   border-radius: 16px !important;
 }
 
-/* Injecting Berry-style organic SVG vector circles in CSS */
+/* Injecting Berry-style organic SVG vector circles in CSS with custom motion */
 :root.light div.lg\:col-span-4.bg-slate-950::before {
   content: "";
   position: absolute;
@@ -343,6 +343,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
   pointer-events: none;
+  animation: berry-float-slow 18s infinite ease-in-out;
 }
 
 :root.light div.lg\:col-span-4.bg-slate-950::after {
@@ -355,6 +356,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   pointer-events: none;
+  animation: berry-float-fast 12s infinite ease-in-out;
 }
 
 :root.light div.lg\:col-span-4.bg-slate-950 *,
@@ -383,6 +385,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
   pointer-events: none;
+  animation: berry-float-slow 22s infinite ease-in-out;
 }
 
 :root.light div.lg\:col-span-8.bg-\[\#0D1117\]::after {
@@ -395,6 +398,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   pointer-events: none;
+  animation: berry-float-fast 15s infinite ease-in-out reverse;
 }
 
 :root.light div.lg\:col-span-8.bg-\[\#0D1117\] *,
@@ -448,6 +452,33 @@
 :root.light .text-cyan-500,
 :root.light .text-emerald-500 {
   color: #00c853 !important; /* Emerald Berry success color */
+}
+
+/* High contrast Light-Mode gradients for clipped typography classes */
+:root.light .metallic-gradient-text {
+  background: linear-gradient(135deg, #121926 0%, #364152 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+:root.light .primary-gradient-text {
+  background: linear-gradient(135deg, #5e35b1 0%, #1a237e 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+:root.light header p {
+  color: #364152 !important;
+  opacity: 0.9 !important;
+}
+
+/* Primary Site scope label gradient fixes for Dashboard */
+:root.light .bg-gradient-to-r.from-white.to-gray-400 {
+  background-image: linear-gradient(to right, #121926, #4b5563) !important;
 }
 
 /* Buttons & Dynamic Interactive Select Controls */
@@ -528,5 +559,20 @@
 :root.light .pointer-events-none.fixed.inset-0.z-0 {
   display: none !important;
 }
+
+/* 5. BERRY KEYFRAME ANIMATION ENGINE */
+@keyframes berry-float-slow {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10px, -15px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes berry-float-fast {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(-5px, 10px) scale(0.97) rotate(3deg); }
+  66% { transform: translate(8px, -5px) scale(1.02) rotate(-2deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
 
 
