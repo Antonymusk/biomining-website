@@ -10,6 +10,13 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
+            // Extremely large third-party utilities that block load
+            if (id.includes('xlsx')) {
+              return 'vendor-xlsx';
+            }
+            if (id.includes('@supabase')) {
+              return 'vendor-supabase';
+            }
             if (id.includes('recharts')) {
               return 'vendor-recharts';
             }
@@ -19,7 +26,7 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'vendor-lucide';
             }
-            return 'vendor'; // all other third-party dependencies
+            return 'vendor'; // remaining base dependencies (react, router, tailwind runtime, etc)
           }
         }
       }

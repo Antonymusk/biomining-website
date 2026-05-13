@@ -206,195 +206,327 @@
 }
 
 /* ==========================================
-   PERSISTENT ENTERPRISE LIGHT MODE OVERRIDES
+   BERRY DESIGN ADAPTATION - LIGHT MODE ENGINE
    ========================================== */
 
-/* Butter-smooth transition on key properties to prevent flashing */
-*, *::before, *::after {
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease, box-shadow 0.25s ease;
-}
-
 :root.light {
-  --background: #f4f7fb;
-  --foreground: #0f172a;
+  --background: #eef2f6;
+  --foreground: #121926;
+  --color-dark-bg: #eef2f6;
 }
 
 :root.light body {
-  background-color: #f4f7fb !important;
-  color: #0f172a !important;
+  background-color: #eef2f6 !important;
+  color: #121926 !important;
+  background-image: none !important;
 }
 
-/* Sidebar Adaptations (Premium Matte White Panel) */
+/* 1. CINEMATIC FLOATING LAYOUT ENGINE */
+:root.light div.flex.h-screen.w-full {
+  background-color: #eef2f6 !important;
+}
+
+/* Sidebar Wrapper (Floating Matte White Block) */
 :root.light aside {
   background: #ffffff !important;
-  border-right: 1px solid rgba(15, 23, 42, 0.05) !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02) !important;
+  border: none !important;
+  margin: 16px 0 16px 16px !important;
+  border-radius: 16px !important;
+  height: calc(100vh - 32px) !important;
+  box-shadow: 0 2px 12px rgba(32, 40, 45, 0.06) !important;
+  overflow: hidden !important;
 }
 
-:root.light aside div,
+:root.light aside div, 
+:root.light aside nav,
 :root.light aside button {
-  border-color: rgba(15, 23, 42, 0.05) !important;
+  border-color: transparent !important;
 }
 
-:root.light aside * {
-  color: #475569 !important;
+/* Header Wrapper (Floating Bar with Padding) */
+:root.light header {
+  background: #ffffff !important;
+  margin: 16px 16px 0 16px !important;
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 2px 10px rgba(32, 40, 45, 0.04) !important;
+  backdrop-filter: none !important;
 }
 
-:root.light aside .active {
-  background-color: rgba(59, 130, 246, 0.06) !important;
-  border: 1px solid rgba(59, 130, 246, 0.1) !important;
+/* Top Header content colors */
+:root.light header h1,
+:root.light header h2,
+:root.light header div,
+:root.light header button {
+  color: #121926 !important;
 }
 
-:root.light aside .active * {
-  color: #2563eb !important;
+/* Main Dashboard Scroll View padding adjustment to line up with headers */
+:root.light main {
+  padding-top: 16px !important;
+  background-color: #eef2f6 !important;
 }
 
-/* Active sidebar neon line override */
-:root.light aside .absolute.bg-primary {
-  background-color: #2563eb !important;
+/* 2. BERRY ACTIVE ELEMENTS (LAVENDER THEME) */
+:root.light .sidebar-item-hover:hover {
+  background-color: #ede7f6 !important;
+  border-radius: 12px !important;
+}
+
+:root.light .sidebar-item-hover:hover * {
+  color: #5e35b1 !important;
+}
+
+/* Active Nav Link overrides */
+:root.light aside a.active {
+  background-color: #ede7f6 !important;
+  color: #5e35b1 !important;
+  border: none !important;
+  border-radius: 12px !important;
   box-shadow: none !important;
 }
 
-/* Header Adaptations (Soft Frosted White Glass) */
-:root.light header {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+:root.light aside a.active * {
+  color: #5e35b1 !important;
+  font-weight: 600 !important;
 }
 
-:root.light header * {
-  color: #0f172a !important;
+/* Sidebar Active Motion Indicator Overrides */
+:root.light div[layoutid="sidebar-active"] {
+  background-color: #5e35b1 !important;
+  width: 3px !important;
+  border-radius: 0 4px 4px 0 !important;
 }
 
-:root.light header span.text-slate-400,
-:root.light header span.text-gray-400 {
-  color: #64748b !important;
-}
+/* 3. VIBRANT METRIC CARDS OVERRIDES (THE IMAGE HERO COMPONENT) */
 
-:root.light header .text-primary {
-  color: #2563eb !important;
-}
-
-/* Glass Cards and Main Dashboard Cards (Elevated Pure White) */
+/* General Dashboard Cards (Flat Elegant White Surface) */
 :root.light .glass-card,
 :root.light div.rounded-xl.border.border-white\/5,
 :root.light div.rounded-2xl.border.border-white\/5 {
   background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.05) !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.01), 0 4px 12px rgba(15, 23, 42, 0.02) !important;
+  border: none !important;
+  box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08) !important;
   backdrop-filter: none !important;
 }
 
 :root.light .glass-card *,
-:root.light div.rounded-xl.border.border-white\/5 *,
-:root.light div.rounded-2xl.border.border-white\/5 * {
-  color: #1e293b !important;
+:root.light div.rounded-xl.border.border-white\/5 * {
+  color: #364152 !important;
 }
 
-:root.light .glass-card span.text-primary,
-:root.light div.rounded-xl.border.border-white\/5 span.text-primary,
-:root.light div.rounded-2xl.border.border-white\/5 span.text-primary,
-:root.light .text-primary {
-  color: #2563eb !important;
+/* Target Gauge Light Mode Overrides (High-contrast colors) */
+:root.light svg circle.text-dark-bg\/20 {
+  stroke: #eef2f6 !important;
 }
 
-:root.light .text-gray-400,
-:root.light .text-slate-400 {
-  color: #64748b !important;
+:root.light .stroke-primary {
+  stroke: #2196f3 !important;
 }
 
-:root.light .text-gray-500,
-:root.light .text-slate-500 {
-  color: #94a3b8 !important;
+/* Custom Deep Berry Purple Card Adaptation (Matches Total Earning Card) */
+:root.light div.lg\:col-span-4.bg-slate-950 {
+  background: linear-gradient(135deg, #4527a0 0%, #7e57c2 100%) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px !important;
 }
 
-/* KPI Card Spacers and Typography Polish */
-:root.light .glass-card h3,
-:root.light div.rounded-xl.border.border-white\/5 h3 {
-  color: #475569 !important;
-  font-weight: 500 !important;
+/* Injecting Berry-style organic SVG vector circles in CSS */
+:root.light div.lg\:col-span-4.bg-slate-950::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
 }
 
-:root.light .glass-card p.text-3xl,
-:root.light div.rounded-xl.border.border-white\/5 p.text-3xl {
-  color: #0f172a !important;
-  font-weight: 700 !important;
+:root.light div.lg\:col-span-4.bg-slate-950::after {
+  content: "";
+  position: absolute;
+  top: -140px;
+  right: -30px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 
-/* Inputs, Textareas and Dropdowns (Polished White Surface) */
-:root.light input,
-:root.light select,
-:root.light textarea {
+:root.light div.lg\:col-span-4.bg-slate-950 *,
+:root.light div.lg\:col-span-4.bg-slate-950 p,
+:root.light div.lg\:col-span-4.bg-slate-950 span,
+:root.light div.lg\:col-span-4.bg-slate-950 h3 {
+  color: #ffffff !important;
+}
+
+/* Custom Vibrant Ocean Blue Card Adaptation (Matches Total Order Card) */
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] {
+  background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px !important;
+  border: none !important;
+}
+
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\]::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\]::after {
+  content: "";
+  position: absolute;
+  top: -140px;
+  right: -30px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] *,
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] h2,
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] h3,
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.font-mono {
+  color: #ffffff !important;
+}
+
+/* Production directive sub-box contrast fix for light-mode blue card */
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.bg-white\/5 * {
+  color: #e3f2fd !important;
+}
+
+/* Lower grid cards (Fuel Efficiency & Board) surface contrast */
+:root.light div.bg-slate-950 {
   background: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.1) !important;
-  color: #0f172a !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02) !important;
 }
 
-/* Tables in Light Mode */
+:root.light div.bg-slate-900\/50 {
+  background: #f8fafc !important;
+  border-color: #edf2f7 !important;
+}
+
+:root.light div.bg-slate-900\/50 span.text-2xl {
+  color: #121926 !important;
+}
+
+/* 4. TYPOGRAPHY & CONTRAST FOR BERRY LIGHT THEME */
+
+:root.light h1,
+:root.light h2,
+:root.light h3,
+:root.light h4,
+:root.light p,
+:root.light span:not(.text-white) {
+  color: #121926;
+}
+
+:root.light .text-slate-400,
+:root.light .text-gray-400,
+:root.light .text-gray-500 {
+  color: #697586 !important;
+}
+
+:root.light .text-cyan-500,
+:root.light .text-emerald-500 {
+  color: #00c853 !important; /* Emerald Berry success color */
+}
+
+/* Buttons & Dynamic Interactive Select Controls */
+:root.light select,
+:root.light input {
+  background: #ffffff !important;
+  border: 1px solid #e3ebe6 !important;
+  color: #121926 !important;
+  border-radius: 8px !important;
+}
+
+:root.light select {
+  background-color: #f8fafc !important;
+}
+
+:root.light select * {
+  background-color: #ffffff !important;
+  color: #121926 !important;
+}
+
+:root.light .bg-primary {
+  background-color: #5e35b1 !important; /* Deep purple primary button matching Berry */
+}
+
+:root.light .text-primary {
+  color: #5e35b1 !important;
+}
+
+/* Tables (Elegant Borderless Material Surfaces) */
 :root.light table {
-  color: #1e293b !important;
+  color: #364152 !important;
 }
 
 :root.light th {
-  background-color: rgba(15, 23, 42, 0.02) !important;
-  color: #475569 !important;
-  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+  background-color: #f8fafc !important;
+  color: #121926 !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #eef2f6 !important;
 }
 
 :root.light td {
-  border-bottom-color: rgba(15, 23, 42, 0.04) !important;
+  border-bottom: 1px solid #eef2f6 !important;
+  color: #364152 !important;
 }
 
 :root.light tr:hover {
-  background-color: rgba(15, 23, 42, 0.01) !important;
+  background-color: #fcfcfd !important;
 }
 
-/* Floating Modals & Avatar Dropdowns (Level 4 Floating Elevation) */
-:root.light div.absolute.rounded-xl.bg-slate-950,
-:root.light div.absolute.rounded-lg.bg-slate-950,
-:root.light div.absolute.rounded-xl.bg-slate-950\/95,
-:root.light div.absolute.rounded-lg.bg-slate-950\/95 {
-  background-color: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03) !important;
-}
-
-:root.light div.absolute.rounded-xl.bg-slate-950 *,
-:root.light div.absolute.rounded-lg.bg-slate-950 * {
-  color: #334155 !important;
-}
-
-:root.light div.absolute.rounded-xl.bg-slate-950 button:hover,
-:root.light div.absolute.rounded-lg.bg-slate-950 button:hover {
-  background-color: rgba(15, 23, 42, 0.03) !important;
-  color: #0f172a !important;
-}
-
-/* Chart & Analytics Adaptation */
+/* Recharts Dynamic Vector Theme overrides */
 :root.light .recharts-cartesian-grid-horizontal line,
 :root.light .recharts-cartesian-grid-vertical line {
-  stroke: rgba(15, 23, 42, 0.06) !important;
-  stroke-dasharray: 2 2 !important;
+  stroke: #eef2f6 !important;
+  stroke-dasharray: 0 !important;
 }
 
 :root.light .recharts-text {
-  fill: #475569 !important;
-  font-size: 10px !important;
+  fill: #697586 !important;
   font-weight: 500 !important;
 }
 
-:root.light .recharts-legend-item-text {
-  color: #475569 !important;
+/* Global Scrollbar Light theme styling matching layout */
+:root.light ::-webkit-scrollbar-track {
+  background: #eef2f6;
 }
 
-/* Scrollbars for Light Mode */
-:root.light ::-webkit-scrollbar-track {
-  background: #f4f7fb;
-}
 :root.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #b0bec5;
+  border: 2px solid #eef2f6;
+  border-radius: 8px;
+}
+
+:root.light ::-webkit-scrollbar-thumb:hover {
+  background: #90a4ae;
+}
+
+/* Dynamic Theme Background Glow Hider for performance and clean layout */
+:root.light .pointer-events-none.fixed.inset-0.z-0 {
+  display: none !important;
 }
 
 

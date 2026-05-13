@@ -23,21 +23,21 @@ import { cn } from "../../lib/utils";
 import { useAuth } from "../../lib/AuthContext";
 
 const navItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { name: "MIS Entry", icon: FileText, path: "/mis-entry" },
-  { name: "Operations", icon: Activity, path: "/operations" },
-  { name: "Fleet Control", icon: Truck, path: "/fleet-control" },
-  { name: "Drivers", icon: Users, path: "/drivers" },
-  { name: "Manpower", icon: UserCheck, path: "/manpower" },
-  { name: "Inventory", icon: PackageSearch, path: "/inventory" },
-  { name: "Maintenance", icon: Wrench, path: "/maintenance" },
-  { name: "Procurement", icon: ShoppingCart, path: "/requisition-center" },
-  { name: "Analytics", icon: BarChart3, path: "/analytics" },
-  { name: "Alert Center", icon: ShieldAlert, path: "/alert-center" },
-  { name: "Reports", icon: FileText, path: "/reports" },
-  { name: "Recycle Bin", icon: Trash2, path: "/recycle-bin" },
-  { name: "Settings", icon: Settings, path: "/settings" },
-  { name: "User Management", icon: UserCheck, path: "/user-management" },
+  { name: "Dashboard", icon: LayoutDashboard, path: "/", preload: () => import("../../pages/Dashboard") },
+  { name: "MIS Entry", icon: FileText, path: "/mis-entry", preload: () => import("../../pages/MISEntry") },
+  { name: "Operations", icon: Activity, path: "/operations", preload: () => import("../../pages/Operations") },
+  { name: "Fleet Control", icon: Truck, path: "/fleet-control", preload: () => import("../../pages/FleetControl") },
+  { name: "Drivers", icon: Users, path: "/drivers", preload: () => import("../../pages/DriverManagement") },
+  { name: "Manpower", icon: UserCheck, path: "/manpower", preload: () => import("../../pages/Manpower") },
+  { name: "Inventory", icon: PackageSearch, path: "/inventory", preload: () => import("../../pages/Inventory") },
+  { name: "Maintenance", icon: Wrench, path: "/maintenance", preload: () => import("../../pages/MaintenanceCenter") },
+  { name: "Procurement", icon: ShoppingCart, path: "/requisition-center", preload: () => import("../../pages/RequisitionCenter") },
+  { name: "Analytics", icon: BarChart3, path: "/analytics", preload: () => import("../../pages/Analytics") },
+  { name: "Alert Center", icon: ShieldAlert, path: "/alert-center", preload: () => import("../../pages/AlertCenter") },
+  { name: "Reports", icon: FileText, path: "/reports", preload: () => import("../../pages/Reports") },
+  { name: "Recycle Bin", icon: Trash2, path: "/recycle-bin", preload: () => import("../../pages/RecycleBin") },
+  { name: "Settings", icon: Settings, path: "/settings", preload: () => import("../../pages/Settings") },
+  { name: "User Management", icon: UserCheck, path: "/user-management", preload: () => import("../../pages/UserManagement") },
 ];
 
 export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) {
@@ -131,6 +131,12 @@ export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed
               to={item.path}
               title={isCollapsed ? item.name : undefined}
               onClick={() => setIsMobileOpen(false)}
+              onMouseEnter={() => {
+                // Speculatively preload module chunks on link hover
+                if (typeof item.preload === 'function') {
+                  item.preload().catch(() => {});
+                }
+              }}
               className={({ isActive }) =>
                 cn(
                   "flex items-center transition-all duration-150 group relative sidebar-item-hover cursor-pointer",

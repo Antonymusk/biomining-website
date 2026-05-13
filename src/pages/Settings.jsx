@@ -1,18 +1,19 @@
-import { useState, useEffect, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Target, MapPin, Wifi, Database, Palette, ShieldCheck, 
   ChevronRight, Settings as SettingsIcon
 } from "lucide-react";
 import { Card } from "../components/ui/Card";
+import { lazyWithRetry } from "../lib/utils";
 
-// Lazy Load Settings Modules for peak performance
-const OperationalTargets = lazy(() => import("../components/settings/OperationalTargets"));
-const SiteConfiguration = lazy(() => import("../components/settings/SiteConfiguration"));
-const PWAOffline = lazy(() => import("../components/settings/PWAOffline"));
-const BackupRecovery = lazy(() => import("../components/settings/BackupRecovery"));
-const Appearance = lazy(() => import("../components/settings/Appearance"));
-const Security = lazy(() => import("../components/settings/Security"));
+// Lazy Load Settings Modules for peak performance with deployment fault-tolerance
+const OperationalTargets = lazyWithRetry(() => import("../components/settings/OperationalTargets"));
+const SiteConfiguration = lazyWithRetry(() => import("../components/settings/SiteConfiguration"));
+const PWAOffline = lazyWithRetry(() => import("../components/settings/PWAOffline"));
+const BackupRecovery = lazyWithRetry(() => import("../components/settings/BackupRecovery"));
+const Appearance = lazyWithRetry(() => import("../components/settings/Appearance"));
+const Security = lazyWithRetry(() => import("../components/settings/Security"));
 
 const TABS = [
   { id: "targets", label: "Operational Targets", icon: Target, component: OperationalTargets, desc: "Intelligence & Quotas" },
