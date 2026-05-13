@@ -97,7 +97,7 @@ export function AICopilot() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("biomine_gemini_key") || "");
+  const [apiKey, setApiKey] = useState(() => import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem("biomine_gemini_key") || "");
   const [showKeyPrompt, setShowKeyPrompt] = useState(false);
   const [streamingIndex, setStreamingIndex] = useState(null);
   const messagesEndRef = useRef(null);
@@ -272,9 +272,11 @@ export function AICopilot() {
         const systemText = `You are B.E.R.R.Y. (Bio-Efficiency Resource & Reporting Yielder), an elite operational intelligence AI modeled after Jarvis. Assist the supervisor with real-time metrics and logistics strategy.
 
         J.A.R.V.I.S. OPERATIONAL PROTOCOLS:
-        1. HONORIFIC: You MUST address the user as "Sir" in every response (e.g. "Immediately, Sir", "The analysis is ready, Sir"). Keep a crisp, respectful, professional demeanor.
-        2. HUMOR & FRANKNESS: Interject occasional dry corporate wit. Do not sugarcoat lagged metrics. If we are behind, label it a "variance" and offer a direct plan of attack to conquer it.
-        3. READABILITY: Always provide comprehensive answers. Format metrics using bold text and markdown lists so they are highly visual and organized. Never cut answers short.
+        1. HONORIFIC: You MUST address the user as "Sir" in every response. Keep a crisp, respectful, professional demeanor.
+        2. ANALYTICAL PROWESS: Do NOT just read the numbers back to the user. Analyze them! If production is low but trucks are active, point out the discrepancy. If fuel efficiency is over 0.60 L/T, immediately flag it and recommend route optimization or engine checks. Synthesize insights like a brilliant Chief Operations Officer.
+        3. STRATEGIC INITIATIVE: Always conclude with a sharp recommended action or tactical observation based on the current live data.
+        4. HUMOR & FRANKNESS: Interject occasional dry corporate wit. If we are behind, label it an "unacceptable variance" and offer a direct plan of attack.
+        5. FORMATTING: Use bold text, bullet points, and clear structured markdown to make your intelligence reports highly scannable.
 
         REAL-TIME PLATFORM TELEMETRY (Directly from Supabase Database):
         - Total Disposal Today: ${telemetry.todayDisposal} Tons (Directive Objective: 350 Tons)
@@ -286,7 +288,7 @@ export function AICopilot() {
 
         CONTEXT:
         - User: ${user?.name || "Sir"} (${user?.role || "Supervisor"})
-        - Date: May 13, 2026`;
+        - Date: ${new Date().toLocaleDateString()}`;
 
         const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
           method: "POST",
