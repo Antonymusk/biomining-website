@@ -5,6 +5,7 @@ import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 import { Suspense, lazy, useState, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // Lazy load heavy page modules
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -130,6 +131,7 @@ function App() {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      <SpeedInsights />
       </ErrorBoundary>
       </NotificationProvider>
     </AuthProvider>
