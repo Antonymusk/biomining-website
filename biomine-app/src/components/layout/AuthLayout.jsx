@@ -88,7 +88,7 @@ export function AuthLayout() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-bg p-4 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-dark-bg p-4 md:p-8 relative overflow-hidden auth-layout-root">
       {/* Global Atmospheric Background Mesh Motion */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-80">
         <div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[140px] animate-ambient-1" />
@@ -96,10 +96,10 @@ export function AuthLayout() {
       </div>
       
       {/* Massive Premium Split Panel Box */}
-      <div className="w-full max-w-5xl bg-[#131b2e]/90 border border-white/5 rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 min-h-[620px] backdrop-blur-2xl">
+      <div className="w-full max-w-5xl bg-[#131b2e]/90 border border-white/5 rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 min-h-[620px] backdrop-blur-2xl auth-card">
         
         {/* LEFT: Interactive Cinematic Atmospheric Space */}
-        <div className="hidden lg:flex lg:w-[48%] flex-col items-center justify-between p-14 relative bg-slate-950/40 border-r border-white/5 overflow-hidden">
+        <div className="hidden lg:flex lg:w-[48%] flex-col items-center justify-between p-14 relative bg-slate-950/40 border-r border-white/5 overflow-hidden auth-left-panel">
           {/* Decorative background grid light */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.05)_0%,transparent_70%)] pointer-events-none" />
           <div className="absolute inset-0 bg-[linear-gradient(115deg,transparent_20%,rgba(255,255,255,0.005)_35%,rgba(255,255,255,0.02)_40%,rgba(255,255,255,0.005)_45%,transparent_60%)] pointer-events-none" />
@@ -126,7 +126,7 @@ export function AuthLayout() {
         </div>
 
         {/* RIGHT: Authentic Form Container */}
-        <div className="w-full lg:w-[52%] flex flex-col justify-center items-center p-8 sm:p-14 md:p-16 relative">
+        <div className="w-full lg:w-[52%] flex flex-col justify-center items-center p-8 sm:p-14 md:p-16 relative auth-right-panel">
           {/* Renders actual dynamic input forms (Login.jsx / Signup.jsx) */}
 
           {/* Renders actual input forms (Login.jsx / Signup.jsx) */}
