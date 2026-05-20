@@ -74,17 +74,7 @@ export default function SiteConfiguration() {
     }
   };
 
-  const toggleStatus = async (id) => {
-    const site = sites.find(s => s.id === id);
-    if (!site) return;
 
-    const nextStatus = site.status === "Active" ? "Inactive" : "Active";
-    const updatedData = await siteService.saveSite({ ...site, status: nextStatus });
-    setSites(updatedData);
-    
-    window.dispatchEvent(new Event("biomine_sites_updated"));
-    toast.success(`${site.name} established to ${nextStatus} state.`);
-  };
 
   const handleDelete = async (id) => {
     const savingToast = toast.loading("Executing registry drop...");
@@ -188,17 +178,6 @@ export default function SiteConfiguration() {
                           title="Edit Site Configurations"
                         >
                           <Edit3 size={14} />
-                        </button>
-                        <button 
-                          onClick={() => toggleStatus(site.id)}
-                          className={`p-1.5 rounded transition-colors ${
-                            site.status === 'Active' 
-                              ? 'hover:bg-amber-500/10 hover:text-amber-400 text-slate-500' 
-                              : 'hover:bg-emerald-500/10 hover:text-emerald-400 text-slate-500'
-                          }`}
-                          title={site.status === 'Active' ? "Suspend Site Operations" : "Reinstate Operations"}
-                        >
-                          {site.status === 'Active' ? <Archive size={14} /> : <Check size={14} />}
                         </button>
                         <button 
                           onClick={() => handleDelete(site.id)}
