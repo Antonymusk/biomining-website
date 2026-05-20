@@ -59,7 +59,7 @@ export const siteService = {
     }
     
     // Re-fetch total system list to satisfy absolute UX bind conformity
-    return this.getSites();
+    return siteService.getSites();
   },
 
   /**
@@ -74,6 +74,6 @@ export const siteService = {
     if (error) {
       throw new Error(`Registry Drop Failure: ${error.message}`);
     }
-    return this.getSites();
+    return siteService.getSites();
   }
 };

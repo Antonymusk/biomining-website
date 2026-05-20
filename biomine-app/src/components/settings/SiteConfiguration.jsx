@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Plus, Search, Filter, Edit3, Archive, Building2, X, Check, Loader2 } from "lucide-react";
+import { MapPin, Plus, Search, Filter, Edit3, Archive, Building2, X, Check, Loader2, Trash2 } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
@@ -84,6 +84,18 @@ export default function SiteConfiguration() {
     
     window.dispatchEvent(new Event("biomine_sites_updated"));
     toast.success(`${site.name} established to ${nextStatus} state.`);
+  };
+
+  const handleDelete = async (id) => {
+    const savingToast = toast.loading("Executing registry drop...");
+    try {
+      const updatedData = await siteService.deleteSite(id);
+      setSites(updatedData);
+      toast.success("Site configuration erased.", { id: savingToast });
+      window.dispatchEvent(new Event("biomine_sites_updated"));
+    } catch (err) {
+      toast.error(`Delete rejection: ${err.message}`, { id: savingToast });
+    }
   };
 
   return (
@@ -181,12 +193,19 @@ export default function SiteConfiguration() {
                           onClick={() => toggleStatus(site.id)}
                           className={`p-1.5 rounded transition-colors ${
                             site.status === 'Active' 
-                              ? 'hover:bg-red-500/10 hover:text-red-400 text-slate-500' 
+                              ? 'hover:bg-amber-500/10 hover:text-amber-400 text-slate-500' 
                               : 'hover:bg-emerald-500/10 hover:text-emerald-400 text-slate-500'
                           }`}
                           title={site.status === 'Active' ? "Suspend Site Operations" : "Reinstate Operations"}
                         >
                           {site.status === 'Active' ? <Archive size={14} /> : <Check size={14} />}
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(site.id)}
+                          className="p-1.5 hover:bg-red-500/10 hover:text-red-400 text-slate-500 rounded transition-colors"
+                          title="Delete Site"
+                        >
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
