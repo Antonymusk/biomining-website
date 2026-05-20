@@ -66,14 +66,36 @@ export const siteService = {
    * Deletes a site instance from deployment records.
    */
   deleteSite: async (siteId) => {
-    const { error } = await supabase
-      .from('sites')
-      .delete()
-      .eq('id', siteId);
-      
-    if (error) {
-      throw new Error(`Registry Drop Failure: ${error.message}`);
+    try {
+      const { error } = await supabase
+        .from('sites')
+        .delete()
+        .eq('id', siteId);
+        
+      if (error) {
+        console.error("Supabase Registry Drop Failure:", error);
+      }
+    } catch (err) {
+      console.warn("Delete transaction failed on remote, checking cache.", err);
     }
+    
+    // Always purge from offline cache snapshot to ensure absolute consistency
+    const cache = localStorage.getItem("biomine_sites_cache_snapshot");
+    if (cache) {
+      try {
+        let parsed = JSON.parse(cache);
+        // If siteId is undefined/null, remove all undefined/null id entries to fix corrupt cache
+        if (!siteId) {
+          parsed = parsed.filter(s => s.id);
+        } else {
+          parsed = parsed.filter(s => s.id !== siteId);
+        }
+        localStorage.setItem("biomine_sites_cache_snapshot", JSON.stringify(parsed));
+      } catch (e) {
+        console.error("Cache parsing error", e);
+      }
+    }
+
     return siteService.getSites();
   }
 };

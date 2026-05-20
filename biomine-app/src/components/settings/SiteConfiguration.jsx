@@ -171,7 +171,7 @@ export default function SiteConfiguration() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex justify-end items-center gap-2">
                         <button 
                           onClick={() => handleOpenModal(site)}
                           className="p-1.5 hover:bg-blue-500/10 hover:text-blue-400 text-slate-500 rounded transition-colors"
