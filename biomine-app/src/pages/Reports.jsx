@@ -78,9 +78,10 @@ export default function Reports() {
         let reportHtml = `
           <html>
             <head>
-              <title>MIS Report - ${selectedSite === 'all' ? 'All Sites' : selectedSite}</title>
+              <title>MIS Report - \${selectedSite === 'all' ? 'All Sites' : selectedSite}</title>
               <style>
-                body { font-family: 'Inter', -apple-system, sans-serif; padding: 40px; background-color: #ffffff; color: #364152; line-height: 1.6; }
+                @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+                body { font-family: 'Montserrat', -apple-system, sans-serif; padding: 40px; background-color: #ffffff; color: #364152; line-height: 1.6; }
                 .branding-header { 
                   background: linear-gradient(135deg, #5e35b1 0%, #3949ab 100%);
                   color: white;

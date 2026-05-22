@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @import "./styles/motion.css";
 
@@ -12,7 +13,7 @@
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
-  --font-sans: "Inter", "Geist", sans-serif;
+  --font-sans: "Montserrat", sans-serif;
 }
 
 @layer base {
