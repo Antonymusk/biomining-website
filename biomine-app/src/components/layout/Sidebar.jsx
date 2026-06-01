@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
   FileText, 
@@ -23,42 +23,75 @@ import {
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../lib/AuthContext";
 
-const navItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/", preload: () => import("../../pages/Dashboard") },
-  { name: "MIS Entry", icon: FileText, path: "/mis-entry", preload: () => import("../../pages/MISEntry") },
-  { name: "Operations", icon: Activity, path: "/operations", preload: () => import("../../pages/Operations") },
-  { name: "Fleet Control", icon: Truck, path: "/fleet-control", preload: () => import("../../pages/FleetControl") },
-  { name: "Drivers", icon: Users, path: "/drivers", preload: () => import("../../pages/DriverManagement") },
-  { name: "Manpower", icon: UserCheck, path: "/manpower", preload: () => import("../../pages/Manpower") },
-  { name: "Inventory", icon: PackageSearch, path: "/inventory", preload: () => import("../../pages/Inventory") },
-  { name: "Maintenance", icon: Wrench, path: "/maintenance", preload: () => import("../../pages/MaintenanceCenter") },
-  { name: "Procurement", icon: ShoppingCart, path: "/requisition-center", preload: () => import("../../pages/RequisitionCenter") },
-  { name: "Price List", icon: Coins, path: "/price-list", preload: () => import("../../pages/PriceList") },
-  { name: "Analytics", icon: BarChart3, path: "/analytics", preload: () => import("../../pages/Analytics") },
-  { name: "Alert Center", icon: ShieldAlert, path: "/alert-center", preload: () => import("../../pages/AlertCenter") },
-  { name: "Reports", icon: FileText, path: "/reports", preload: () => import("../../pages/Reports") },
-  { name: "Recycle Bin", icon: Trash2, path: "/recycle-bin", preload: () => import("../../pages/RecycleBin") },
-  { name: "Settings", icon: Settings, path: "/settings", preload: () => import("../../pages/Settings") },
-  { name: "User Management", icon: UserCheck, path: "/user-management", preload: () => import("../../pages/UserManagement") },
+// Group operational links into logical enterprise categories
+const navGroups = [
+  {
+    group: "Operations",
+    items: [
+      { name: "MIS Entry", icon: FileText, path: "/mis-entry", preload: () => import("../../pages/MISEntry") },
+      { name: "Operations", icon: Activity, path: "/operations", preload: () => import("../../pages/Operations") },
+      { name: "Fleet Control", icon: Truck, path: "/fleet-control", preload: () => import("../../pages/FleetControl") },
+      { name: "Drivers", icon: Users, path: "/drivers", preload: () => import("../../pages/DriverManagement") },
+      { name: "Manpower", icon: UserCheck, path: "/manpower", preload: () => import("../../pages/Manpower") },
+    ]
+  },
+  {
+    group: "Logistics",
+    items: [
+      { name: "Inventory", icon: PackageSearch, path: "/inventory", preload: () => import("../../pages/Inventory") },
+      { name: "Maintenance", icon: Wrench, path: "/maintenance", preload: () => import("../../pages/MaintenanceCenter") },
+      { name: "Procurement", icon: ShoppingCart, path: "/requisition-center", preload: () => import("../../pages/RequisitionCenter") },
+      { name: "Price List", icon: Coins, path: "/price-list", preload: () => import("../../pages/PriceList") },
+    ]
+  },
+  {
+    group: "Intelligence",
+    items: [
+      { name: "Analytics", icon: BarChart3, path: "/analytics", preload: () => import("../../pages/Analytics") },
+      { name: "Alert Center", icon: ShieldAlert, path: "/alert-center", preload: () => import("../../pages/AlertCenter") },
+      { name: "Reports", icon: FileText, path: "/reports", preload: () => import("../../pages/Reports") },
+      { name: "Recycle Bin", icon: Trash2, path: "/recycle-bin", preload: () => import("../../pages/RecycleBin") },
+    ]
+  },
+  {
+    group: "Management",
+    items: [
+      { name: "Settings", icon: Settings, path: "/settings", preload: () => import("../../pages/Settings") },
+      { name: "User Management", icon: UserCheck, path: "/user-management", preload: () => import("../../pages/UserManagement") },
+    ]
+  }
 ];
 
 export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) {
   const { logout, hasPermission, user } = useAuth();
   
-  const filteredNavItems = useMemo(() => {
-    return navItems.filter(item => {
-      let moduleName = item.name;
-      // Map frontend display names to DB matrix keys
-      if (item.name === "MIS Entry") moduleName = "MIS";
-      if (item.name === "Procurement") moduleName = "Procurement";
-      if (item.name === "Recycle Bin") moduleName = "Archive"; 
-      
-      // Special handles for built-ins
-      if (item.path === "/") return true; // Always allow dashboard
-      
-      return hasPermission(moduleName, 'READ_ONLY');
+  // Persist collapsible group toggles locally
+  const [collapsedGroups, setCollapsedGroups] = useState(() => {
+    try {
+      const saved = localStorage.getItem("biomine_sidebar_groups");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleGroup = (groupName) => {
+    setCollapsedGroups(prev => {
+      const updated = { ...prev, [groupName]: !prev[groupName] };
+      localStorage.setItem("biomine_sidebar_groups", JSON.stringify(updated));
+      return updated;
     });
-  }, [user, hasPermission]);
+  };
+
+  // Helper method checking if individual sub-items are allowed under RBAC
+  const isItemAllowed = (name) => {
+    let moduleName = name;
+    if (name === "MIS Entry") moduleName = "MIS";
+    if (name === "Procurement") moduleName = "Procurement";
+    if (name === "Recycle Bin") moduleName = "Archive"; 
+    
+    return hasPermission(moduleName, 'READ_ONLY');
+  };
 
   return (
     <>
@@ -126,60 +159,151 @@ export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed
           </div>
         )}
 
-        <nav className={cn("flex-1 space-y-1.5 p-2 overflow-y-auto overflow-x-hidden scrollbar-none z-10", isCollapsed ? "flex flex-col items-center gap-1.5" : "")}>
-          {filteredNavItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              title={isCollapsed ? item.name : undefined}
-              onClick={() => setIsMobileOpen(false)}
-              onMouseEnter={() => {
-                // Speculatively preload module chunks on link hover
-                if (typeof item.preload === 'function') {
-                  item.preload().catch(() => {});
-                }
-              }}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center transition-all duration-150 group relative sidebar-item-hover cursor-pointer",
-                  isCollapsed 
-                    ? "justify-center h-10 w-10 rounded-xl" 
-                    : "gap-3.5 rounded-xl px-4 h-11 text-[12px]",
-                  isActive 
-                    ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(59,130,246,0.15)] rounded-xl" 
-                    : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] rounded-xl"
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <motion.div
-                      layoutId="sidebar-active"
-                      className={cn(
-                        "absolute rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]",
-                        isCollapsed ? "left-0 top-2.5 bottom-2.5 w-0.5" : "left-1.5 top-3.5 bottom-3.5 w-1"
-                      )}
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        {/* Scrollable Navigation Area */}
+        <nav className={cn("flex-1 space-y-4 p-2.5 overflow-y-auto overflow-x-hidden scrollbar-none z-10", isCollapsed ? "flex flex-col items-center gap-1.5" : "")}>
+          
+          {/* STANDALONE CORE DASHBOARD LINK (ALWAYS VISIBLE AT TOP) */}
+          <NavLink
+            to="/"
+            title={isCollapsed ? "Dashboard" : undefined}
+            onClick={() => setIsMobileOpen(false)}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center transition-all duration-150 group relative sidebar-item-hover cursor-pointer w-full",
+                isCollapsed 
+                  ? "justify-center h-10 w-10 rounded-xl" 
+                  : "gap-3.5 rounded-xl px-4 h-11 text-[12px] w-full",
+                isActive 
+                  ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(59,130,246,0.15)] rounded-xl" 
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] rounded-xl"
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active"
+                    className={cn(
+                      "absolute rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+                      isCollapsed ? "left-0 top-2.5 bottom-2.5 w-0.5" : "left-1.5 top-3.5 bottom-3.5 w-1"
+                    )}
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <LayoutDashboard size={isCollapsed ? 18 : 16} className={cn("shrink-0 transition-transform group-hover:scale-105 cursor-pointer", isActive && "text-slate-100")} />
+                {!isCollapsed && (
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="whitespace-nowrap uppercase tracking-widest text-[11px] font-bold cursor-pointer"
+                  >
+                    Dashboard
+                  </motion.span>
+                )}
+              </>
+            )}
+          </NavLink>
+
+          {/* DYNAMIC COLLAPSIBLE SECTIONS */}
+          {navGroups.map((group) => {
+            const isGroupCollapsed = !!collapsedGroups[group.group];
+            
+            // Filter sub-items based on dynamic system permissions
+            const allowedItems = group.items.filter(item => isItemAllowed(item.name));
+            
+            if (allowedItems.length === 0) return null;
+
+            return (
+              <div key={group.group} className="space-y-1.5 w-full">
+                
+                {/* Collapsible Section Header (Visible when expanded) */}
+                {!isCollapsed ? (
+                  <button
+                    onClick={() => toggleGroup(group.group)}
+                    className="w-full flex items-center justify-between px-3.5 py-1 text-[9px] font-black text-gray-500 hover:text-gray-300 uppercase tracking-widest transition-colors cursor-pointer text-left"
+                  >
+                    <span>{group.group}</span>
+                    <ChevronRight 
+                      size={10} 
+                      className={cn("transition-transform duration-200 text-gray-600", !isGroupCollapsed && "rotate-90 text-gray-400")} 
                     />
-                  )}
-                  <item.icon size={isCollapsed ? 18 : 16} className={cn("shrink-0 transition-transform group-hover:scale-105 cursor-pointer", isActive && "text-slate-100")} />
-                  {!isCollapsed && (
-                    <motion.span 
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="whitespace-nowrap uppercase tracking-widest text-[11px] font-bold cursor-pointer"
+                  </button>
+                ) : (
+                  // Thin divider line for collapsed icon states
+                  <div className="h-px bg-white/5 w-6 mx-auto my-3" />
+                )}
+
+                {/* Sub-items Render block with premium slide-accordion animation */}
+                <AnimatePresence initial={false}>
+                  {(!isGroupCollapsed || isCollapsed) && (
+                    <motion.div
+                      initial={isCollapsed ? false : { height: 0, opacity: 0 }}
+                      animate={isCollapsed ? false : { height: "auto", opacity: 1 }}
+                      exit={isCollapsed ? false : { height: 0, opacity: 0 }}
+                      transition={{ duration: 0.18, ease: "easeInOut" }}
+                      className="space-y-1 overflow-hidden w-full flex flex-col items-center"
                     >
-                      {item.name}
-                    </motion.span>
+                      {allowedItems.map((item) => (
+                        <NavLink
+                          key={item.path}
+                          to={item.path}
+                          title={isCollapsed ? item.name : undefined}
+                          onClick={() => setIsMobileOpen(false)}
+                          onMouseEnter={() => {
+                            if (typeof item.preload === 'function') {
+                              item.preload().catch(() => {});
+                            }
+                          }}
+                          className={({ isActive }) =>
+                            cn(
+                              "flex items-center transition-all duration-150 group relative sidebar-item-hover cursor-pointer w-full",
+                              isCollapsed 
+                                ? "justify-center h-10 w-10 rounded-xl" 
+                                : "gap-3.5 rounded-xl px-4 h-11 text-[12px] w-full",
+                              isActive 
+                                ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(59,130,246,0.15)] rounded-xl" 
+                                : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] rounded-xl"
+                            )
+                          }
+                        >
+                          {({ isActive }) => (
+                            <>
+                              {isActive && (
+                                <motion.div
+                                  layoutId="sidebar-active"
+                                  className={cn(
+                                    "absolute rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+                                    isCollapsed ? "left-0 top-2.5 bottom-2.5 w-0.5" : "left-1.5 top-3.5 bottom-3.5 w-1"
+                                  )}
+                                  initial={false}
+                                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
+                              )}
+                              <item.icon size={isCollapsed ? 18 : 16} className={cn("shrink-0 transition-transform group-hover:scale-105 cursor-pointer", isActive && "text-slate-100")} />
+                              {!isCollapsed && (
+                                <motion.span 
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  className="whitespace-nowrap uppercase tracking-widest text-[11px] font-bold cursor-pointer"
+                                >
+                                  {item.name}
+                                </motion.span>
+                              )}
+                            </>
+                          )}
+                        </NavLink>
+                      ))}
+                    </motion.div>
                   )}
-                </>
-              )}
-            </NavLink>
-          ))}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </nav>
 
+        {/* Sidebar Footer */}
         <div className={cn("border-t border-white/5 p-2", isCollapsed ? "flex justify-center" : "")}>
           <button 
             onClick={logout}
