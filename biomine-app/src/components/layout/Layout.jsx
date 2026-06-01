@@ -7,8 +7,44 @@ import { Search, Command, CornerDownLeft, Activity } from "lucide-react";
 import { AICopilot } from "./AICopilot";
 
 export function Layout() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPinned, setIsPinned] = useState(() => {
+    try {
+      const saved = localStorage.getItem("biomine_sidebar_pinned");
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      const saved = localStorage.getItem("biomine_sidebar_pinned");
+      const pinned = saved ? JSON.parse(saved) : false;
+      return !pinned; // If pinned, expanded (false). If auto-hide, start collapsed (true).
+    } catch {
+      return true;
+    }
+  });
+
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  const togglePin = () => {
+    setIsPinned(prev => {
+      const updated = !prev;
+      localStorage.setItem("biomine_sidebar_pinned", JSON.stringify(updated));
+      if (updated) {
+        setIsCollapsed(false);
+      }
+      return updated;
+    });
+  };
+
+  // Expand sidebar automatically if mobile open toggles
+  useEffect(() => {
+    if (isMobileOpen) {
+      setIsCollapsed(false);
+    }
+  }, [isMobileOpen]);
   const [isCommandKOpen, setIsCommandKOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -106,6 +142,17 @@ export function Layout() {
         setIsCollapsed={setIsCollapsed} 
         isMobileOpen={isMobileOpen}
         setIsMobileOpen={setIsMobileOpen}
+        isPinned={isPinned}
+        setIsPinned={setIsPinned}
+        togglePin={togglePin}
+      />
+
+      {/* Spacer to prevent sidebar overlapping content on desktop */}
+      <div 
+        className="hidden md:block transition-all duration-200 ease-out shrink-0" 
+        style={{ 
+          width: isPinned ? (isCollapsed ? 64 : 260) : 64 
+        }} 
       />
 
       <div className="flex flex-1 flex-col overflow-hidden z-10">

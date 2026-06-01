@@ -18,7 +18,8 @@ import {
   Wrench,
   Trash2,
   UserCheck,
-  Coins
+  Coins,
+  Pin
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../lib/AuthContext";
@@ -62,7 +63,15 @@ const navGroups = [
   }
 ];
 
-export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen }) {
+export const Sidebar = React.memo(function Sidebar({ 
+  isCollapsed, 
+  setIsCollapsed, 
+  isMobileOpen, 
+  setIsMobileOpen,
+  isPinned,
+  setIsPinned,
+  togglePin
+}) {
   const { logout, hasPermission, user } = useAuth();
   
   // Persist collapsible group toggles locally
@@ -83,7 +92,22 @@ export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed
     });
   };
 
-  // Helper method checking if individual sub-items are allowed under RBAC
+  // Hover Events (Auto-Hide / Auto-Expand) - desktop only
+  const handleMouseEnter = () => {
+    if (window.innerWidth < 768) return;
+    if (!isPinned && isCollapsed) {
+      setIsCollapsed(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (window.innerWidth < 768) return;
+    if (!isPinned && !isCollapsed) {
+      setIsCollapsed(true);
+    }
+  };
+
+  // Helper checking if individual sub-items are allowed under RBAC
   const isItemAllowed = (name) => {
     let moduleName = name;
     if (name === "MIS Entry") moduleName = "MIS";
@@ -110,8 +134,10 @@ export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed
           x: isMobileOpen ? 0 : (window.innerWidth < 768 ? -260 : 0)
         }}
         transition={{ duration: 0.2, ease: "easeOut" }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={cn(
-          "fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-white/5 bg-slate-950/80 backdrop-blur-xl shadow-2xl md:relative overflow-hidden",
+          "fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-white/5 bg-slate-950/85 backdrop-blur-xl shadow-2xl overflow-hidden",
           isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
@@ -138,20 +164,43 @@ export const Sidebar = React.memo(function Sidebar({ isCollapsed, setIsCollapsed
             )}
           </div>
           
+          {/* STATEFUL PIN AND COLLAPSE BUTTONS */}
           {!isCollapsed && (
-            <button 
-              onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex h-7 w-7 items-center justify-center rounded-md hover:bg-white/5 text-gray-400 transition-colors border border-transparent hover:border-white/5 cursor-pointer"
-            >
-              <ChevronLeft size={14} />
-            </button>
+            <div className="flex items-center gap-1 z-10">
+              <button 
+                onClick={togglePin}
+                title={isPinned ? "Enable Auto-Hide (Unpin)" : "Pin Sidebar Open"}
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors border border-transparent hover:bg-white/5 hover:border-white/5 cursor-pointer",
+                  isPinned && "text-accent bg-accent/10 border-accent/20 hover:bg-accent/20 hover:border-accent/30 shadow-[0_0_10px_rgba(192,255,62,0.15)]"
+                )}
+              >
+                <Pin size={12} className={cn("transition-transform duration-200", isPinned && "rotate-45")} />
+              </button>
+              <button 
+                onClick={() => {
+                  setIsPinned(false);
+                  localStorage.setItem("biomine_sidebar_pinned", "false");
+                  setIsCollapsed(true);
+                }}
+                title="Collapse Sidebar"
+                className="hidden md:flex h-7 w-7 items-center justify-center rounded-md hover:bg-white/5 text-gray-400 transition-colors border border-transparent hover:border-white/5 cursor-pointer"
+              >
+                <ChevronLeft size={14} />
+              </button>
+            </div>
           )}
         </div>
 
         {isCollapsed && (
           <div className="flex justify-center py-2 border-b border-white/5 z-10">
             <button 
-              onClick={() => setIsCollapsed(false)}
+              onClick={() => {
+                setIsPinned(true);
+                localStorage.setItem("biomine_sidebar_pinned", "true");
+                setIsCollapsed(false);
+              }}
+              title="Expand & Pin Sidebar"
               className="flex h-7 w-7 items-center justify-center rounded-md hover:bg-white/5 text-gray-400 transition-colors border border-white/5 cursor-pointer"
             >
               <ChevronRight size={14} />
