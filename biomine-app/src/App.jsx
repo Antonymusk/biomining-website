@@ -27,6 +27,7 @@ const Signup = lazyWithRetry(() => import("./pages/Signup"));
 const UserManagement = lazyWithRetry(() => import("./pages/UserManagement"));
 const Manpower = lazyWithRetry(() => import("./pages/Manpower"));
 const Notifications = lazyWithRetry(() => import("./pages/Notifications"));
+const PriceList = lazyWithRetry(() => import("./pages/PriceList"));
 import { AuthProvider } from "./lib/AuthContext";
 import { NotificationProvider } from "./lib/NotificationContext";
 import ConnectionStatus from "./components/layout/ConnectionStatus";
@@ -123,6 +124,7 @@ function App() {
               <Route path="settings" element={<ProtectedRoute module="Settings"><Settings /></ProtectedRoute>} />
               <Route path="profile" element={<ProtectedRoute module="Profile"><Profile /></ProtectedRoute>} />
               <Route path="user-management" element={<ProtectedRoute module="User Management"><UserManagement /></ProtectedRoute>} />
+              <Route path="price-list" element={<ProtectedRoute module="Price List"><PriceList /></ProtectedRoute>} />
               <Route path="notifications" element={<Notifications />} />
             </Route>
             

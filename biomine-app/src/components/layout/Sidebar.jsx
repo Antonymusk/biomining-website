@@ -17,7 +17,8 @@ import {
   ShoppingCart,
   Wrench,
   Trash2,
-  UserCheck
+  UserCheck,
+  Coins
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../lib/AuthContext";
@@ -32,6 +33,7 @@ const navItems = [
   { name: "Inventory", icon: PackageSearch, path: "/inventory", preload: () => import("../../pages/Inventory") },
   { name: "Maintenance", icon: Wrench, path: "/maintenance", preload: () => import("../../pages/MaintenanceCenter") },
   { name: "Procurement", icon: ShoppingCart, path: "/requisition-center", preload: () => import("../../pages/RequisitionCenter") },
+  { name: "Price List", icon: Coins, path: "/price-list", preload: () => import("../../pages/PriceList") },
   { name: "Analytics", icon: BarChart3, path: "/analytics", preload: () => import("../../pages/Analytics") },
   { name: "Alert Center", icon: ShieldAlert, path: "/alert-center", preload: () => import("../../pages/AlertCenter") },
   { name: "Reports", icon: FileText, path: "/reports", preload: () => import("../../pages/Reports") },

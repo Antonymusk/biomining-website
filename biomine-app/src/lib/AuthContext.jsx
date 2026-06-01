@@ -194,6 +194,9 @@ export function AuthProvider({ children }) {
     if (!user) return false;
     if (user.role === 'Super Admin' || user.permissions?.['All'] === 'FULL_CONTROL') return true;
     
+    // Transparent Read Override for Price List
+    if (moduleName === "Price List" && requiredLevel === "READ_ONLY") return true;
+
     const userLevel = user.permissions?.[moduleName] || 'NO_ACCESS';
     
     const hierarchy = { 'NO_ACCESS': 0, 'READ_ONLY': 1, 'READ_WRITE': 2, 'FULL_CONTROL': 3 };
