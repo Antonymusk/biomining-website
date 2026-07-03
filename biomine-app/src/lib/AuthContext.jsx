@@ -25,19 +25,48 @@ export function AuthProvider({ children }) {
         .eq("user_id", authUserId)
         .maybeSingle();
 
+      // Ensure text 'role' and 'role_id' foreign key join are kept in sync
+      if (roleData && roleData.roles && roleData.role !== roleData.roles.name) {
+        const { data: dbRole } = await supabase.from("roles").select("*").eq("name", roleData.role).maybeSingle();
+        if (dbRole) {
+           await supabase.from("user_roles").update({ role_id: dbRole.id }).eq("user_id", authUserId);
+           const { data: refetched } = await supabase.from("user_roles").select(`*, roles(*)`).eq("user_id", authUserId).maybeSingle();
+           roleData = refetched;
+        }
+      }
+
       // 3. Handle missing role data via simple migration logic / fallback
       if (!roleData || !roleData.roles) {
         // Check local/existing simple role and map it to dynamic role in DB
-        const simpleRoleName = roleData?.role || "MIS Operator"; 
+        const simpleRoleName = roleData?.role || "Viewer"; 
         const { data: dbRole } = await supabase.from("roles").select("*").eq("name", simpleRoleName).maybeSingle();
         
         if (dbRole) {
-           // Patch missing link
-           await supabase.from("user_roles").update({ role_id: dbRole.id }).eq("user_id", authUserId);
+           // Patch missing link or create if missing
+           if (!roleData) {
+             const defaultPayload = {
+               user_id: authUserId,
+               role: simpleRoleName,
+               role_id: dbRole.id,
+               approval_status: "Approved",
+               suspended: false,
+               created_at: new Date().toISOString()
+             };
+             await supabase.from("user_roles").insert([defaultPayload]);
+           } else {
+             await supabase.from("user_roles").update({ role_id: dbRole.id }).eq("user_id", authUserId);
+           }
            // re-fetch
            const { data: refetched } = await supabase.from("user_roles").select(`*, roles(*)`).eq("user_id", authUserId).maybeSingle();
            roleData = refetched;
         }
+      }
+
+      // Auto-approve newly signed-up Viewer accounts so they can immediately access the dashboard read-only
+      if (roleData && roleData.role === "Viewer" && roleData.approval_status === "Pending") {
+         await supabase.from("user_roles").update({ approval_status: "Approved" }).eq("user_id", authUserId);
+         const { data: refetched } = await supabase.from("user_roles").select(`*, roles(*)`).eq("user_id", authUserId).maybeSingle();
+         roleData = refetched;
       }
 
       // --- CRITICAL ENTERPRISE BOOTSTRAP SEQUENCE ---
@@ -52,7 +81,7 @@ export function AuthProvider({ children }) {
 
       const noSuperAdminsExist = (superAdminCount === 0 || superAdminCount === null);
 
-      if (!roleData || noSuperAdminsExist || isDeveloperEmail) {
+      if (noSuperAdminsExist || isDeveloperEmail) {
          const { data: superRole } = await supabase.from("roles").select("id").eq("name", "Super Admin").maybeSingle();
          
          // Auto-promote to Super Admin to prevent critical governance deadlock
@@ -74,7 +103,7 @@ export function AuthProvider({ children }) {
       }
 
        // Override in-memory derived roleName for absolute developer privilege guarantees.
-       let roleName = roleData?.roles?.name || roleData?.role || "Viewer";
+       let roleName = roleData?.role || roleData?.roles?.name || "Viewer";
        let roleId = roleData?.roles?.id;
        
        if (isDeveloperEmail) {
@@ -137,7 +166,7 @@ export function AuthProvider({ children }) {
         primary_site: assignedSites[0]?.name || "Enterprise Global",
         
         // ULTIMATE FAIL-SAFE OVERRIDE: Still ensures total system access for Super Admin/Dev
-        approval_status: (roleName === "Super Admin" || isDeveloperEmail) ? "Approved" : (roleData?.approval_status || "Pending"),
+        approval_status: (roleName === "Super Admin" || isDeveloperEmail) ? "Approved" : (roleData?.approval_status || "Approved"),
         suspended: (roleName === "Super Admin" || isDeveloperEmail) ? false : (roleData?.suspended || false),
         permissions: modulePermissions,
         hasGlobalScope: (roleName === "Super Admin" || isDeveloperEmail)
@@ -194,10 +223,16 @@ export function AuthProvider({ children }) {
     if (!user) return false;
     if (user.role === 'Super Admin' || user.permissions?.['All'] === 'FULL_CONTROL') return true;
     
-    // Transparent Read Override for Price List
-    if (moduleName === "Price List" && requiredLevel === "READ_ONLY") return true;
+    // Administrative modules must check database permissions explicitly (cannot default to true for READ_ONLY)
+    const adminModules = ['User Management', 'Global Configuration', 'User Governance'];
+    if (requiredLevel === 'READ_ONLY' && !adminModules.includes(moduleName)) return true;
 
     const userLevel = user.permissions?.[moduleName] || 'NO_ACCESS';
+    
+    // Hardcode Viewer restriction for ultimate safety
+    if (user.role === 'Viewer' && (requiredLevel === 'READ_WRITE' || requiredLevel === 'FULL_CONTROL')) {
+      return false;
+    }
     
     const hierarchy = { 'NO_ACCESS': 0, 'READ_ONLY': 1, 'READ_WRITE': 2, 'FULL_CONTROL': 3 };
     return (hierarchy[userLevel] || 0) >= (hierarchy[requiredLevel] || 1);
@@ -242,6 +277,10 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
   };
 
+  const logoutOthers = async () => {
+    await supabase.auth.signOut({ scope: "others" });
+  };
+
   const refreshProfile = async () => {
     if (session?.user?.id) {
       await fetchUserProfile(session.user.id, session.user.email);
@@ -249,7 +288,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, hasPermission, hasRole, isActionAllowed, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ session, user, loading, hasPermission, hasRole, isActionAllowed, logout, logoutOthers, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

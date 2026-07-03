@@ -4,6 +4,7 @@ import { Save, Target, TrendingUp, Fuel, Gauge, AlertTriangle, Building2, Settin
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { useSites } from "../../hooks/useSites";
+import { useAuth } from "../../lib/AuthContext";
 import toast from "react-hot-toast";
 
 const DEFAULT_TARGETS = {
@@ -18,6 +19,8 @@ const DEFAULT_TARGETS = {
 };
 
 export default function OperationalTargets() {
+  const { hasPermission } = useAuth();
+  const isReadOnly = !hasPermission('Settings', 'READ_WRITE');
   const { sites, loading } = useSites();
   const [selectedSite, setSelectedSite] = useState("");
   const [targets, setTargets] = useState({});
@@ -41,6 +44,7 @@ export default function OperationalTargets() {
   }, [selectedSite]);
 
   const handleInputChange = (field, value) => {
+    if (isReadOnly) return;
     setTargets(prev => ({
       ...prev,
       [field]: parseFloat(value) || 0
@@ -48,6 +52,7 @@ export default function OperationalTargets() {
   };
 
   const handleSave = async () => {
+    if (isReadOnly) return;
     setIsSaving(true);
     // Artificial delay for enterprise feel
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -62,9 +67,9 @@ export default function OperationalTargets() {
     toast.success(`Operational targets for ${selectedSite} updated successfully!`, {
       icon: '🎯',
       style: {
-        background: '#0f172a',
-        color: '#3b82f6',
-        border: '1px solid #1e293b'
+        background: '#080808',
+        color: '#ff3b30',
+        border: '1px solid #1f1f23'
       }
     });
     setIsSaving(false);
@@ -105,7 +110,10 @@ export default function OperationalTargets() {
             <Target className="text-primary" size={22} />
             Operational Targets
           </h2>
-          <p className="text-sm text-slate-400">Configure intelligence thresholds and production quotas.</p>
+          <p className="text-sm text-slate-400 flex items-center gap-2">
+            Configure intelligence thresholds and production quotas.
+            {isReadOnly && <span className="text-xs text-amber-500 font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">Read Only</span>}
+          </p>
         </div>
         <select
           value={selectedSite}
@@ -139,9 +147,10 @@ export default function OperationalTargets() {
               </div>
               <input 
                 type="number" 
+                disabled={isReadOnly}
                 value={targets.dailyDisposal} 
                 onChange={(e) => handleInputChange('dailyDisposal', e.target.value)}
-                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors disabled:opacity-60"
               />
             </div>
 
@@ -152,9 +161,10 @@ export default function OperationalTargets() {
               </div>
               <input 
                 type="number" 
+                disabled={isReadOnly}
                 value={targets.weeklyProduction} 
                 onChange={(e) => handleInputChange('weeklyProduction', e.target.value)}
-                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors disabled:opacity-60"
               />
             </div>
 
@@ -165,9 +175,10 @@ export default function OperationalTargets() {
               </div>
               <input 
                 type="number" 
+                disabled={isReadOnly}
                 value={targets.monthlyProduction} 
                 onChange={(e) => handleInputChange('monthlyProduction', e.target.value)}
-                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors"
+                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-primary/50 transition-colors disabled:opacity-60"
               />
             </div>
           </div>
@@ -194,9 +205,10 @@ export default function OperationalTargets() {
               <input 
                 type="number" 
                 step="0.01"
+                disabled={isReadOnly}
                 value={targets.fuelEfficiency} 
                 onChange={(e) => handleInputChange('fuelEfficiency', e.target.value)}
-                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-amber-500/50 transition-colors disabled:opacity-60"
               />
             </div>
 
@@ -208,9 +220,10 @@ export default function OperationalTargets() {
               <input 
                 type="range" 
                 min="0" max="100"
+                disabled={isReadOnly}
                 value={targets.fleetUtilization} 
                 onChange={(e) => handleInputChange('fleetUtilization', e.target.value)}
-                className="w-full accent-amber-500"
+                className="w-full accent-amber-500 disabled:opacity-60"
               />
             </div>
 
@@ -221,9 +234,10 @@ export default function OperationalTargets() {
               </div>
               <input 
                 type="number" 
+                disabled={isReadOnly}
                 value={targets.fuelVarianceTolerance} 
                 onChange={(e) => handleInputChange('fuelVarianceTolerance', e.target.value)}
-                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-amber-500/50 transition-colors"
+                className="w-full bg-slate-950/50 border border-white/5 rounded-lg px-4 py-2 text-white outline-none focus:border-amber-500/50 transition-colors disabled:opacity-60"
               />
             </div>
           </div>
@@ -253,9 +267,10 @@ export default function OperationalTargets() {
                 <input 
                   type="range" 
                   min="0" max="100"
+                  disabled={isReadOnly}
                   value={targets.warningThreshold} 
                   onChange={(e) => handleInputChange('warningThreshold', e.target.value)}
-                  className="w-full accent-amber-500"
+                  className="w-full accent-amber-500 disabled:opacity-60"
                 />
                 <p className="text-[10px] text-slate-500">System will generate passive operational advisory alerts when reached.</p>
               </div>
@@ -272,9 +287,10 @@ export default function OperationalTargets() {
                 <input 
                   type="range" 
                   min="0" max="100"
+                  disabled={isReadOnly}
                   value={targets.criticalThreshold} 
                   onChange={(e) => handleInputChange('criticalThreshold', e.target.value)}
-                  className="w-full accent-red-500"
+                  className="w-full accent-red-500 disabled:opacity-60"
                 />
                 <p className="text-[10px] text-slate-500">System will initiate active managerial intervention alerts.</p>
               </div>
@@ -294,17 +310,19 @@ export default function OperationalTargets() {
         </Card>
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-white/5">
-        <Button 
-          variant="primary" 
-          onClick={handleSave} 
-          disabled={isSaving || targets.warningThreshold >= targets.criticalThreshold}
-          className="gap-2"
-        >
-          <Save size={16} className={isSaving ? "animate-spin" : ""} />
-          {isSaving ? "Propagating..." : `Deploy Targets to ${selectedSite}`}
-        </Button>
-      </div>
+      {!isReadOnly && (
+        <div className="flex justify-end pt-4 border-t border-white/5">
+          <Button 
+            variant="primary" 
+            onClick={handleSave} 
+            disabled={isSaving || targets.warningThreshold >= targets.criticalThreshold}
+            className="gap-2"
+          >
+            <Save size={16} className={isSaving ? "animate-spin" : ""} />
+            {isSaving ? "Propagating..." : `Deploy Targets to ${selectedSite}`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

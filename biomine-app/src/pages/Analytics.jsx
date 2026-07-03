@@ -110,6 +110,71 @@ export default function Analytics() {
     return processAnalytics(rawData, dateRange, selectedSites);
   }, [rawData, dateRange, selectedSites]);
 
+  const productionChart = useMemo(() => (
+    <SafeChartContainer height="350px" minHeight="300px">
+      {(width, height) => chartData.length > 0 ? (
+        <ResponsiveContainer width={width} height={height}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <RechartsTooltip cursor={{fill: '#1e293b', opacity: 0.4}} wrapperClassName="recharts-custom-tooltip" />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+            {selectedSites.map((site, idx) => (
+              <Bar key={`prod_${site}`} dataKey={`prod_${site}`} name={`${site}`} fill={getSiteColor(site, idx)} radius={[4, 4, 0, 0]} />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      ) : <EmptyState />}
+    </SafeChartContainer>
+  ), [chartData, selectedSites]);
+
+  const fuelChart = useMemo(() => (
+    <SafeChartContainer height="350px" minHeight="300px">
+      {(width, height) => chartData.length > 0 ? (
+        <ResponsiveContainer width={width} height={height}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <RechartsTooltip wrapperClassName="recharts-custom-tooltip" />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+            {selectedSites.map((site, idx) => (
+              <Line key={`dies_${site}`} type="monotone" dataKey={`dies_${site}`} name={`${site}`} stroke={getSiteColor(site, idx)} strokeWidth={3} dot={{ fill: getSiteColor(site, idx), strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      ) : <EmptyState />}
+    </SafeChartContainer>
+  ), [chartData, selectedSites]);
+
+  const disposalChart = useMemo(() => (
+    <SafeChartContainer height="350px" minHeight="300px">
+      {(width, height) => chartData.length > 0 ? (
+        <ResponsiveContainer width={width} height={height}>
+          <AreaChart data={chartData}>
+            <defs>
+              {selectedSites.map((site, idx) => (
+                <linearGradient key={`grad_${site}`} id={`color_${idx}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={getSiteColor(site, idx)} stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor={getSiteColor(site, idx)} stopOpacity={0}/>
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+            <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
+            <RechartsTooltip wrapperClassName="recharts-custom-tooltip" />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+            {selectedSites.map((site, idx) => (
+              <Area key={`disp_${site}`} type="monotone" dataKey={`disp_${site}`} name={`${site}`} stroke={getSiteColor(site, idx)} fillOpacity={1} fill={`url(#color_${idx})`} />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : <EmptyState />}
+    </SafeChartContainer>
+  ), [chartData, selectedSites]);
+
   const toggleSite = (site) => {
     setSelectedSites(prev => 
       prev.includes(site) ? prev.filter(s => s !== site) : [...prev, site]
@@ -313,7 +378,7 @@ export default function Analytics() {
                   animate={{ opacity: 1, y: 0, scale: 1 }} 
                   exit={{ opacity: 0, y: -4, scale: 0.98 }} 
                   transition={{ duration: 0.15, ease: "easeOut" }}
-                  className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[260px] bg-[#151b28] border border-dark-border/80 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-xl"
+                  className="absolute top-[calc(100%+6px)] left-0 w-full min-w-[260px] bg-dark-card border border-dark-border/80 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-xl"
                 >
                   <div className="p-2 border-b border-dark-border/50 bg-black/20">
                     <div className="relative">
@@ -404,22 +469,7 @@ export default function Analytics() {
           {/* Production Chart */}
           <Card className="min-w-0 overflow-hidden">
             <h3 className="text-lg font-medium text-white mb-4">Production Trend by Site</h3>
-            <SafeChartContainer height="350px" minHeight="300px">
-              {(width, height) => chartData.length > 0 ? (
-                <ResponsiveContainer width={width} height={height}>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                    <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <RechartsTooltip cursor={{fill: '#1e293b', opacity: 0.4}} contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }} />
-                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                    {selectedSites.map((site, idx) => (
-                      <Bar key={`prod_${site}`} dataKey={`prod_${site}`} name={`${site}`} fill={getSiteColor(site, idx)} radius={[4, 4, 0, 0]} />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : <EmptyState />}
-            </SafeChartContainer>
+            {productionChart}
           </Card>
         </div>
       )}
@@ -451,22 +501,7 @@ export default function Analytics() {
 
           <Card className="min-w-0 overflow-hidden">
             <h3 className="text-lg font-medium text-white mb-4">Diesel Consumption Trends</h3>
-            <SafeChartContainer height="350px" minHeight="300px">
-              {(width, height) => chartData.length > 0 ? (
-                <ResponsiveContainer width={width} height={height}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                    <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <RechartsTooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }} />
-                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                    {selectedSites.map((site, idx) => (
-                      <Line key={`dies_${site}`} type="monotone" dataKey={`dies_${site}`} name={`${site}`} stroke={getSiteColor(site, idx)} strokeWidth={3} dot={{ fill: getSiteColor(site, idx), strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : <EmptyState />}
-            </SafeChartContainer>
+            {fuelChart}
           </Card>
         </div>
       )}
@@ -498,30 +533,7 @@ export default function Analytics() {
 
           <Card className="min-w-0 overflow-hidden">
             <h3 className="text-lg font-medium text-white mb-4">Disposal Performance Area</h3>
-            <SafeChartContainer height="350px" minHeight="300px">
-              {(width, height) => chartData.length > 0 ? (
-                <ResponsiveContainer width={width} height={height}>
-                  <AreaChart data={chartData}>
-                    <defs>
-                      {selectedSites.map((site, idx) => (
-                        <linearGradient key={`grad_${site}`} id={`color_${idx}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={getSiteColor(site, idx)} stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor={getSiteColor(site, idx)} stopOpacity={0}/>
-                        </linearGradient>
-                      ))}
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                    <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} />
-                    <RechartsTooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }} />
-                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                    {selectedSites.map((site, idx) => (
-                      <Area key={`disp_${site}`} type="monotone" dataKey={`disp_${site}`} name={`${site}`} stroke={getSiteColor(site, idx)} fillOpacity={1} fill={`url(#color_${idx})`} />
-                    ))}
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : <EmptyState />}
-            </SafeChartContainer>
+            {disposalChart}
           </Card>
         </div>
       )}

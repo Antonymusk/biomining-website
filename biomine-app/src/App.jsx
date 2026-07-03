@@ -10,7 +10,6 @@ import { lazyWithRetry } from "./lib/utils";
 // Lazy load heavy page modules using a robust, self-recovering importer
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const MISEntry = lazyWithRetry(() => import("./pages/MISEntry"));
-const Operations = lazyWithRetry(() => import("./pages/Operations"));
 const FleetControl = lazyWithRetry(() => import("./pages/FleetControl"));
 const Inventory = lazyWithRetry(() => import("./pages/Inventory"));
 const Analytics = lazyWithRetry(() => import("./pages/Analytics"));
@@ -18,14 +17,12 @@ const Reports = lazyWithRetry(() => import("./pages/Reports"));
 const Settings = lazyWithRetry(() => import("./pages/Settings"));
 const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const AlertCenter = lazyWithRetry(() => import("./pages/AlertCenter"));
-const DriverManagement = lazyWithRetry(() => import("./pages/DriverManagement"));
 const RequisitionCenter = lazyWithRetry(() => import("./pages/RequisitionCenter"));
 const MaintenanceCenter = lazyWithRetry(() => import("./pages/MaintenanceCenter"));
 const RecycleBin = lazyWithRetry(() => import("./pages/RecycleBin"));
 const Login = lazyWithRetry(() => import("./pages/Login"));
 const Signup = lazyWithRetry(() => import("./pages/Signup"));
 const UserManagement = lazyWithRetry(() => import("./pages/UserManagement"));
-const Manpower = lazyWithRetry(() => import("./pages/Manpower"));
 const Notifications = lazyWithRetry(() => import("./pages/Notifications"));
 const PriceList = lazyWithRetry(() => import("./pages/PriceList"));
 import { AuthProvider } from "./lib/AuthContext";
@@ -110,14 +107,11 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index element={<ProtectedRoute module="Dashboard"><Dashboard /></ProtectedRoute>} />
               <Route path="mis-entry" element={<ProtectedRoute module="MIS Entry"><MISEntry /></ProtectedRoute>} />
-              <Route path="operations" element={<ProtectedRoute module="Operations"><Operations /></ProtectedRoute>} />
               <Route path="fleet-control" element={<ProtectedRoute module="Fleet Control"><FleetControl /></ProtectedRoute>} />
               <Route path="inventory" element={<ProtectedRoute module="Inventory"><Inventory /></ProtectedRoute>} />
               <Route path="analytics" element={<ProtectedRoute module="Analytics"><Analytics /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute module="Reports"><Reports /></ProtectedRoute>} />
               <Route path="alert-center" element={<ProtectedRoute module="Alert Center"><AlertCenter /></ProtectedRoute>} />
-              <Route path="drivers" element={<ProtectedRoute module="Drivers"><DriverManagement /></ProtectedRoute>} />
-              <Route path="manpower" element={<ProtectedRoute module="Manpower"><Manpower /></ProtectedRoute>} />
               <Route path="requisition-center" element={<ProtectedRoute module="Procurement"><RequisitionCenter /></ProtectedRoute>} />
               <Route path="maintenance" element={<ProtectedRoute module="Maintenance"><MaintenanceCenter /></ProtectedRoute>} />
               <Route path="recycle-bin" element={<ProtectedRoute module="Recycle Bin"><RecycleBin /></ProtectedRoute>} />

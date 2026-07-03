@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -24,7 +24,7 @@ const FALLBACK_TARGETS = {
 };
 
 // Circular Gauge Component for Premium Aesthetic
-const TargetGauge = ({ current, target, title="Achieved", size=44, scoreMode=false }) => {
+const TargetGauge = React.memo(({ current, target, title="Achieved", size=44, scoreMode=false }) => {
   const percentage = Math.min(Math.round((current / (target || 1)) * 100), 100);
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
@@ -64,12 +64,13 @@ const TargetGauge = ({ current, target, title="Achieved", size=44, scoreMode=fal
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center transform text-center">
-        <span className="text-3xl font-black text-white tracking-tight">{percentage}{scoreMode ? '' : '%'}</span>
-        <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">{title}</span>
+        <span className="gauge-value text-3xl font-black text-white tracking-tight">{percentage}{scoreMode ? '' : '%'}</span>
+        <span className="gauge-label text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">{title}</span>
       </div>
     </div>
   );
-};
+});
+TargetGauge.displayName = "TargetGauge";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -338,7 +339,7 @@ export default function Dashboard() {
           variants={cardVariants}
           whileHover={cardHoverState}
         >
-          <Card className="h-full relative bg-[#0D1117] border-emerald-500/10 flex flex-col md:flex-row gap-6 p-6 overflow-hidden cursor-pointer">
+          <Card className="h-full relative bg-dark-card border-dark-border flex flex-col md:flex-row gap-6 p-6 overflow-hidden cursor-pointer">
              <div className="absolute -right-20 -bottom-20 opacity-5 text-emerald-500"><Target size={250} /></div>
              
              <div className="flex-1 flex flex-col justify-between">

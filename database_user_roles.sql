@@ -66,7 +66,7 @@ BEGIN
     assigned_role := 'Super Admin';
     assigned_status := 'Approved';
   ELSE
-    assigned_role := 'Operator';
+    assigned_role := 'Viewer';
     assigned_status := 'Pending';
   END IF;
 

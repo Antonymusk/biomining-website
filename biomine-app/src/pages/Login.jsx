@@ -42,7 +42,7 @@ export default function Login() {
   const handleGoogleSignIn = () => {
     toast.error("Google Enterprise SSO is disabled for this local cluster. Please sign in with email.", {
       icon: '🔐',
-      style: { borderRadius: '12px', background: '#0f172a', color: '#f8fafc', border: '1px solid #334155' }
+      style: { borderRadius: '12px', background: '#080808', color: '#f8fafc', border: '1px solid #1f1f23' }
     });
   };
 
@@ -50,7 +50,7 @@ export default function Login() {
     <div className="w-full">
       {/* Page Branding Header */}
       <div className="mb-6 text-center">
-        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20 mb-5">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-orange-500 shadow-lg shadow-primary/20 mb-5">
           <span className="text-2xl font-black text-white">B</span>
         </div>
         
@@ -66,7 +66,7 @@ export default function Login() {
       <button 
         type="button"
         onClick={handleGoogleSignIn}
-        className="w-full h-12 bg-[#0f172a]/40 hover:bg-[#0f172a]/80 border border-white/5 hover:border-white/10 text-slate-200 rounded-xl transition-all duration-200 flex items-center justify-center gap-2.5 font-medium text-xs shadow-sm active:scale-[0.99] select-none cursor-pointer"
+        className="w-full h-12 bg-dark-card/40 hover:bg-dark-card/80 border border-white/5 hover:border-white/10 text-slate-200 rounded-xl transition-all duration-200 flex items-center justify-center gap-2.5 font-medium text-xs shadow-sm active:scale-[0.99] select-none cursor-pointer"
       >
         <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -104,7 +104,7 @@ export default function Login() {
               placeholder="mail@example.com" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10.5 h-11 bg-[#0f172a]/50 border-white/5 focus:border-cyan-500/30 text-slate-200 text-sm placeholder-slate-600" 
+              className="pl-10.5 h-11 bg-dark-card/50 border-white/5 focus:border-primary/30 text-slate-200 text-sm placeholder-slate-600" 
               required
             />
           </div>
@@ -122,7 +122,7 @@ export default function Login() {
               placeholder="••••••••••••••••" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10.5 h-11 bg-[#0f172a]/50 border-white/5 focus:border-cyan-500/30 text-slate-200 text-sm placeholder-slate-600" 
+              className="pl-10.5 h-11 bg-dark-card/50 border-white/5 focus:border-primary/30 text-slate-200 text-sm placeholder-slate-600" 
               required
             />
           </div>
@@ -130,17 +130,17 @@ export default function Login() {
 
         <div className="flex items-center justify-between pt-1.5 select-none">
           <label className="flex items-center gap-2 text-xs text-slate-400 font-medium cursor-pointer">
-            <input type="checkbox" className="rounded border-white/10 bg-[#0f172a] text-cyan-600 focus:ring-0 h-3.5 w-3.5 cursor-pointer" />
+            <input type="checkbox" className="rounded border-white/10 bg-dark-card text-primary focus:ring-0 h-3.5 w-3.5 cursor-pointer" />
             Remember Me
           </label>
-          <Link to="#" onClick={() => toast("Contact system administrator to reset credentials.", { icon: '🎫' })} className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <Link to="#" onClick={() => toast("Contact system administrator to reset credentials.", { icon: '🎫' })} className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
             Forgot Password?
           </Link>
         </div>
 
         <Button 
           type="submit" 
-          className="w-full h-12 mt-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-500/90 hover:to-blue-600/90 text-white text-sm font-bold shadow-[0_4px_16px_rgba(6,182,212,0.15)] transition-all active:scale-[0.99]"
+          className="w-full h-12 mt-4 bg-gradient-to-r from-primary to-orange-500 hover:opacity-90 text-white text-sm font-bold shadow-[0_4px_16px_rgba(255,59,48,0.15)] transition-all active:scale-[0.99]"
           disabled={loading}
         >
           {loading ? <Loader2 className="animate-spin" size={18} /> : "Access Dashboard"}
@@ -149,7 +149,7 @@ export default function Login() {
 
       <div className="mt-8 text-center">
         <span className="text-xs text-slate-500 font-medium">Not Registered Yet? </span>
-        <Link to="/signup" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
+        <Link to="/signup" className="text-xs font-bold text-primary hover:text-primary/80 transition-colors">
           Request Enterprise Access
         </Link>
       </div>

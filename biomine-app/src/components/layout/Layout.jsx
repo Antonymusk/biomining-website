@@ -131,11 +131,7 @@ export function Layout() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-dark-bg text-foreground relative">
-      {/* Background Animated Rich Cinematic Gradient Blobs */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-80">
-        <div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[140px] animate-ambient-1" />
-        <div className="absolute -bottom-40 -right-40 h-[700px] w-[700px] rounded-full bg-accent/8 blur-[160px] animate-ambient-2" />
-      </div>
+      {/* Background Animated Rich Cinematic Gradient Blobs - Disabled for pure black theme */}
 
       <Sidebar 
         isCollapsed={isCollapsed} 
@@ -186,7 +182,7 @@ export function Layout() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-[#111622]/95 border border-dark-border/80 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl"
+              className="bg-dark-card/95 border border-dark-border/80 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Search input header */}

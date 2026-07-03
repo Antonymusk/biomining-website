@@ -6,22 +6,16 @@ import { useNotifications } from "../../lib/NotificationContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert, AlertCircle, Info, CheckCircle2 } from "lucide-react";
+import { useAppearance } from "../../lib/AppearanceContext";
 
 export const TopHeader = React.memo(function TopHeader({ setIsMobileOpen, title = "Dashboard", subtitle = "Overview" }) {
   const { user, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem("biomine_theme") || "dark");
-
-  useEffect(() => {
-    if (theme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-    localStorage.setItem("biomine_theme", theme);
-  }, [theme]);
+  const { settings, updateSettings } = useAppearance();
+  const theme = settings.theme;
+  const setTheme = (newTheme) => updateSettings({ theme: newTheme });
 
   const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState(null);

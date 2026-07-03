@@ -114,14 +114,14 @@ const parseMarkdownToHTML = (text) => {
     .replace(/>/g, "&gt;");
 
   // Bold
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-white">$1</strong>');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold">$1</strong>');
 
   // Headers
-  html = html.replace(/^### (.*$)/gim, '<div class="text-[10px] font-black tracking-wider text-primary uppercase mt-3 mb-1">$1</div>');
-  html = html.replace(/^## (.*$)/gim, '<div class="text-[11px] font-black tracking-wide text-white uppercase mt-4 mb-1.5 border-b border-white/5 pb-0.5">$1</div>');
+  html = html.replace(/^### (.*$)/gim, '<div class="ai-md-h3 text-[10px] font-black tracking-wider uppercase mt-3 mb-1">$1</div>');
+  html = html.replace(/^## (.*$)/gim, '<div class="ai-md-h2 text-[11px] font-black tracking-wide uppercase mt-4 mb-1.5 border-b pb-0.5">$1</div>');
 
   // Bullets
-  html = html.replace(/^\s*[-*•]\s+(.*)/gim, '<div class="flex items-start gap-2 my-1 pl-1"><span class="text-primary font-black text-[9px] mt-0.5">■</span><span class="text-gray-300 flex-1">$1</span></div>');
+  html = html.replace(/^\s*[-*•]\s+(.*)/gim, '<div class="flex items-start gap-2 my-1 pl-1"><span class="ai-md-bullet font-black text-[9px] mt-0.5">■</span><span class="ai-md-bullet-text flex-1">$1</span></div>');
 
   return html;
 };
@@ -632,7 +632,7 @@ Ready for direct log queries.`;
             exit={{ opacity: 0, scale: 0.93, y: 35 }}
             transition={{ type: "spring", stiffness: 350, damping: 26 }}
             className={cn(
-              "w-[370px] sm:w-[410px] h-[550px] mb-4 rounded-2xl border bg-slate-950/90 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300",
+              "ai-copilot-window w-[370px] sm:w-[410px] h-[550px] mb-4 rounded-2xl border bg-slate-950/90 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300",
               activeProtocol === "warrior" && "border-primary/20 shadow-primary/5",
               activeProtocol === "analytics" && "border-teal-500/20 shadow-teal-500/5",
               activeProtocol === "watchdog" && "border-rose-500/20 shadow-rose-500/5",
@@ -643,7 +643,7 @@ Ready for direct log queries.`;
             }}
           >
             {/* Drawer Header */}
-            <div className="p-4 border-b border-white/5 bg-gradient-to-r from-white/[0.02] to-transparent flex items-center justify-between shrink-0">
+            <div className="ai-header p-4 border-b border-white/5 bg-gradient-to-r from-white/[0.02] to-transparent flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className={cn(
                   "relative h-8.5 w-8.5 rounded-xl flex items-center justify-center border transition-all duration-300",
@@ -744,7 +744,7 @@ Ready for direct log queries.`;
             </div>
 
             {/* Protocol Switching Bar */}
-            <div className="grid grid-cols-4 border-b border-white/5 bg-slate-950/40 p-1 gap-1 select-none">
+            <div className="ai-protocol-bar grid grid-cols-4 border-b border-white/5 bg-slate-950/40 p-1 gap-1 select-none">
               {PROTOCOLS.map(proto => {
                 const isActive = activeProtocol === proto.id;
                 return (
@@ -802,7 +802,7 @@ Ready for direct log queries.`;
               </AnimatePresence>
 
               {/* Messages Feed */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.002)_0%,transparent_80%)]">
+              <div className="ai-messages-box flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.002)_0%,transparent_80%)]">
                 {messages.map((msg, index) => {
                   const isUser = msg.role === "user";
                   return (
@@ -811,10 +811,10 @@ Ready for direct log queries.`;
                       className={cn("flex gap-2.5", isUser && "flex-row-reverse")}
                     >
                       <div className={cn(
-                        "h-7 w-7 rounded-lg shrink-0 flex items-center justify-center border transition-colors duration-300",
+                        "ai-avatar h-7 w-7 rounded-lg shrink-0 flex items-center justify-center border transition-colors duration-300",
                         isUser 
-                          ? "bg-slate-800 border-slate-700 text-slate-200" 
-                          : cn("bg-slate-950 border-white/5", currentProtocol.accentColor)
+                          ? "ai-avatar-user bg-slate-800 border-slate-700 text-slate-200" 
+                          : cn("ai-avatar-bot bg-slate-950 border-white/5", currentProtocol.accentColor)
                       )}>
                         {isUser ? <MessageSquare size={13} /> : <Bot size={13} />}
                       </div>
@@ -823,8 +823,8 @@ Ready for direct log queries.`;
                         <div className={cn(
                           "p-3 rounded-2xl text-[11px] leading-relaxed shadow-sm transition-all duration-300",
                           isUser
-                            ? "bg-primary text-white rounded-tr-none font-medium"
-                            : cn("rounded-tl-none border", currentProtocol.bubbleClass)
+                            ? "ai-bubble-user bg-primary text-white rounded-tr-none font-medium"
+                            : cn("ai-bubble-bot rounded-tl-none border", currentProtocol.bubbleClass)
                         )}>
                           {msg.role === "assistant" ? (
                             index === streamingIndex ? (
@@ -846,10 +846,10 @@ Ready for direct log queries.`;
                 })}
                 {isTyping && (
                   <div className="flex gap-2.5">
-                    <div className={cn("h-7 w-7 rounded-lg border shrink-0 flex items-center justify-center animate-pulse bg-slate-950", currentProtocol.colorClass)}>
+                    <div className={cn("ai-avatar ai-avatar-bot h-7 w-7 rounded-lg border shrink-0 flex items-center justify-center animate-pulse bg-slate-950", currentProtocol.colorClass)}>
                       <Bot size={13} />
                     </div>
-                    <div className={cn("p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-sm h-[34px] border bg-slate-950", currentProtocol.bubbleClass)}>
+                    <div className={cn("ai-bubble-bot p-3 rounded-2xl rounded-tl-none flex items-center gap-1 shadow-sm h-[34px] border bg-slate-950", currentProtocol.bubbleClass)}>
                       <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce bg-current", currentProtocol.accentColor)} style={{ animationDelay: "0ms" }}></span>
                       <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce bg-current", currentProtocol.accentColor)} style={{ animationDelay: "150ms" }}></span>
                       <span className={cn("h-1.5 w-1.5 rounded-full animate-bounce bg-current", currentProtocol.accentColor)} style={{ animationDelay: "300ms" }}></span>
@@ -860,13 +860,13 @@ Ready for direct log queries.`;
               </div>
 
               {/* Quick Directives Bar */}
-              <div className="px-3 py-2 border-t border-white/5 bg-slate-950/40 overflow-x-auto scrollbar-none flex gap-1.5 shrink-0 select-none">
+              <div className="ai-quick-directives px-3 py-2 border-t border-white/5 bg-slate-950/40 overflow-x-auto scrollbar-none flex gap-1.5 shrink-0 select-none">
                 {DIRECTIVES.map((d, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleSendDirective(d.query)}
-                    className="px-2.5 py-1 bg-white/[0.02] border border-white/5 hover:bg-white/5 text-slate-300 hover:text-white rounded-lg text-[8px] font-bold uppercase tracking-widest shrink-0 transition-all active:scale-95 cursor-pointer hover:border-white/10"
+                    className="ai-directive-btn px-2.5 py-1 bg-white/[0.02] border border-white/5 hover:bg-white/5 text-slate-300 hover:text-white rounded-lg text-[8px] font-bold uppercase tracking-widest shrink-0 transition-all active:scale-95 cursor-pointer hover:border-white/10"
                   >
                     {d.label}
                   </button>
@@ -874,13 +874,13 @@ Ready for direct log queries.`;
               </div>
 
               {/* Message Input Tray */}
-              <form onSubmit={handleSendMessage} className="p-3 border-t border-white/5 bg-slate-950/60 flex gap-2 shrink-0">
+              <form onSubmit={handleSendMessage} className="ai-input-tray p-3 border-t border-white/5 bg-slate-950/60 flex gap-2 shrink-0">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="State your directive, Sir..."
-                  className="flex-1 bg-slate-950 border border-white/5 text-[11px] text-white px-3 py-2.5 rounded-xl focus:outline-none focus:border-white/10 placeholder-gray-600 font-medium"
+                  className="ai-input-field flex-1 bg-slate-950 border border-white/5 text-[11px] text-white px-3 py-2.5 rounded-xl focus:outline-none focus:border-white/10 placeholder-gray-600 font-medium"
                 />
                 <button
                   type="submit"

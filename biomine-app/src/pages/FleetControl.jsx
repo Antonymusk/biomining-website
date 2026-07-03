@@ -16,7 +16,7 @@ import { useSites } from "../hooks/useSites";
 import { useAuth } from "../lib/AuthContext";
 
 export default function FleetControl() {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [trips, setTrips] = useState([]);
   const { sites: dbSites, loading: isSitesLoading } = useSites();
@@ -188,9 +188,11 @@ export default function FleetControl() {
               placeholder="Search vehicles or IDs..." className="pl-8 bg-dark-bg/60 border-dark-border" 
             />
           </div>
-          <button onClick={() => setIsAddVehicleOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all text-sm font-medium">
-            <Plus size={16} /> Add Vehicle
-          </button>
+          {hasPermission('Fleet Control', 'READ_WRITE') && (
+            <button onClick={() => setIsAddVehicleOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all text-sm font-medium">
+              <Plus size={16} /> Add Vehicle
+            </button>
+          )}
         </div>
       </div>
 

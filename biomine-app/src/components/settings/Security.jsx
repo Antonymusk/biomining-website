@@ -3,6 +3,7 @@ import { ShieldCheck, Monitor, Smartphone, MapPin, KeyRound, Lock, Power, Finger
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../lib/AuthContext";
 import toast from "react-hot-toast";
 
 const MOCK_SESSIONS = [
@@ -19,17 +20,37 @@ const MOCK_AUDIT = [
 ];
 
 export default function Security() {
+  const { hasPermission, logoutOthers } = useAuth();
+  const isReadOnly = !hasPermission('Settings', 'READ_WRITE');
   const [sessions, setSessions] = useState(MOCK_SESSIONS);
   const [resetLoading, setResetLoading] = useState(false);
+  const [terminatingOthers, setTerminatingOthers] = useState(false);
 
   const handleTerminateSession = (id) => {
+    if (isReadOnly) return;
     setSessions(sessions.filter(s => s.id !== id));
     toast.success("External session terminated.", {
       icon: "🔒"
     });
   };
 
+  const handleTerminateAllOthers = async () => {
+    if (isReadOnly) return;
+    if (!confirm("Are you sure you want to terminate all other active sessions for your account?")) return;
+    setTerminatingOthers(true);
+    try {
+      await logoutOthers();
+      // Revoke mock sessions as well for UI consistency
+      setSessions(sessions.filter(s => s.current));
+    } catch (err) {
+      toast.error("Failed to terminate external sessions.");
+    } finally {
+      setTerminatingOthers(false);
+    }
+  };
+
   const triggerPasswordReset = async () => {
+    if (isReadOnly) return;
     setResetLoading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
@@ -59,11 +80,24 @@ export default function Security() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Sessions */}
         <Card className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-white/5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/5 gap-2">
             <h3 className="font-bold text-white text-sm flex items-center gap-2">
               <Monitor size={16} className="text-slate-400" /> Live Token Workspace
             </h3>
-            <span className="text-[10px] font-bold tracking-widest text-emerald-400 px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20">SECURE</span>
+            <div className="flex items-center gap-3">
+              {!isReadOnly && (
+                <Button 
+                  onClick={handleTerminateAllOthers}
+                  disabled={terminatingOthers}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-[10px] uppercase font-bold text-rose-400 border-rose-500/20 hover:bg-rose-500/10 h-7"
+                >
+                  {terminatingOthers ? "Terminating..." : "Terminate Other Sessions"}
+                </Button>
+              )}
+              <span className="text-[10px] font-bold tracking-widest text-emerald-400 px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20">SECURE</span>
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -92,7 +126,7 @@ export default function Security() {
                 
                 <div className="flex items-center gap-4">
                   <span className="text-xs text-slate-400 hidden md:block">{session.active}</span>
-                  {!session.current && (
+                  {!session.current && !isReadOnly && (
                     <button 
                       onClick={() => handleTerminateSession(session.id)}
                       className="p-2 hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
@@ -119,7 +153,7 @@ export default function Security() {
                 variant="outline" 
                 className="w-full justify-start gap-3 bg-slate-950/50 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all py-6"
                 onClick={triggerPasswordReset}
-                disabled={resetLoading}
+                disabled={resetLoading || isReadOnly}
               >
                 <div className="p-2 bg-slate-800 rounded text-slate-300">
                   <Lock size={16} />

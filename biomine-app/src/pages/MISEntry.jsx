@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Save, Plus, Trash2, CheckCircle2, X, Lock, 
@@ -16,8 +16,115 @@ import { useNotifications } from "../lib/NotificationContext";
 import { useSites } from "../hooks/useSites";
 import { siteService } from "../services/siteService";
 
+const getVehicleAnalysis = (v) => {
+  const hrs = Number(v.hours) || 0;
+  const fuel = Number(v.diesel) || 0;
+  const rate = hrs > 0 ? fuel / hrs : 0;
+  let baseBench = 9;
+  const n = (v.name || "").toLowerCase();
+  if (n.includes("200") || n.includes("210")) baseBench = 12;
+  else if (n.includes("hyva") || n.includes("truck")) baseBench = 4;
+
+  let status = "Operational";
+  let color = "text-gray-400 border-white/10";
+  if (rate > baseBench * 1.15) {
+    status = "High Burn"; color = "text-warning border-warning/30 bg-warning/5";
+  } else if (rate > 0 && rate < baseBench * 0.85) {
+    status = "Efficient"; color = "text-emerald-500 border-emerald-500/30 bg-emerald-500/5";
+  }
+  return { rate, baseBench, status, color };
+};
+
+const VehicleRow = React.memo(({ v, i, isShiftClosedToday, isReadOnly, updateVehicle, removeVehicle }) => {
+  const [localV, setLocalV] = useState(v);
+  
+  // Sync if parent updates externally
+  useEffect(() => { setLocalV(v); }, [v]);
+
+  const handleChange = (f, val) => setLocalV(prev => ({...prev, [f]: val}));
+  const handleBlur = (f, val) => {
+    if (v[f] !== val) updateVehicle(i, f, val);
+  };
+
+  const a = getVehicleAnalysis(localV);
+
+  return (
+    <div className="bg-slate-950/50 border border-white/5 rounded-xl p-3">
+      <div className="flex flex-col md:flex-row gap-3">
+         <div className="flex-1">
+            <Input placeholder="Vehicle/Excavator Name" value={localV.name} 
+              onChange={e => handleChange('name', e.target.value)} 
+              onBlur={e => handleBlur('name', e.target.value)}
+              disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 text-white font-bold text-xs" />
+         </div>
+         <div className="w-full md:w-24">
+            <Input type="number" placeholder="Hrs" value={localV.hours} 
+              onChange={e => handleChange('hours', e.target.value)} 
+              onBlur={e => handleBlur('hours', e.target.value)}
+              disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 text-center font-mono" />
+         </div>
+         <div className="w-full md:w-28">
+            <Input type="number" placeholder="Diesel (L)" value={localV.diesel} 
+              onChange={e => handleChange('diesel', e.target.value)} 
+              onBlur={e => handleBlur('diesel', e.target.value)}
+              disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 font-mono" />
+         </div>
+         {!isReadOnly && (
+            <button onClick={() => removeVehicle(v.id)} disabled={isShiftClosedToday} className="text-gray-600 hover:text-red-500 transition-colors flex items-center justify-center px-2 disabled:opacity-30"><Trash2 size={16} /></button>
+         )}
+      </div>
+      {localV.name && localV.hours && (
+         <div className={`mt-2 pt-2 border-t border-white/5 text-[10px] flex justify-between items-center ${a.color}`}>
+            <span className="font-bold uppercase tracking-widest">Current Burn: {a.rate.toFixed(1)} L/Hr</span>
+            <span className="opacity-70">Metric Status: {a.status} (Bench: {a.baseBench} L/h)</span>
+         </div>
+      )}
+    </div>
+  );
+});
+VehicleRow.displayName = 'VehicleRow';
+
+const MachineRow = React.memo(({ m, i, isShiftClosedToday, isReadOnly, updateMachine, removeMachine }) => {
+  const [localM, setLocalM] = useState(m);
+  
+  useEffect(() => { setLocalM(m); }, [m]);
+
+  const handleChange = (f, val) => setLocalM(prev => ({...prev, [f]: val}));
+  const handleBlur = (f, val) => {
+    if (m[f] !== val) updateMachine(i, f, val);
+  };
+
+  return (
+    <div className="bg-slate-950/50 border border-white/5 rounded-xl p-3 flex flex-col md:flex-row gap-3">
+      <div className="flex-1">
+        <Input placeholder="Plant Node Name" value={localM.name} 
+          onChange={e => handleChange('name', e.target.value)} 
+          onBlur={e => handleBlur('name', e.target.value)}
+          disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 font-bold text-xs" />
+      </div>
+      <div className="flex-1">
+        <Input type="number" placeholder="Yield (Tons)" value={localM.production} 
+          onChange={e => handleChange('production', e.target.value)} 
+          onBlur={e => handleBlur('production', e.target.value)}
+          disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 font-mono" />
+      </div>
+      <div className="flex-1">
+        <Input type="number" placeholder="Aux Fuel (L)" value={localM.diesel} 
+          onChange={e => handleChange('diesel', e.target.value)} 
+          onBlur={e => handleBlur('diesel', e.target.value)}
+          disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/5 font-mono" />
+      </div>
+      {!isReadOnly && (
+        <button onClick={() => removeMachine(m.id)} disabled={isShiftClosedToday} className="text-gray-600 hover:text-red-500 px-2 disabled:opacity-30"><Trash2 size={16} /></button>
+      )}
+    </div>
+  );
+});
+MachineRow.displayName = 'MachineRow';
+
 export default function MISEntry() {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
+  const isReadOnly = !hasPermission('MIS', 'READ_WRITE');
   const { emitOperationalEvent } = useNotifications();
   const { sites: dbSites, loading: isSitesLoading, refetch: refetchSites } = useSites();
   
@@ -169,35 +276,16 @@ export default function MISEntry() {
     fetchHistoric();
   }, [site]);
 
-  const getVehicleAnalysis = (v) => {
-    const hrs = Number(v.hours) || 0;
-    const fuel = Number(v.diesel) || 0;
-    const rate = hrs > 0 ? fuel / hrs : 0;
-    let baseBench = 9;
-    const n = (v.name || "").toLowerCase();
-    if (n.includes("200") || n.includes("210")) baseBench = 12;
-    else if (n.includes("hyva") || n.includes("truck")) baseBench = 4;
-
-    let status = "Operational";
-    let color = "text-gray-400 border-white/10";
-    if (rate > baseBench * 1.15) {
-      status = "High Burn"; color = "text-warning border-warning/30 bg-warning/5";
-    } else if (rate > 0 && rate < baseBench * 0.85) {
-      status = "Efficient"; color = "text-emerald-500 border-emerald-500/30 bg-emerald-500/5";
-    }
-    return { rate, baseBench, status, color };
-  };
-
   // --------------------------------------------
   // Handlers
   // --------------------------------------------
-  const addVehicle = () => setVehicles([...vehicles, { id: crypto.randomUUID(), name: "", hours: "", diesel: "" }]);
-  const updateVehicle = (idx, f, v) => { const u = [...vehicles]; u[idx][f] = v; setVehicles(u); };
-  const removeVehicle = (id) => setVehicles(vehicles.filter(v => v.id !== id));
+  const addVehicle = useCallback(() => setVehicles(prev => [...prev, { id: crypto.randomUUID(), name: "", hours: "", diesel: "" }]), []);
+  const updateVehicle = useCallback((idx, f, v) => setVehicles(prev => { const u = [...prev]; u[idx] = {...u[idx], [f]: v}; return u; }), []);
+  const removeVehicle = useCallback((id) => setVehicles(prev => prev.filter(v => v.id !== id)), []);
 
-  const addMachine = () => setMachines([...machines, { id: crypto.randomUUID(), name: "", production: "", diesel: "" }]);
-  const updateMachine = (idx, f, v) => { const u = [...machines]; u[idx][f] = v; setMachines(u); };
-  const removeMachine = (id) => setMachines(machines.filter(m => m.id !== id));
+  const addMachine = useCallback(() => setMachines(prev => [...prev, { id: crypto.randomUUID(), name: "", production: "", diesel: "" }]), []);
+  const updateMachine = useCallback((idx, f, v) => setMachines(prev => { const u = [...prev]; u[idx] = {...u[idx], [f]: v}; return u; }), []);
+  const removeMachine = useCallback((id) => setMachines(prev => prev.filter(m => m.id !== id)), []);
 
   const validate = () => {
      if (!site) return "Location required";
@@ -322,14 +410,17 @@ export default function MISEntry() {
             <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                Input Matrix Controller
                {isShiftClosedToday && <Badge className="bg-red-500/10 text-red-400 border-red-500/20 font-black uppercase gap-1.5"><Lock size={12} /> Locked</Badge>}
+               {isReadOnly && <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 font-black uppercase gap-1.5"><Lock size={12} /> Read Only</Badge>}
             </h1>
          </div>
 
-         <div className="flex gap-3">
-            <Button onClick={handleSaveEntry} disabled={isSubmitting || isShiftClosedToday} variant="primary" className="font-black gap-2 uppercase text-xs shadow-lg shadow-primary/20">
-               {isSubmitting ? <span className="animate-spin">...</span> : <Save size={14} />} Sync Data
-            </Button>
-         </div>
+         {!isReadOnly && (
+            <div className="flex gap-3">
+               <Button onClick={handleSaveEntry} disabled={isSubmitting || isShiftClosedToday} variant="primary" className="font-black gap-2 uppercase text-xs shadow-lg shadow-primary/20">
+                  {isSubmitting ? <span className="animate-spin">...</span> : <Save size={14} />} Sync Data
+               </Button>
+            </div>
+         )}
       </div>
 
       {/* MASTER CONFIG */}
@@ -339,12 +430,12 @@ export default function MISEntry() {
             <div className="space-y-4">
                <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Log Window</label>
-                  <Input type="date" value={date} onChange={e => setDate(e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/10" />
+                  <Input type="date" value={date} onChange={e => setDate(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10" />
                </div>
                <div>
                   <div className="flex justify-between items-center mb-1.5">
                      <label className="text-[10px] font-bold text-gray-400 uppercase">Operational Zone</label>
-                     {isSuperAdmin && (
+                     {isSuperAdmin && !isReadOnly && (
                         <button 
                            type="button"
                            onClick={() => setIsSiteModalOpen(true)}
@@ -354,13 +445,13 @@ export default function MISEntry() {
                         </button>
                      )}
                   </div>
-                  <select value={site} onChange={e => setSite(e.target.value)} disabled={isShiftClosedToday || allowedSites.length <= 1} className="w-full h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-white text-sm font-bold focus:border-primary outline-none transition-all cursor-pointer">
+                  <select value={site} onChange={e => setSite(e.target.value)} disabled={isShiftClosedToday || allowedSites.length <= 1 || isReadOnly} className="w-full h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-white text-sm font-bold focus:border-primary outline-none transition-all cursor-pointer">
                      {allowedSites.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                   </select>
                </div>
                <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Total Disposal (Tons)</label>
-                  <Input type="number" value={disposal} onChange={e => setDisposal(e.target.value)} placeholder="0.00" disabled={isShiftClosedToday} className="bg-slate-950 border-white/10 text-lg font-mono" />
+                  <Input type="number" value={disposal} onChange={e => setDisposal(e.target.value)} placeholder="0.00" disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10 text-lg font-mono" />
                </div>
             </div>
          </Card>
@@ -375,11 +466,11 @@ export default function MISEntry() {
             <div className="grid grid-cols-2 gap-4 flex-1">
                <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Fuel Opening (L)</label>
-                  <Input type="number" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/10" />
+                  <Input type="number" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10" />
                </div>
                <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Claimed Consumed (L)</label>
-                  <Input type="number" value={claimedDiesel} onChange={e => setClaimedDiesel(e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/10" />
+                  <Input type="number" value={claimedDiesel} onChange={e => setClaimedDiesel(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10" />
                </div>
                <div className="bg-slate-900/50 border border-white/5 p-3 rounded-xl flex flex-col justify-center">
                   <span className="text-[10px] text-gray-500 font-bold uppercase">Calc Total Sum</span>
@@ -399,33 +490,22 @@ export default function MISEntry() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                <Truck size={16} className="text-cyan-500" /> Fleet Asset Telemetry
             </h3>
-            <Button variant="outline" size="sm" onClick={addVehicle} disabled={isShiftClosedToday} className="text-[10px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-wider"><Plus size={12} className="mr-1" /> Append Asset</Button>
+            {!isReadOnly && (
+               <Button variant="outline" size="sm" onClick={addVehicle} disabled={isShiftClosedToday} className="text-[10px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-wider"><Plus size={12} className="mr-1" /> Append Asset</Button>
+            )}
          </div>
          <div className="space-y-3">
-            {vehicles.map((v, i) => {
-               const a = getVehicleAnalysis(v);
-               return (
-               <div key={v.id} className="bg-slate-950/50 border border-white/5 rounded-xl p-3">
-                  <div className="flex flex-col md:flex-row gap-3">
-                     <div className="flex-1">
-                        <Input placeholder="Vehicle/Excavator Name" value={v.name} onChange={e => updateVehicle(i, 'name', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 text-white font-bold text-xs" />
-                     </div>
-                     <div className="w-full md:w-24">
-                        <Input type="number" placeholder="Hrs" value={v.hours} onChange={e => updateVehicle(i, 'hours', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 text-center font-mono" />
-                     </div>
-                     <div className="w-full md:w-28">
-                        <Input type="number" placeholder="Diesel (L)" value={v.diesel} onChange={e => updateVehicle(i, 'diesel', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 font-mono" />
-                     </div>
-                     <button onClick={() => removeVehicle(v.id)} disabled={isShiftClosedToday} className="text-gray-600 hover:text-red-500 transition-colors flex items-center justify-center px-2 disabled:opacity-30"><Trash2 size={16} /></button>
-                  </div>
-                  {v.name && v.hours && (
-                     <div className={`mt-2 pt-2 border-t border-white/5 text-[10px] flex justify-between items-center ${a.color}`}>
-                        <span className="font-bold uppercase tracking-widest">Current Burn: {a.rate.toFixed(1)} L/Hr</span>
-                        <span className="opacity-70">Metric Status: {a.status} (Bench: {a.baseBench} L/h)</span>
-                     </div>
-                  )}
-               </div>
-            )})}
+            {vehicles.map((v, i) => (
+               <VehicleRow 
+                  key={v.id} 
+                  v={v} 
+                  i={i} 
+                  isShiftClosedToday={isShiftClosedToday} 
+                  isReadOnly={isReadOnly} 
+                  updateVehicle={updateVehicle} 
+                  removeVehicle={removeVehicle} 
+               />
+            ))}
          </div>
       </Card>
 
@@ -435,16 +515,21 @@ export default function MISEntry() {
             <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                <Activity size={16} className="text-emerald-500" /> Fixed Plant & Machinery
             </h3>
-            <Button variant="outline" size="sm" onClick={addMachine} disabled={isShiftClosedToday} className="text-[10px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-wider"><Plus size={12} className="mr-1" /> Append Plant</Button>
+            {!isReadOnly && (
+               <Button variant="outline" size="sm" onClick={addMachine} disabled={isShiftClosedToday} className="text-[10px] font-bold border-white/10 hover:bg-white/5 uppercase tracking-wider"><Plus size={12} className="mr-1" /> Append Plant</Button>
+            )}
          </div>
          <div className="space-y-3">
             {machines.map((m, i) => (
-               <div key={m.id} className="bg-slate-950/50 border border-white/5 rounded-xl p-3 flex flex-col md:flex-row gap-3">
-                  <div className="flex-1"><Input placeholder="Plant Node Name" value={m.name} onChange={e => updateMachine(i, 'name', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 font-bold text-xs" /></div>
-                  <div className="flex-1"><Input type="number" placeholder="Yield (Tons)" value={m.production} onChange={e => updateMachine(i, 'production', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 font-mono" /></div>
-                  <div className="flex-1"><Input type="number" placeholder="Aux Fuel (L)" value={m.diesel} onChange={e => updateMachine(i, 'diesel', e.target.value)} disabled={isShiftClosedToday} className="bg-slate-950 border-white/5 font-mono" /></div>
-                  <button onClick={() => removeMachine(m.id)} disabled={isShiftClosedToday} className="text-gray-600 hover:text-red-500 px-2 disabled:opacity-30"><Trash2 size={16} /></button>
-               </div>
+               <MachineRow 
+                  key={m.id} 
+                  m={m} 
+                  i={i} 
+                  isShiftClosedToday={isShiftClosedToday} 
+                  isReadOnly={isReadOnly} 
+                  updateMachine={updateMachine} 
+                  removeMachine={removeMachine} 
+               />
             ))}
          </div>
       </Card>
@@ -462,6 +547,7 @@ export default function MISEntry() {
                <p className="text-[10px] font-bold text-gray-500 uppercase mt-1 tracking-widest">Execute final legally-binding daily validation</p>
             </div>
             {isShiftClosedToday && <div className="bg-red-500/20 px-3 py-1 rounded font-black text-red-400 text-[10px] uppercase flex items-center gap-1"><Lock size={10} /> Read Only State</div>}
+            {!isShiftClosedToday && isReadOnly && <div className="bg-amber-500/20 px-3 py-1 rounded font-black text-amber-400 text-[10px] uppercase flex items-center gap-1"><Lock size={10} /> Read Only State</div>}
          </div>
 
          {isShiftClosedToday ? (
@@ -479,8 +565,9 @@ export default function MISEntry() {
                   <textarea 
                      value={closureNotes}
                      onChange={e => setClosureNotes(e.target.value)}
-                     placeholder="Provide official hand-over briefing, incidents, and structural summaries..."
-                     className="w-full h-32 bg-slate-950 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-primary outline-none transition-all resize-none placeholder:text-gray-600"
+                     disabled={isReadOnly}
+                     placeholder={isReadOnly ? "Read-only: Incidents and summaries briefing locked." : "Provide official hand-over briefing, incidents, and structural summaries..."}
+                     className="w-full h-32 bg-slate-950 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-primary outline-none transition-all resize-none placeholder:text-gray-600 disabled:opacity-60"
                   />
                </div>
                <div className="flex flex-col justify-between bg-slate-900/40 border border-white/5 p-4 rounded-xl">
@@ -497,13 +584,15 @@ export default function MISEntry() {
                         </div>
                      </div>
                   </div>
-                  <Button 
-                     onClick={handleCloseShift}
-                     disabled={isClosureLoading || !disposal}
-                     className="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs gap-2 h-11 shadow-lg shadow-red-900/20 mt-4"
-                  >
-                     {isClosureLoading ? "Sealing Record..." : <><Lock size={14} /> Execute Shift Closure</>}
-                  </Button>
+                  {!isReadOnly && (
+                     <Button 
+                        onClick={handleCloseShift}
+                        disabled={isClosureLoading || !disposal}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-black uppercase text-xs gap-2 h-11 shadow-lg shadow-red-900/20 mt-4"
+                     >
+                        {isClosureLoading ? "Sealing Record..." : <><Lock size={14} /> Execute Shift Closure</>}
+                     </Button>
+                  )}
                   <p className="text-[9px] text-gray-600 text-center mt-2">WARNING: Irreversible structural action.</p>
                </div>
             </div>

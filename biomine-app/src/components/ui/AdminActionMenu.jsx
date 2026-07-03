@@ -10,7 +10,10 @@ import { Button } from './Button';
 import { requisitionService } from '../../services/requisitionService';
 
 export function AdminActionMenu({ module, recordId, record, onComplete }) {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
+  const permName = module === "Fleet" ? "Fleet Control" : module;
+  const canEdit = hasPermission(permName, 'READ_WRITE');
+  const canDelete = hasPermission(permName, 'FULL_CONTROL');
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState(null); // 'delete' | 'edit' | 'view'
   const [reason, setReason] = useState("");
@@ -391,93 +394,99 @@ export function AdminActionMenu({ module, recordId, record, onComplete }) {
               <div className="py-1">
                 {module === "Procurement" ? (
                   <>
-                    <button 
-                      onClick={handleOpenView}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                    >
-                      <Eye size={14} className="text-info" /> View Details
-                    </button>
-                    {['Super Admin', 'Admin'].includes(user?.role) && (
-                      <>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Edit Priority Selected'); handleOpenEdit(e); }}
-                          className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                        >
-                          <Edit size={14} className="text-primary" /> Edit Priority
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Update Status Selected'); handleOpenEdit(e); }}
-                          className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                        >
-                          <FileSignature size={14} className="text-warning" /> Update Status
-                        </button>
-                        <button 
-                          onClick={handleMarkDispatched}
-                          className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                        >
-                          <Truck size={14} className="text-blue-400" /> Mark Dispatched
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Mark Delivered Selected'); handleOpenEditWithStatus('Delivered'); }}
-                          className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                        >
-                          <PackageCheck size={14} className="text-success" /> Mark Delivered
-                        </button>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Mark Fulfilled Selected'); handleOpenEditWithStatus('Fulfilled'); }}
-                          className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                        >
-                          <CheckCircle2 size={14} className="text-emerald-400" /> Mark Fulfilled
-                        </button>
-                        <button 
-                          onClick={(e) => { handleTriggerConfirm(e, 'Reject'); }}
-                          className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
-                        >
-                          <XCircle size={14} /> Reject Request
-                        </button>
-                        <button 
-                          onClick={(e) => { handleTriggerConfirm(e, 'Archive'); }}
-                          className="w-full text-left px-4 py-2 text-xs text-purple-400 hover:bg-purple-400/10 flex items-center gap-2"
-                        >
-                          <Archive size={14} /> Archive Request
-                        </button>
-                      </>
-                    )}
-                    {user?.role === 'Super Admin' && (
-                      <>
-                        <div className="h-px bg-white/5 my-1"></div>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setModalType('delete'); setIsOpen(false); }}
-                          className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
-                        >
-                          <Trash2 size={14} /> Delete Request
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <button 
-                      onClick={handleOpenView}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                    >
-                      <Eye size={14} className="text-info" /> View Details
-                    </button>
-                    <button 
-                      onClick={handleOpenEdit}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
-                    >
-                      <Edit size={14} className="text-primary" /> Edit Record
-                    </button>
-                    <div className="h-px bg-white/5 my-1"></div>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); setModalType('delete'); setIsOpen(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
-                    >
-                      <Trash2 size={14} /> Delete Record
-                    </button>
-                  </>
-                )}
+                     <button 
+                       onClick={handleOpenView}
+                       className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                     >
+                       <Eye size={14} className="text-info" /> View Details
+                     </button>
+                     {canEdit && (
+                       <>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Edit Priority Selected'); handleOpenEdit(e); }}
+                           className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                         >
+                           <Edit size={14} className="text-primary" /> Edit Priority
+                         </button>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Update Status Selected'); handleOpenEdit(e); }}
+                           className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                         >
+                           <FileSignature size={14} className="text-warning" /> Update Status
+                         </button>
+                         <button 
+                           onClick={handleMarkDispatched}
+                           className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                         >
+                           <Truck size={14} className="text-blue-400" /> Mark Dispatched
+                         </button>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Mark Delivered Selected'); handleOpenEditWithStatus('Delivered'); }}
+                           className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                         >
+                           <PackageCheck size={14} className="text-success" /> Mark Delivered
+                         </button>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); console.log('[AdminActionMenu Click Debug] Mark Fulfilled Selected'); handleOpenEditWithStatus('Fulfilled'); }}
+                           className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                         >
+                           <CheckCircle2 size={14} className="text-emerald-400" /> Mark Fulfilled
+                         </button>
+                         <button 
+                           onClick={(e) => { handleTriggerConfirm(e, 'Reject'); }}
+                           className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
+                         >
+                           <XCircle size={14} /> Reject Request
+                         </button>
+                         <button 
+                           onClick={(e) => { handleTriggerConfirm(e, 'Archive'); }}
+                           className="w-full text-left px-4 py-2 text-xs text-purple-400 hover:bg-purple-400/10 flex items-center gap-2"
+                         >
+                           <Archive size={14} /> Archive Request
+                         </button>
+                       </>
+                     )}
+                     {canDelete && (
+                       <>
+                         <div className="h-px bg-white/5 my-1"></div>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); setModalType('delete'); setIsOpen(false); }}
+                           className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
+                         >
+                           <Trash2 size={14} /> Delete Request
+                         </button>
+                       </>
+                     )}
+                   </>
+                 ) : (
+                   <>
+                     <button 
+                       onClick={handleOpenView}
+                       className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                     >
+                       <Eye size={14} className="text-info" /> View Details
+                     </button>
+                     {canEdit && (
+                       <button 
+                         onClick={handleOpenEdit}
+                         className="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                       >
+                         <Edit size={14} className="text-primary" /> Edit Record
+                       </button>
+                     )}
+                     {canDelete && (
+                       <>
+                         <div className="h-px bg-white/5 my-1"></div>
+                         <button 
+                           onClick={(e) => { e.stopPropagation(); setModalType('delete'); setIsOpen(false); }}
+                           className="w-full text-left px-4 py-2 text-xs text-danger hover:bg-danger/10 flex items-center gap-2 font-medium"
+                         >
+                           <Trash2 size={14} /> Delete Record
+                         </button>
+                       </>
+                     )}
+                   </>
+                 )}
               </div>
             </motion.div>
           )}

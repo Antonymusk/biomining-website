@@ -11,6 +11,7 @@ export default function UserManagement() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [sites, setSites] = useState([]);
+  const [dbRolesList, setDbRolesList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -26,6 +27,10 @@ export default function UserManagement() {
       // 1. Fetch sites
       const { data: sitesData } = await supabase.from("sites").select("*");
       setSites(sitesData || []);
+
+      // Fetch dynamic roles list
+      const { data: rolesData } = await supabase.from("roles").select("*");
+      setDbRolesList(rolesData || []);
 
       // 2. Load user roles from local storage / Supabase
       const localRoles = JSON.parse(localStorage.getItem("local_user_roles") || "[]");
@@ -44,7 +49,7 @@ export default function UserManagement() {
             name: u.name || u.email?.split('@')[0],
             role: matchingRole?.role || "Viewer",
             assigned_site: matchingRole?.assigned_site || null,
-            approval_status: matchingRole?.approval_status || "Pending",
+            approval_status: matchingRole?.approval_status || "Approved",
             suspended: matchingRole?.suspended || false,
             created_at: u.created_at || matchingRole?.created_at || new Date().toISOString()
           };
@@ -57,7 +62,7 @@ export default function UserManagement() {
           name: r.email?.split('@')[0] || "User",
           role: r.role || "Viewer",
           assigned_site: r.assigned_site || null,
-          approval_status: r.approval_status || "Pending",
+          approval_status: r.approval_status || "Approved",
           suspended: r.suspended || false,
           created_at: r.created_at || new Date().toISOString()
         }));
@@ -111,7 +116,13 @@ export default function UserManagement() {
         .upsert({
           user_id: userId,
           ...fields
-        });
+        }, { onConflict: 'user_id' });
+        
+      if (error) {
+        console.error("Upsert role error:", error);
+        toast.error("Failed to sync permissions table: " + error.message);
+        return;
+      }
 
       // Always update local storage fallback
       const localRoles = JSON.parse(localStorage.getItem("local_user_roles") || "[]");
@@ -137,7 +148,13 @@ export default function UserManagement() {
   };
 
   const handleApprove = (userId, email, currentRole) => {
-    updateUserRoleRecord(userId, email, { approval_status: "Approved", role: currentRole || "Operator" });
+    const roleToAssign = currentRole || "Viewer";
+    const matchingRole = dbRolesList.find(r => r.name === roleToAssign);
+    updateUserRoleRecord(userId, email, { 
+      approval_status: "Approved", 
+      role: roleToAssign,
+      role_id: matchingRole ? matchingRole.id : null
+    });
   };
 
   const handleReject = (userId, email) => {
@@ -145,7 +162,11 @@ export default function UserManagement() {
   };
 
   const handleRoleChange = (userId, email, newRole) => {
-    updateUserRoleRecord(userId, email, { role: newRole });
+    const matchingRole = dbRolesList.find(r => r.name === newRole);
+    updateUserRoleRecord(userId, email, { 
+      role: newRole,
+      role_id: matchingRole ? matchingRole.id : null
+    });
   };
 
   const handleSiteChange = (userId, email, newSite) => {
@@ -154,6 +175,45 @@ export default function UserManagement() {
 
   const handleSuspendToggle = (userId, email, currentSuspended) => {
     updateUserRoleRecord(userId, email, { suspended: !currentSuspended });
+  };
+
+  const handleDeleteUser = async (userId, email) => {
+    if (!confirm(`Are you sure you want to delete user ${email} from the system?`)) return;
+    const deletingToast = toast.loading(`Deleting ${email}...`);
+    try {
+      // 1. Delete from user_roles
+      const { error: errRoles } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId);
+      
+      if (errRoles) throw errRoles;
+
+      // 2. Delete from site_assignments
+      await supabase
+        .from("site_assignments")
+        .delete()
+        .eq("user_id", userId);
+
+      // 3. Delete from users
+      const { error: errUsers } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", userId);
+
+      if (errUsers) throw errUsers;
+
+      // Also clean up local storage local_user_roles fallback if present
+      const localRoles = JSON.parse(localStorage.getItem("local_user_roles") || "[]");
+      const updatedLocal = localRoles.filter(r => r.user_id !== userId);
+      localStorage.setItem("local_user_roles", JSON.stringify(updatedLocal));
+
+      toast.success("User deleted successfully.", { id: deletingToast });
+      fetchUsersAndSites();
+    } catch (err) {
+      console.error(err);
+      toast.error(`Delete failed: ${err.message || err}`, { id: deletingToast });
+    }
   };
 
   const activeSuperAdminCount = useMemo(() => {
@@ -306,7 +366,7 @@ export default function UserManagement() {
                   <div className="flex flex-col col-span-2 md:col-span-1">
                     <span className="text-[9px] text-gray-500 uppercase font-semibold mb-1">Assigned Site Boundary</span>
                     <select
-                      disabled={u.role === "Super Admin" || u.role === "Admin" || isSelf}
+                      disabled={u.role === "Super Admin" || u.role === "Admin" || isSelf || !isCurrentSuper}
                       value={u.assigned_site || "None"}
                       onChange={(e) => handleSiteChange(u.id, u.email, e.target.value)}
                       className="bg-dark-bg/60 border border-dark-border text-xs rounded-md h-8 outline-none text-white focus:border-primary/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -361,6 +421,18 @@ export default function UserManagement() {
                           <ShieldAlert size={14} /> Suspend Access
                         </>
                       )}
+                    </Button>
+                  )}
+
+                  {!isSelf && isCurrentSuper && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteUser(u.id, u.email)}
+                      className="h-8 w-8 p-0 border-danger/30 hover:bg-danger/10 text-danger flex items-center justify-center rounded-lg"
+                      title="Delete User"
+                    >
+                      <Trash2 size={14} />
                     </Button>
                   )}
                 </div>

@@ -66,7 +66,7 @@ export default function RequisitionCenter() {
   const [requisitions, setRequisitions] = useState([]);
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isActionAllowed } = useAuth();
+  const { isActionAllowed, user, hasPermission } = useAuth();
   const isAdmin = isActionAllowed('PROCUREMENT_APPROVAL');
   
   // Filters
@@ -97,13 +97,76 @@ export default function RequisitionCenter() {
 
   // New Request State
   const [formData, setFormData] = useState({ site_id: "", item_name: "", category: "Spare Parts", quantity: 1, priority: "Medium", item_description: "", expected_delivery_date: "" });
+  const [vendors, setVendors] = useState([]);
+
+  const fetchVendors = async () => {
+    try {
+      const data = await requisitionService.getVendors();
+      setVendors(data || []);
+    } catch (err) {
+      console.error("Failed to load vendors", err);
+    }
+  };
+
+  const getFilteredVendors = useCallback((req) => {
+    if (!req || !vendors || vendors.length === 0) return [];
+    
+    // Filter vendors by category specialties
+    const matched = vendors.filter(v => 
+      v.specialties?.some(spec => 
+        spec.toLowerCase() === req.category.toLowerCase() || 
+        req.category.toLowerCase().includes(spec.toLowerCase()) ||
+        spec.toLowerCase().includes(req.category.toLowerCase())
+      )
+    );
+    
+    const candidates = matched.length > 0 ? matched : vendors;
+    
+    // Sort logic: critical = fastest delivery, other = cheapest
+    return [...candidates].sort((a, b) => {
+      if (req.priority === 'Critical') {
+        const timeA = parseFloat(a.delivery_sla);
+        const timeB = parseFloat(b.delivery_sla);
+        return timeA - timeB;
+      } else {
+        return a.price_index - b.price_index;
+      }
+    });
+  }, [vendors]);
+
+  const handleAssignVendor = async (req, vendor) => {
+    const promise = requisitionService.updateRequisitionWorkflow(
+      req.id, 
+      req.requisition_number, 
+      'In Procurement', 
+      { name: user?.name || "System" }, 
+      { 
+        vendor_id: vendor.id, 
+        vendor_name: vendor.vendor_name,
+        estimated_cost: Math.round(req.quantity * (vendor.price_index * 150))
+      }
+    );
+    
+    toast.promise(promise, {
+      loading: `Assigning ${vendor.vendor_name} to ${req.requisition_number}...`,
+      success: `Assigned successfully! Requisition moved to In Procurement.`,
+      error: `Failed to assign vendor.`
+    });
+    
+    try {
+      await promise;
+      fetchRequisitions();
+      setIsDrawerOpen(false);
+    } catch(err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     fetchSites();
     fetchRequisitions();
+    fetchVendors();
   }, [filterStatus]);
-
-  useRealtimeSubscription('requisitions', fetchRequisitions);
 
   async function fetchSites() {
     try {
@@ -286,9 +349,11 @@ export default function RequisitionCenter() {
               className="w-full bg-dark-bg/60 border border-dark-border rounded-lg pl-8 pr-3 py-2 text-sm text-white outline-none focus:border-primary/50"
             />
           </div>
-          <Button onClick={() => setIsRaiseModalOpen(true)} variant="primary" className="whitespace-nowrap h-9">
-            <Plus size={16} className="mr-2" /> Raise Requirement
-          </Button>
+          {hasPermission('Procurement', 'READ_WRITE') && (
+            <Button onClick={() => setIsRaiseModalOpen(true)} variant="primary" className="whitespace-nowrap h-9">
+              <Plus size={16} className="mr-2" /> Raise Requirement
+            </Button>
+          )}
         </div>
       </div>
 
@@ -468,13 +533,98 @@ export default function RequisitionCenter() {
                   </div>
                 )}
 
+                {/* AI SMART SUPPLIER MATCHER SECTION */}
+                {(selectedReq.status === 'Pending' || selectedReq.status === 'Approved') && (
+                  <div className="border-t border-dark-border/40 pt-4 space-y-3">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2 mb-2">
+                      <span className="text-primary">✨</span> AI Smart Supplier Matcher
+                    </h4>
+                    
+                    {getFilteredVendors(selectedReq).length === 0 ? (
+                      <p className="text-xs text-gray-500 italic">No vendors found matching this category.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">
+                          Best Match Recommendations
+                        </div>
+                        {getFilteredVendors(selectedReq).slice(0, 2).map((vendor, idx) => {
+                          const isRecommended = idx === 0;
+                          return (
+                            <div 
+                              key={vendor.id} 
+                              className={`p-3 rounded-xl border transition-all ${
+                                isRecommended 
+                                  ? 'bg-primary/5 border-primary/40 shadow-[0_0_12px_rgba(255,59,48,0.05)]' 
+                                  : 'bg-dark-bg/60 border-dark-border/60 hover:border-gray-500'
+                              }`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    {vendor.vendor_name}
+                                    {isRecommended && (
+                                      <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
+                                        AI Recommended
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[9px] text-gray-500 mt-0.5">Contact: {vendor.contact_person} • {vendor.phone}</p>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-xs font-mono font-bold text-emerald-400">
+                                    {vendor.performance_score}% SLA
+                                  </span>
+                                  <p className="text-[9px] text-gray-500 mt-0.5">Reliability: {vendor.reliability_score}%</p>
+                                </div>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-dark-border/20 text-[10px]">
+                                <div>
+                                  <span className="text-gray-500">Delivery Est:</span>{' '}
+                                  <span className="text-gray-200 font-medium">{vendor.delivery_sla}</span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="text-gray-500">Price Factor:</span>{' '}
+                                  <span className={`font-semibold ${vendor.price_index > 1 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                    {vendor.price_index > 1 ? `+${Math.round((vendor.price_index - 1)*100)}%` : `-${Math.round((1 - vendor.price_index)*100)}%`} vs Avg
+                                  </span>
+                                </div>
+                              </div>
+
+                              {isRecommended && (
+                                <div className="mt-3 flex items-center justify-between gap-3 bg-dark-bg/40 p-2 rounded-lg border border-primary/20">
+                                  <div className="text-[9px] text-gray-400 max-w-[170px] leading-relaxed">
+                                    {selectedReq.priority === 'Critical' ? (
+                                      <span><b>Critically Fast Delivery</b> selected based on 48h SLA deadline.</span>
+                                    ) : (
+                                      <span><b>Optimal Cost Efficiency</b> model selected for standard order.</span>
+                                    )}
+                                  </div>
+                                  {hasPermission('Procurement', 'READ_WRITE') && (
+                                    <Button 
+                                      onClick={() => handleAssignVendor(selectedReq, vendor)} 
+                                      className="text-[9px] font-black uppercase py-1 h-7 bg-primary text-white tracking-widest px-2.5 shrink-0"
+                                    >
+                                      Auto-Assign
+                                    </Button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Procurement Documents Attachment */}
                 <div className="border-t border-dark-border/40 pt-4">
-                  <DocumentManager title="Procurement Challans & Quotes" />
+                  <DocumentManager title="Procurement Challans & Quotes" readOnly={!hasPermission('Procurement', 'READ_WRITE')} />
                 </div>
 
-                {/* Timeline History */}
-                <div>
+                {/* Workflow Audit Trail */}
+                <div className="border-t border-dark-border/40 pt-4 space-y-3">
                   <h4 className="text-xs font-bold text-white mb-3 uppercase tracking-wider flex items-center gap-2 border-b border-dark-border pb-2">
                     <Clock size={14} className="text-gray-400" /> Workflow Audit Trail
                   </h4>
@@ -495,8 +645,8 @@ export default function RequisitionCenter() {
                     <p className="text-xs text-gray-500 italic">No audit trail available.</p>
                   )}
                 </div>
-
               </div>
+
               <div className="p-4 border-t border-dark-border bg-dark-bg/80 backdrop-blur-md">
                  <Button onClick={() => setIsDrawerOpen(false)} className="w-full" variant="outline">Close Drawer</Button>
               </div>

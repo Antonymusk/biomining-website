@@ -11,7 +11,7 @@ import { AdminActionMenu } from "../components/ui/AdminActionMenu";
 import { useAuth } from "../lib/AuthContext";
 
 export default function Inventory() {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const [items, setItems] = useState([]);
   const [sites, setSites] = useState([]);
   const [selectedSite, setSelectedSite] = useState("");
@@ -128,18 +128,22 @@ export default function Inventory() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-white">Inventory Management</h2>
         <div className="flex gap-3">
-          <button 
-            onClick={() => setIsAddSiteOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-border text-white rounded-xl hover:bg-dark-border/80 transition-colors"
-          >
-            <Plus size={18} /> Add Site
-          </button>
-          <button 
-            onClick={() => setIsAddItemOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
-          >
-            <Plus size={18} /> Add Item
-          </button>
+          {hasPermission('Inventory', 'READ_WRITE') && (
+            <>
+              <button 
+                onClick={() => setIsAddSiteOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-dark-border text-white rounded-xl hover:bg-dark-border/80 transition-colors"
+              >
+                <Plus size={18} /> Add Site
+              </button>
+              <button 
+                onClick={() => setIsAddItemOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all"
+              >
+                <Plus size={18} /> Add Item
+              </button>
+            </>
+          )}
         </div>
       </div>
 

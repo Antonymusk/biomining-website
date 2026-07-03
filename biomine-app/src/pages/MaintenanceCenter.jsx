@@ -23,8 +23,8 @@ export default function MaintenanceCenter() {
   const [machines, setMachines] = useState([]);
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { isActionAllowed } = useAuth();
-  const canControl = isActionAllowed('MAINTENANCE_CONTROL');
+  const { isActionAllowed, hasPermission } = useAuth();
+  const canControl = isActionAllowed('MAINTENANCE_CONTROL') || hasPermission('Maintenance', 'READ_WRITE');
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -177,8 +177,12 @@ export default function MaintenanceCenter() {
       width: '15%',
       render: (m) => (
         <div className="flex justify-end gap-1.5 items-center" onClick={(e) => e.stopPropagation()}>
-          <Button onClick={() => { setServiceData({ ...serviceData, machine_id: m.id }); setIsLogServiceOpen(true); }} variant="outline" className="h-7 text-[10px] px-2 py-0 border-info text-info hover:bg-info hover:text-white">Quick Log</Button>
-          <Button onClick={() => { setWoData({ ...woData, machine_id: m.id }); setIsAddWOOpen(true); }} variant="outline" className="h-7 text-[10px] px-2 py-0 border-primary text-primary hover:bg-primary hover:text-white">+ WO</Button>
+          {hasPermission('Maintenance', 'READ_WRITE') && (
+            <>
+              <Button onClick={() => { setServiceData({ ...serviceData, machine_id: m.id }); setIsLogServiceOpen(true); }} variant="outline" className="h-7 text-[10px] px-2 py-0 border-info text-info hover:bg-info hover:text-white">Quick Log</Button>
+              <Button onClick={() => { setWoData({ ...woData, machine_id: m.id }); setIsAddWOOpen(true); }} variant="outline" className="h-7 text-[10px] px-2 py-0 border-primary text-primary hover:bg-primary hover:text-white">+ WO</Button>
+            </>
+          )}
           <AdminActionMenu module="Maintenance" recordId={m.id} record={m} onComplete={fetchMachines} />
         </div>
       )
@@ -395,14 +399,15 @@ export default function MaintenanceCenter() {
                   )}
                 </div>
 
-                {/* Maintenance Document Attachment */}
                 <div className="border-t border-dark-border/40 pt-4">
-                  <DocumentManager title="Servicing Photos & Maintenance Reports" />
+                  <DocumentManager title="Servicing Photos & Maintenance Reports" readOnly={!hasPermission('Maintenance', 'READ_WRITE')} />
                 </div>
 
               </div>
               <div className="p-4 border-t border-dark-border bg-dark-bg/80 backdrop-blur-md flex gap-3">
-                <Button onClick={() => { setServiceData({ ...serviceData, machine_id: selectedMachine.id }); setIsLogServiceOpen(true); setIsDrawerOpen(false); }} variant="primary" className="flex-1">Log Service</Button>
+                {hasPermission('Maintenance', 'READ_WRITE') && (
+                  <Button onClick={() => { setServiceData({ ...serviceData, machine_id: selectedMachine.id }); setIsLogServiceOpen(true); setIsDrawerOpen(false); }} variant="primary" className="flex-1">Log Service</Button>
+                )}
                 <Button onClick={() => setIsDrawerOpen(false)} variant="outline">Close Drawer</Button>
               </div>
             </motion.div>

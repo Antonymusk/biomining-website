@@ -30,10 +30,7 @@ const navGroups = [
     group: "Operations",
     items: [
       { name: "MIS Entry", icon: FileText, path: "/mis-entry", preload: () => import("../../pages/MISEntry") },
-      { name: "Operations", icon: Activity, path: "/operations", preload: () => import("../../pages/Operations") },
       { name: "Fleet Control", icon: Truck, path: "/fleet-control", preload: () => import("../../pages/FleetControl") },
-      { name: "Drivers", icon: Users, path: "/drivers", preload: () => import("../../pages/DriverManagement") },
-      { name: "Manpower", icon: UserCheck, path: "/manpower", preload: () => import("../../pages/Manpower") },
     ]
   },
   {
@@ -146,12 +143,12 @@ export const Sidebar = React.memo(function Sidebar({
 
         <div className={cn("flex h-14 items-center border-b border-white/5 relative overflow-hidden px-3.5 z-10", isCollapsed ? "justify-center" : "justify-between")}>
           {/* Smooth atmospheric background glow */}
-          <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.08)_0%,transparent_70%)] pointer-events-none blur-md" />
+          <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(ellipse_at_top,rgba(255,59,48,0.08)_0%,transparent_70%)] pointer-events-none blur-md" />
           
           <div className="flex items-center gap-2.5 overflow-hidden relative z-10">
             <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/5 bg-slate-950/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
-              <span className="relative text-sm font-black tracking-wider bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">B</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10" />
+              <span className="relative text-sm font-black tracking-wider bg-gradient-to-r from-primary to-orange-400 bg-clip-text text-transparent">B</span>
             </div>
             {!isCollapsed && (
               <motion.span 
@@ -172,7 +169,7 @@ export const Sidebar = React.memo(function Sidebar({
                 title={isPinned ? "Enable Auto-Hide (Unpin)" : "Pin Sidebar Open"}
                 className={cn(
                   "flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors border border-transparent hover:bg-white/5 hover:border-white/5 cursor-pointer",
-                  isPinned && "text-accent bg-accent/10 border-accent/20 hover:bg-accent/20 hover:border-accent/30 shadow-[0_0_10px_rgba(192,255,62,0.15)]"
+                  isPinned && "text-accent bg-accent/10 border-accent/20 hover:bg-accent/20 hover:border-accent/30 shadow-[0_0_10px_rgba(255,59,48,0.15)]"
                 )}
               >
                 <Pin size={12} className={cn("transition-transform duration-200", isPinned && "rotate-45")} />
@@ -223,7 +220,7 @@ export const Sidebar = React.memo(function Sidebar({
                   ? "justify-center h-10 w-10 rounded-xl" 
                   : "gap-3.5 rounded-xl px-4 h-11 text-[12px] w-full",
                 isActive 
-                  ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(59,130,246,0.15)] rounded-xl" 
+                  ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(255,59,48,0.15)] rounded-xl" 
                   : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] rounded-xl"
               )
             }
@@ -312,7 +309,7 @@ export const Sidebar = React.memo(function Sidebar({
                                 ? "justify-center h-10 w-10 rounded-xl" 
                                 : "gap-3.5 rounded-xl px-4 h-11 text-[12px] w-full",
                               isActive 
-                                ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(59,130,246,0.15)] rounded-xl" 
+                                ? "bg-primary/[0.08] text-slate-100 font-bold border border-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_18px_rgba(255,59,48,0.15)] rounded-xl" 
                                 : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] rounded-xl"
                             )
                           }
@@ -323,7 +320,7 @@ export const Sidebar = React.memo(function Sidebar({
                                 <motion.div
                                   layoutId="sidebar-active"
                                   className={cn(
-                                    "absolute rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.5)]",
+                                    "absolute rounded-full bg-primary shadow-[0_0_8px_rgba(255,59,48,0.5)]",
                                     isCollapsed ? "left-0 top-2.5 bottom-2.5 w-0.5" : "left-1.5 top-3.5 bottom-3.5 w-1"
                                   )}
                                   initial={false}

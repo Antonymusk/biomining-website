@@ -5,9 +5,12 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { siteService } from "../../services/siteService";
+import { useAuth } from "../../lib/AuthContext";
 import toast from "react-hot-toast";
 
 export default function SiteConfiguration() {
+  const { hasPermission } = useAuth();
+  const isReadOnly = !hasPermission('Settings', 'READ_WRITE');
   const [sites, setSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -43,6 +46,7 @@ export default function SiteConfiguration() {
   }, [sites, search]);
 
   const handleOpenModal = (site = null) => {
+    if (isReadOnly) return;
     if (site) {
       setEditingSite(site);
       setFormData({ ...site });
@@ -55,6 +59,7 @@ export default function SiteConfiguration() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (isReadOnly) return;
     const savingToast = toast.loading("Committing infrastructure configuration payload...");
     
     try {
@@ -77,6 +82,7 @@ export default function SiteConfiguration() {
 
 
   const handleDelete = async (id) => {
+    if (isReadOnly) return;
     const savingToast = toast.loading("Executing registry drop...");
     try {
       const updatedData = await siteService.deleteSite(id);
@@ -98,9 +104,11 @@ export default function SiteConfiguration() {
           </h2>
           <p className="text-sm text-slate-400">Register new zones and manage active governance per site.</p>
         </div>
-        <Button onClick={() => handleOpenModal()} className="gap-2" variant="success">
-          <Plus size={16} /> Add Site
-        </Button>
+        {!isReadOnly && (
+          <Button onClick={() => handleOpenModal()} className="gap-2" variant="success">
+            <Plus size={16} /> Add Site
+          </Button>
+        )}
       </div>
 
       <Card className="flex-1 flex flex-col overflow-hidden p-0">
@@ -130,7 +138,7 @@ export default function SiteConfiguration() {
                 <th className="px-6 py-3 font-semibold">Daily Max Cap</th>
                 <th className="px-6 py-3 font-semibold">Assigned Manager</th>
                 <th className="px-6 py-3 font-semibold">Status</th>
-                <th className="px-6 py-3 font-semibold text-right">Actions</th>
+                {!isReadOnly && <th className="px-6 py-3 font-semibold text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.02]">
@@ -170,24 +178,26 @@ export default function SiteConfiguration() {
                         {site.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end items-center gap-2">
-                        <button 
-                          onClick={() => handleOpenModal(site)}
-                          className="p-1.5 hover:bg-blue-500/10 hover:text-blue-400 text-slate-500 rounded transition-colors"
-                          title="Edit Site Configurations"
-                        >
-                          <Edit3 size={14} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(site.id)}
-                          className="p-1.5 hover:bg-red-500/10 hover:text-red-400 text-slate-500 rounded transition-colors"
-                          title="Delete Site"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+                    {!isReadOnly && (
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end items-center gap-2">
+                          <button 
+                            onClick={() => handleOpenModal(site)}
+                            className="p-1.5 hover:bg-blue-500/10 hover:text-blue-400 text-slate-500 rounded transition-colors"
+                            title="Edit Site Configurations"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(site.id)}
+                            className="p-1.5 hover:bg-red-500/10 hover:text-red-400 text-slate-500 rounded transition-colors"
+                            title="Delete Site"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               ) : (

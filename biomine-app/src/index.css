@@ -1,30 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Instrument+Serif:ital,wght@0,400;1,400&display=swap');
 @import "tailwindcss";
 @import "./styles/motion.css";
 
 @theme {
-  --color-dark-bg: #0f172a;
-  --color-dark-card: #1e293b;
-  --color-dark-border: #334155;
-  --color-primary: #3b82f6;
-  --color-accent: #8b5cf6;
-  --color-neon-blue: #0ea5e9;
-  --color-neon-cyan: #06b6d4;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
+  --color-dark-bg: #000000;
+  --color-dark-card: #080808;
+  --color-dark-border: #2a2a2e;
+  --color-primary: #ff3b30;
+  --color-accent: #ff453a;
+  --color-neon-blue: #ff3b30;
+  --color-neon-cyan: #ff9f0a;
+  --color-success: #34c759;
+  --color-warning: #ff9f0a;
+  --color-danger: #ff3b30;
   --font-sans: "Montserrat", sans-serif;
+  --font-serif: "Playfair Display", "Instrument Serif", serif;
+
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f5f5f5;
+  --color-slate-200: #e5e5e5;
+  --color-slate-300: #d4d4d4;
+  --color-slate-400: #a3a3a3;
+  --color-slate-500: #737373;
+  --color-slate-600: #525252;
+  --color-slate-700: #404040;
+  --color-slate-800: #27272a;
+  --color-slate-900: #0d0d0d;
+  --color-slate-950: #050505;
 }
 
 @layer base {
   :root {
     --background: var(--color-dark-bg);
-    --foreground: #f8fafc;
+    --foreground: #f5f2eb;
     
     /* Dynamically Controlled Appearance Vectors */
     --glass-blur: 16px;
     --glass-opacity: 0.4;
-    --glass-border-opacity: 0.03;
+    --glass-border-opacity: 0.20;
     --glass-reflection: 0.05;
     --glass-shadow: 0.25;
     
@@ -54,14 +67,22 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     transition: font-size 0.2s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.012em;
+    color: #f5f2eb;
   }
 }
 
 @layer utilities {
   .glass-card {
-    background: rgba(15, 23, 42, var(--glass-opacity));
+    background: rgba(8, 8, 8, var(--glass-opacity));
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid rgba(255, 255, 255, var(--glass-border-opacity));
@@ -70,23 +91,23 @@
   }
   
   .glass-button {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(37, 99, 235, 0.25);
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.8) 0%, rgba(225, 29, 72, 0.8) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 8px rgba(255, 59, 48, 0.25);
     transition: all 0.15s ease;
   }
   
   .glass-button:hover {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(255, 59, 48, 0.4);
     transform: translateY(-1px);
   }
 
   .neon-text {
-    text-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
+    text-shadow: 0 0 8px rgba(255, 59, 48, 0.2);
   }
 
   /* Metallic Typography Gradients */
   .metallic-gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f5f2eb 60%, #cbd5e1 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -95,7 +116,7 @@
   }
   
   .primary-gradient-text {
-    background: linear-gradient(135deg, #ffffff 0%, #3b82f6 50%, #06b6d4 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #ff3b30 50%, #ff9f0a 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -110,7 +131,7 @@
   
   .hover-lift:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
 
   .hover-glow {
@@ -118,8 +139,8 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 0 12px rgba(14, 165, 233, 0.15);
-    border-color: rgba(14, 165, 233, 0.2);
+    box-shadow: 0 0 12px rgba(255, 59, 48, 0.15);
+    border-color: rgba(255, 59, 48, 0.2);
   }
 
   /* Interactive Sidebar Item */
@@ -128,8 +149,8 @@
   }
   
   .sidebar-item-hover:hover {
-    background-color: rgba(255, 255, 255, 0.02);
-    border-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
     transform: translateX(2px);
   }
 }
@@ -258,9 +279,15 @@
 /* Top Header content colors */
 :root.light header h1,
 :root.light header h2,
-:root.light header div,
-:root.light header span,
-:root.light header button {
+:root.light header h3,
+:root.light header h4,
+:root.light header p,
+:root.light header label,
+:root.light header button:not(.bg-primary):not(.bg-red-500):not(.text-white):not(.text-danger) {
+  color: #121926 !important;
+}
+
+:root.light header span:not(.absolute):not(.bg-red-500):not(.text-white) {
   color: #121926 !important;
 }
 
@@ -328,6 +355,7 @@
 }
 
 /* Custom Deep Berry Purple Card Adaptation (Matches Total Earning Card) */
+:root.light div.lg\:col-span-4 .bg-slate-950,
 :root.light div.lg\:col-span-4.bg-slate-950 {
   background: linear-gradient(135deg, #4527a0 0%, #7e57c2 100%) !important;
   position: relative;
@@ -336,6 +364,7 @@
 }
 
 /* Injecting Berry-style organic SVG vector circles in CSS with custom motion */
+:root.light div.lg\:col-span-4 .bg-slate-950::before,
 :root.light div.lg\:col-span-4.bg-slate-950::before {
   content: "";
   position: absolute;
@@ -349,6 +378,7 @@
   animation: berry-float-slow 18s infinite ease-in-out;
 }
 
+:root.light div.lg\:col-span-4 .bg-slate-950::after,
 :root.light div.lg\:col-span-4.bg-slate-950::after {
   content: "";
   position: absolute;
@@ -362,15 +392,19 @@
   animation: berry-float-fast 12s infinite ease-in-out;
 }
 
+:root.light div.lg\:col-span-4 .bg-slate-950 *,
 :root.light div.lg\:col-span-4.bg-slate-950 *,
+:root.light div.lg\:col-span-4 .bg-slate-950 p,
 :root.light div.lg\:col-span-4.bg-slate-950 p,
+:root.light div.lg\:col-span-4 .bg-slate-950 span,
 :root.light div.lg\:col-span-4.bg-slate-950 span,
+:root.light div.lg\:col-span-4 .bg-slate-950 h3,
 :root.light div.lg\:col-span-4.bg-slate-950 h3 {
   color: #ffffff !important;
 }
 
 /* Custom Vibrant Ocean Blue Card Adaptation (Matches Total Order Card) */
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] {
+:root.light div.lg\:col-span-8 .bg-dark-card {
   background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%) !important;
   position: relative;
   overflow: hidden;
@@ -378,7 +412,7 @@
   border: none !important;
 }
 
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\]::before {
+:root.light div.lg\:col-span-8 .bg-dark-card::before {
   content: "";
   position: absolute;
   top: -80px;
@@ -391,7 +425,7 @@
   animation: berry-float-slow 22s infinite ease-in-out;
 }
 
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\]::after {
+:root.light div.lg\:col-span-8 .bg-dark-card::after {
   content: "";
   position: absolute;
   top: -140px;
@@ -404,20 +438,20 @@
   animation: berry-float-fast 15s infinite ease-in-out reverse;
 }
 
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] *,
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] h2,
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] h3,
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.font-mono {
+:root.light div.lg\:col-span-8 .bg-dark-card *,
+:root.light div.lg\:col-span-8 .bg-dark-card h2,
+:root.light div.lg\:col-span-8 .bg-dark-card h3,
+:root.light div.lg\:col-span-8 .bg-dark-card div.font-mono {
   color: #ffffff !important;
 }
 
 /* Production directive sub-box contrast fix for light-mode blue card */
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.bg-white\/5 {
+:root.light div.lg\:col-span-8 .bg-dark-card div.bg-white\/5 {
   background-color: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
-:root.light div.lg\:col-span-8.bg-\[\#0D1117\] div.bg-white\/5 * {
+:root.light div.lg\:col-span-8 .bg-dark-card div.bg-white\/5 * {
   color: #e3f2fd !important;
 }
 
@@ -664,9 +698,82 @@
 }
 
 /* Absolute Global Cleanup for any lingering "text-white" utility issues in Light mode */
-:root.light h3.text-white,
-:root.light h4.text-white {
+:root.light h1,
+:root.light h2,
+:root.light h3,
+:root.light h4,
+:root.light h5,
+:root.light h6 {
   color: #121926 !important;
+}
+
+:root.light h1.text-white,
+:root.light h2.text-white,
+:root.light h3.text-white,
+:root.light h4.text-white,
+:root.light h5.text-white,
+:root.light h6.text-white {
+  color: #121926 !important;
+}
+
+/* Hardening text contrast for light utility classes inside container cards and tables */
+:root.light .glass-card .text-white:not(button):not(a):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.badge),
+:root.light .glass-card .text-gray-100,
+:root.light .glass-card .text-gray-200,
+:root.light .glass-card .text-gray-300,
+:root.light .glass-card .text-slate-100,
+:root.light .glass-card .text-slate-200,
+:root.light .glass-card .text-slate-300,
+:root.light table .text-white:not(button):not(a):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.badge),
+:root.light table .text-gray-100,
+:root.light table .text-gray-200,
+:root.light table .text-gray-300,
+:root.light table .text-slate-100,
+:root.light table .text-slate-200,
+:root.light table .text-slate-300,
+:root.light td .text-white:not(button):not(a):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.badge),
+:root.light td .text-gray-100,
+:root.light td .text-gray-200,
+:root.light td .text-gray-300,
+:root.light td .text-slate-100,
+:root.light td .text-slate-200,
+:root.light td .text-slate-300 {
+  color: #121926 !important;
+}
+
+/* Card, table, and list wrapper backgrounds in light mode */
+:root.light .bg-slate-950,
+:root.light .bg-slate-900,
+:root.light .bg-slate-950\/90,
+:root.light .bg-slate-950\/80:not(.absolute),
+:root.light .bg-slate-950\/60,
+:root.light .bg-slate-950\/50,
+:root.light .bg-slate-950\/40,
+:root.light .bg-slate-950\/30,
+:root.light .bg-slate-950\/20,
+:root.light .bg-slate-900\/60,
+:root.light .bg-slate-900\/50,
+:root.light .bg-slate-900\/40,
+:root.light .bg-dark-card,
+:root.light .bg-dark-bg\/40,
+:root.light .bg-dark-bg\/60,
+:root.light div.rounded-lg.border.border-white\/5 {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #eef2f6 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Border color overrides in light mode */
+:root.light .border-dark-border,
+:root.light .border-dark-border\/60,
+:root.light .border-dark-border\/40 {
+  border-color: #eef2f6 !important;
+}
+
+:root.light .bg-dark-border {
+  background-color: #eef2f6 !important;
 }
 
 :root.light ::-webkit-scrollbar-thumb:hover {
@@ -825,7 +932,28 @@
   100% { transform: translate(0, 0) scale(1) rotate(0deg); }
 }
 
-/* 6. AI COPILOT LIGHT THEME ENGINE */
+/* 6. AI COPILOT THEME & MARKDOWN STYLING */
+
+/* AI Copilot Default (Dark Theme) Semantic Markdown Styling */
+.ai-bubble-bot strong,
+.ai-bubble-bot b {
+  color: #ffffff;
+}
+.ai-bubble-bot .ai-md-h2 {
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.ai-bubble-bot .ai-md-h3 {
+  color: var(--color-primary);
+}
+.ai-bubble-bot .ai-md-bullet {
+  color: var(--color-primary);
+}
+.ai-bubble-bot .ai-md-bullet-text {
+  color: #cbd5e1;
+}
+
+/* AI COPILOT LIGHT THEME ENGINE */
 :root.light .ai-copilot-window {
   background-color: #ffffff !important;
   border: 1px solid rgba(94, 53, 177, 0.12) !important;
@@ -842,15 +970,78 @@
   color: #121926 !important;
 }
 
+:root.light .ai-header p {
+  color: #697586 !important;
+}
+
+:root.light .ai-header button {
+  color: #697586 !important;
+}
+
+:root.light .ai-header button:hover {
+  color: #121926 !important;
+  background-color: rgba(94, 53, 177, 0.08) !important;
+}
+
+:root.light .ai-protocol-bar {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:root.light .ai-protocol-bar button {
+  color: #697586 !important;
+  border-color: transparent !important;
+}
+
+:root.light .ai-protocol-bar button:hover {
+  color: #121926 !important;
+  background-color: #eef2f6 !important;
+}
+
+:root.light .ai-protocol-bar button.bg-primary\/20 {
+  background-color: #ede7f6 !important;
+  color: #5e35b1 !important;
+  border-color: rgba(94, 53, 177, 0.15) !important;
+}
+
+:root.light .ai-protocol-bar button.bg-teal-500\/20 {
+  background-color: #e0f2f1 !important;
+  color: #00796b !important;
+  border-color: rgba(0, 121, 107, 0.15) !important;
+}
+
+:root.light .ai-protocol-bar button.bg-rose-500\/20 {
+  background-color: #ffebee !important;
+  color: #c2185b !important;
+  border-color: rgba(194, 24, 91, 0.15) !important;
+}
+
+:root.light .ai-protocol-bar button.bg-slate-500\/20 {
+  background-color: #eceff1 !important;
+  color: #37474f !important;
+  border-color: rgba(55, 71, 79, 0.15) !important;
+}
+
 :root.light .ai-messages-box {
   background-color: #fcfcfd !important;
 }
 
+:root.light .ai-avatar-user {
+  background-color: #eef2f6 !important;
+  border-color: #cbd5e1 !important;
+  color: #4b5563 !important;
+}
+
+:root.light .ai-avatar-bot {
+  background-color: #ffffff !important;
+  border-color: rgba(94, 53, 177, 0.15) !important;
+}
+
 :root.light .ai-bubble-bot {
   background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(94, 53, 177, 0.08) !important;
   color: #364152 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+  box-shadow: 0 4px 15px rgba(94, 53, 177, 0.03) !important;
 }
 
 :root.light .ai-bubble-bot strong,
@@ -858,23 +1049,75 @@
   color: #121926 !important;
 }
 
-:root.light .ai-input-field {
+:root.light .ai-bubble-bot .ai-md-h2 {
+  color: #121926 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:root.light .ai-bubble-bot .ai-md-h3 {
+  color: #5e35b1 !important;
+}
+
+:root.light .ai-bubble-bot .ai-md-bullet {
+  color: #5e35b1 !important;
+}
+
+:root.light .ai-bubble-bot .ai-md-bullet-text {
+  color: #364152 !important;
+}
+
+:root.light .ai-bubble-user {
+  background-color: #5e35b1 !important;
+  color: #ffffff !important;
+}
+
+:root.light .ai-quick-directives {
+  background-color: #f8fafc !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:root.light .ai-directive-btn {
   background-color: #ffffff !important;
+  border: 1px solid rgba(94, 53, 177, 0.1) !important;
+  color: #697586 !important;
+}
+
+:root.light .ai-directive-btn:hover {
+  background-color: #ede7f6 !important;
+  border-color: rgba(94, 53, 177, 0.2) !important;
+  color: #5e35b1 !important;
+}
+
+:root.light .ai-input-tray {
+  background-color: #ffffff !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:root.light .ai-input-field {
+  background-color: #f8fafc !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   color: #121926 !important;
 }
 
 :root.light .ai-input-field:focus {
   border-color: #5e35b1 !important;
+  background-color: #ffffff !important;
 }
 
-:root.light form.border-t {
-  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
-  background-color: #ffffff !important;
+:root.light .ai-input-field::placeholder {
+  color: #90a4ae !important;
 }
 
 :root.light button.rounded-2xl.shadow-\[0_8px_30px_rgb\(94\,53\,177\,0\.3\)\] {
   box-shadow: 0 8px 25px rgba(94, 53, 177, 0.25) !important;
+}
+
+/* Target Gauge Light Mode Overrides */
+:root.light .gauge-value {
+  color: #121926 !important;
+}
+:root.light .gauge-label {
+  color: #697586 !important;
 }
 
 /* 7. SYSTEM ERROR & RESTRICTION SCREENS (PROTECTED ROUTE ENGINE) */
@@ -941,7 +1184,7 @@
   inset: -0.5px;
   border-radius: inherit;
   padding: 1.2px;
-  background: linear-gradient(135deg, #5e35b1, #2196f3, #00e676, #5e35b1);
+  background: linear-gradient(135deg, #ff3b30, #ff9f0a, #f5f2eb, #ff3b30);
   background-size: 300% 300%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -954,7 +1197,7 @@
 
 .glass-card:hover,
 .bg-dark-card:hover {
-  box-shadow: 0 20px 40px rgba(94, 53, 177, 0.08) !important;
+  box-shadow: 0 20px 40px rgba(255, 59, 48, 0.08) !important;
 }
 
 .glass-card:hover::after,
@@ -967,7 +1210,7 @@
 :root.light .glass-card:hover::after,
 :root.light .bg-dark-card:hover::after {
   opacity: 0.3;
-  background: linear-gradient(135deg, #5e35b1, #6200ea, #0288d1, #5e35b1);
+  background: linear-gradient(135deg, #ff3b30, #ff9f0a, #f5f2eb, #ff3b30);
 }
 
 @keyframes glow-boundary-spin {
@@ -975,6 +1218,56 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* Custom Border Contrast Enhancements */
+.border-white\/5 {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+.border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Recharts Custom Tooltip overrides */
+.recharts-custom-tooltip {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
+}
+
+.recharts-custom-tooltip .recharts-default-tooltip {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.recharts-custom-tooltip .recharts-tooltip-label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+.recharts-custom-tooltip .recharts-tooltip-item {
+  color: #cbd5e1 !important;
+  font-weight: 500 !important;
+}
+
+/* Light Theme overrides for tooltips */
+:root.light .recharts-custom-tooltip {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid #eef2f6 !important;
+  box-shadow: 0 10px 30px rgba(94, 53, 177, 0.06) !important;
+}
+
+:root.light .recharts-custom-tooltip .recharts-tooltip-label {
+  color: #121926 !important;
+}
+
+:root.light .recharts-custom-tooltip .recharts-tooltip-item {
+  color: #364152 !important;
+}
+
 
 
 

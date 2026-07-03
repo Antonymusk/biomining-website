@@ -476,7 +476,7 @@ export default function Reports() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#121824]/95 border border-dark-border p-6 rounded-2xl w-full max-w-lg shadow-2xl relative backdrop-blur-md"
+              className="bg-dark-card/95 border border-dark-border p-6 rounded-2xl w-full max-w-lg shadow-2xl relative backdrop-blur-md"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-6">

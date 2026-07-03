@@ -41,6 +41,25 @@ export const requisitionService = {
     return data || [];
   },
   
+  getVendors: async () => {
+    try {
+      const { data, error } = await supabase.from('vendors').select('*').order('vendor_name');
+      if (error) throw error;
+      if (data && data.length > 0) return data;
+    } catch (err) {
+      console.warn("Failed to fetch vendors from DB, using mock fallback:", err);
+    }
+    
+    return [
+      { id: "v1-eastern-spares", vendor_name: "Eastern Spares Ltd", contact_person: "Aman Gupta", email: "aman@easternspares.com", phone: "+91 9876543211", performance_score: 99.4, reliability_score: 98, specialties: ["Motors", "Gearboxes", "Conveyor Belts", "Spare Parts"], price_index: 0.95, delivery_sla: "3.2 Days" },
+      { id: "v2-caterpillar-corp", vendor_name: "Caterpillar Industrial Corp", contact_person: "Sarah Jenkins", email: "procure@caterpillar.com", phone: "+1 800 555 0199", performance_score: 98.9, reliability_score: 99, specialties: ["Motors", "Gearboxes", "Spare Parts", "Heavy Machinery"], price_index: 1.10, delivery_sla: "2.1 Days" },
+      { id: "v3-biosolutions-fuel", vendor_name: "BioSolutions Fuel Corp", contact_person: "Rajesh Kumar", email: "orders@biosolutionsfuel.com", phone: "+91 9988776655", performance_score: 100.0, reliability_score: 100, specialties: ["Fuel", "DEF Additive", "Motors", "Spare Parts"], price_index: 0.90, delivery_sla: "1.5 Days" },
+      { id: "v4-metro-hydraulics", vendor_name: "Metro Hydraulics & Belts", contact_person: "Vipul Mehta", email: "contact@metrohydraulics.in", phone: "+91 8877665544", performance_score: 94.8, reliability_score: 92, specialties: ["Conveyor Belts", "Safety Equipment", "Motors", "Spare Parts"], price_index: 1.00, delivery_sla: "3.9 Days" },
+      { id: "v5-reliance-fuels", vendor_name: "Reliance Industrial Fuels", contact_person: "Dinesh Amin", email: "sales@reliancefuels.com", phone: "+91 9001122334", performance_score: 96.5, reliability_score: 95, specialties: ["Fuel"], price_index: 1.05, delivery_sla: "2.5 Days" },
+      { id: "v6-safetyfirst-supplies", vendor_name: "SafetyFirst Supplies", contact_person: "Manoj Singh", email: "support@safetyfirst.in", phone: "+91 7001122334", performance_score: 91.2, reliability_score: 90, specialties: ["Safety Equipment"], price_index: 0.85, delivery_sla: "4.5 Days" }
+    ];
+  },
+  
   getRequisitionHistory: async (reqId) => {
     const { data, error } = await supabase
       .from('requisition_comments')
@@ -104,9 +123,23 @@ export const requisitionService = {
         updates.approved_at = new Date().toISOString();
         updates.approved_by = userName;
         timelineMessage = `${reqNumber} approved by ${userName}`;
+        if (extraPayload.vendor_id && extraPayload.vendor_id.length > 10) {
+            updates.vendor_id = extraPayload.vendor_id;
+        }
+        if (extraPayload.estimated_cost) {
+            updates.estimated_cost = Number(extraPayload.estimated_cost) || 0;
+        }
     } 
     else if (newStatus === 'In Procurement') {
-        // Just status update
+        if (extraPayload.vendor_id && extraPayload.vendor_id.length > 10) {
+            updates.vendor_id = extraPayload.vendor_id;
+        }
+        if (extraPayload.estimated_cost) {
+            updates.estimated_cost = Number(extraPayload.estimated_cost) || 0;
+        }
+        if (extraPayload.vendor_name) {
+            timelineMessage = `${reqNumber} moved to procurement. Vendor matched: ${extraPayload.vendor_name}.`;
+        }
     }
     else if (newStatus === 'Dispatched') {
         updates.dispatched_at = new Date().toISOString();
