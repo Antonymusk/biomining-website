@@ -23,6 +23,7 @@ const RecycleBin = lazyWithRetry(() => import("./pages/RecycleBin"));
 const Login = lazyWithRetry(() => import("./pages/Login"));
 const Signup = lazyWithRetry(() => import("./pages/Signup"));
 const UserManagement = lazyWithRetry(() => import("./pages/UserManagement"));
+const Manpower = lazyWithRetry(() => import("./pages/Manpower"));
 const Notifications = lazyWithRetry(() => import("./pages/Notifications"));
 const PriceList = lazyWithRetry(() => import("./pages/PriceList"));
 import { AuthProvider } from "./lib/AuthContext";
@@ -112,6 +113,7 @@ function App() {
               <Route path="analytics" element={<ProtectedRoute module="Analytics"><Analytics /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute module="Reports"><Reports /></ProtectedRoute>} />
               <Route path="alert-center" element={<ProtectedRoute module="Alert Center"><AlertCenter /></ProtectedRoute>} />
+              <Route path="manpower" element={<ProtectedRoute module="Manpower"><Manpower /></ProtectedRoute>} />
               <Route path="requisition-center" element={<ProtectedRoute module="Procurement"><RequisitionCenter /></ProtectedRoute>} />
               <Route path="maintenance" element={<ProtectedRoute module="Maintenance"><MaintenanceCenter /></ProtectedRoute>} />
               <Route path="recycle-bin" element={<ProtectedRoute module="Recycle Bin"><RecycleBin /></ProtectedRoute>} />
