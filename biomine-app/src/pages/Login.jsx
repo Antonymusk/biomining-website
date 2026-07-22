@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Lock, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
@@ -11,7 +11,17 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,6 +40,12 @@ export default function Login() {
       });
 
       if (error) throw error;
+      
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
       
       navigate("/");
     } catch (err) {
@@ -118,19 +134,31 @@ export default function Login() {
               id="login_password"
               name="password"
               autoComplete="current-password"
-              type="password" 
+              type={showPassword ? "text" : "password"} 
               placeholder="••••••••••••••••" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10.5 h-11 bg-dark-card/50 border-white/5 focus:border-primary/30 text-slate-200 text-sm placeholder-slate-600" 
+              className="pl-10.5 pr-10 h-11 bg-dark-card/50 border-white/5 focus:border-primary/30 text-slate-200 text-sm placeholder-slate-600" 
               required
             />
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-1.5 select-none">
           <label className="flex items-center gap-2 text-xs text-slate-400 font-medium cursor-pointer">
-            <input type="checkbox" className="rounded border-white/10 bg-dark-card text-primary focus:ring-0 h-3.5 w-3.5 cursor-pointer" />
+            <input 
+              type="checkbox" 
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="rounded border-white/10 bg-dark-card text-primary focus:ring-0 h-3.5 w-3.5 cursor-pointer" 
+            />
             Remember Me
           </label>
           <Link to="#" onClick={() => toast("Contact system administrator to reset credentials.", { icon: '🎫' })} className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
