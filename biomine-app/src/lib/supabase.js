@@ -1,21 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-// THE HARD TRUTH: Force routing strictly to the live, validated cluster.
-// This perfectly bypasses ANY typos lurking in the Vercel dashboard environment variables.
-const HARDCODED_LIVE_URL = "https://qgkmikifoorzqqrmsjhm.supabase.co";
-const HARDCODED_LIVE_KEY = "sb_publishable_9s0C0DEw-RV-oI3ZBz5IhQ_vIy33Ym2";
-
-// 1. Read whatever Vercel injected
+// Read environment variables (injected by Vite / Vercel)
 const injectedUrl = import.meta.env.VITE_SUPABASE_URL;
 const injectedKey = import.meta.env.VITE_SUPABASE_KEY;
 
-// 2. DETECT "GHOST ADDRESSES": If it contains that phantom "qszx" domain, drop it immediately.
-const isGhostAddress = injectedUrl && injectedUrl.includes("qszx");
+// Fallback to the correct project details if environment variables are not set on Vercel
+const FALLBACK_URL = "https://avjjuyrobxgwblpagscl.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2amp1eXJvYnhnd2JscGFnc2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MzY3OTEsImV4cCI6MjA5NDIxMjc5MX0.j2L_aUjdSTQ3WetC3OiaapkyO-dXwUKzbn19cjgD7tw";
 
-// 3. Select final routing logic
-const finalUrl = (!injectedUrl || isGhostAddress) ? HARDCODED_LIVE_URL : injectedUrl;
-const finalKey = !injectedKey ? HARDCODED_LIVE_KEY : injectedKey;
+const finalUrl = injectedUrl || FALLBACK_URL;
+const finalKey = injectedKey || FALLBACK_KEY;
 
-console.log("🔐 Auth Engine initialized. Primary Node locked.");
+console.log("🔐 Auth Engine initialized.");
 
 export const supabase = createClient(finalUrl, finalKey);

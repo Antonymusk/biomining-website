@@ -185,12 +185,24 @@ export function AuthProvider({ children }) {
     let mounted = true;
 
     async function getSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (mounted) {
-        setSession(session);
-        if (session) {
-          fetchUserProfile(session.user.id, session.user.email);
-        } else {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Supabase getSession error:", error);
+        }
+        if (mounted) {
+          const session = data?.session || null;
+          setSession(session);
+          if (session) {
+            fetchUserProfile(session.user.id, session.user.email);
+          } else {
+            setUser(null);
+            setLoading(false);
+          }
+        }
+      } catch (err) {
+        console.error("Unhandled error in getSession:", err);
+        if (mounted) {
           setUser(null);
           setLoading(false);
         }
