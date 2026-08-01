@@ -4,7 +4,7 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/AuthContext";
-import { Search, UserCheck, ShieldAlert, Trash2, ArrowRight, UserMinus, Plus, Settings, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Search, UserCheck, ShieldAlert, Trash2, UserMinus, CheckCircle2, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function UserManagement() {
@@ -17,9 +17,6 @@ export default function UserManagement() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUsersAndSites();
-  }, []);
 
   const fetchUsersAndSites = async () => {
     setLoading(true);
@@ -76,6 +73,10 @@ export default function UserManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsersAndSites();
+  }, []);
 
   const updateUserRoleRecord = async (userId, email, fields) => {
     try {

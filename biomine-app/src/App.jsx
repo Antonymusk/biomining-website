@@ -26,7 +26,6 @@ const UserManagement = lazyWithRetry(() => import("./pages/UserManagement"));
 const Manpower = lazyWithRetry(() => import("./pages/Manpower"));
 const Notifications = lazyWithRetry(() => import("./pages/Notifications"));
 const PriceList = lazyWithRetry(() => import("./pages/PriceList"));
-import { AuthProvider } from "./lib/AuthContext";
 import { NotificationProvider } from "./lib/NotificationContext";
 import ConnectionStatus from "./components/layout/ConnectionStatus";
 
@@ -51,7 +50,6 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
       <NotificationProvider>
       <ErrorBoundary>
       <Toaster 
@@ -131,7 +129,6 @@ function App() {
       </BrowserRouter>
       </ErrorBoundary>
       </NotificationProvider>
-    </AuthProvider>
   );
 }
 

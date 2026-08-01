@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
       // Verify if ANY Super Admin exists currently active in the enterprise ecosystem.
       const { count: superAdminCount } = await supabase
          .from("user_roles")
-         .select("id", { count: 'exact', head: true })
+         .select("user_id", { count: 'exact', head: true })
          .eq("role", "Super Admin");
 
       const noSuperAdminsExist = (superAdminCount === 0 || superAdminCount === null);
@@ -94,8 +94,8 @@ export function AuthProvider({ children }) {
            created_at: new Date().toISOString()
          };
          
-         // Write immediate recovery persistence to DB
-         await supabase.from("user_roles").upsert(bootstrapPayload, { onConflict: 'user_id' });
+         // Write immediate recovery persistence to DB (Handled automatically by secure DB trigger)
+         // await supabase.from("user_roles").upsert(bootstrapPayload, { onConflict: 'user_id' });
          
          // Resync finalized state
          const { data: resynced } = await supabase.from("user_roles").select(`*, roles(*)`).eq("user_id", authUserId).maybeSingle();
