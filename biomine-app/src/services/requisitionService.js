@@ -204,14 +204,16 @@ export const requisitionService = {
    */
   logAudit: async (action, targetTable, targetId, description) => {
     try {
+        const actName = action || 'AUDIT_LOG';
         await supabase.from('audit_logs').insert([{
-            action,
+            action: actName,
+            action_type: actName,
             target_table: targetTable,
-            target_id: targetId,
-            description
+            target_id: String(targetId || ''),
+            description: description || ''
         }]);
     } catch(err) {
-        console.error("Failed to log audit", err);
+        console.warn("Failed to log audit", err);
     }
   }
 

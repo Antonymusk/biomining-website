@@ -51,7 +51,24 @@ export const siteService = {
        query = supabase.from('sites').update(payload).eq('id', siteData.id);
     }
 
-    const { error } = await query;
+    let { error } = await query;
+
+    // Graceful schema degradation retry: If Supabase schema cache lacks 'hours' or 'manager' columns, fallback to core payload
+    if (error && (error.message?.includes('hours') || error.message?.includes('manager') || error.code === 'PGRST204')) {
+       console.warn("Retrying site save without extended fields due to schema cache mismatch:", error.message);
+       const fallbackPayload = {
+          name: siteData.name,
+          zone: siteData.zone || 'Central',
+          location: siteData.location || '',
+          capacity: Number(siteData.capacity) || 500,
+          status: siteData.status || 'Active'
+       };
+       const fallbackQuery = isNew
+          ? supabase.from('sites').insert([fallbackPayload])
+          : supabase.from('sites').update(fallbackPayload).eq('id', siteData.id);
+       const fallbackRes = await fallbackQuery;
+       error = fallbackRes.error;
+    }
 
     if (error) {
        console.error("Site Transaction Matrix Broken:", error);

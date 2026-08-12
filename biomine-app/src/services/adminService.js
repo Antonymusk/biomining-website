@@ -14,11 +14,26 @@ export const adminService = {
   
   _logAudit: async (action_type, module, record_id, performed_by, reason) => {
     try {
-      await supabase.from('audit_logs').insert([{
-        action_type, module, record_id, performed_by, reason
-      }]);
+      const actName = action_type || 'AUDIT_LOG';
+      const payload = {
+        action_type: actName,
+        action: actName,
+        module: module || 'System',
+        record_id: record_id && typeof record_id === 'string' && record_id.includes('-') ? record_id : null,
+        target_id: String(record_id || ''),
+        target_table: TABLE_MAP[module] || module || 'system',
+        performed_by: performed_by || 'System',
+        reason: reason || '',
+        description: `${actName} on ${module || 'System'}: ${reason || 'No reason specified'}`
+      };
+      
+      let { error } = await supabase.from('audit_logs').insert([payload]);
+      
+      if (error) {
+        console.warn("Audit log non-blocking notice:", error.message);
+      }
     } catch (err) {
-      console.error("Audit log failed:", err);
+      console.warn("Audit log non-blocking warning:", err);
     }
   },
 

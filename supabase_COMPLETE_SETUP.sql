@@ -1821,6 +1821,17 @@ CREATE TABLE IF NOT EXISTS public.sites (
     created_at timestamptz DEFAULT now()
 );
 
+-- ENSURE COLUMNS EXIST EVEN IF TABLE WAS CREATED IN PRIOR PHASES
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS hours text DEFAULT '24 Hours';
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS manager text DEFAULT 'N/A';
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS capacity numeric DEFAULT 500;
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS zone text DEFAULT 'Central';
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS status text DEFAULT 'Active';
+ALTER TABLE public.sites ADD COLUMN IF NOT EXISTS location text;
+
+-- RELOAD POSTGREST SCHEMA CACHE
+NOTIFY pgrst, 'reload schema';
+
 -- 3. ACTIVATE ROW LEVEL SECURITY ON SITE ENTITY
 ALTER TABLE public.sites ENABLE ROW LEVEL SECURITY;
 
@@ -1830,7 +1841,6 @@ DROP POLICY IF EXISTS "Enable all for authenticated users" ON public.sites;
 DROP POLICY IF EXISTS "Enable write for authenticated users" ON public.sites;
 DROP POLICY IF EXISTS "Enable read for authenticated users" ON public.sites;
 
-DROP POLICY IF EXISTS "Enable master access for authenticated users" ON public.sites;
 CREATE POLICY "Enable master access for authenticated users" 
 ON public.sites 
 FOR ALL 
@@ -1839,7 +1849,6 @@ USING (true)
 WITH CHECK (true);
 
 -- 5. ENSURE GOVERNANCE CROSS-REFERENCES EXIST
--- Just in case Phase 5 was interrupted, ensure dependencies are established
 CREATE TABLE IF NOT EXISTS public.roles (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     name text NOT NULL UNIQUE,
@@ -1861,13 +1870,10 @@ ALTER TABLE public.site_assignments ENABLE ROW LEVEL SECURITY;
 
 -- Add minimal standard policies to guarantee app can always read them
 DROP POLICY IF EXISTS "Auth Read Roles" ON public.roles;
-DROP POLICY IF EXISTS "Auth Read Roles" ON public.roles;
 CREATE POLICY "Auth Read Roles" ON public.roles FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Auth Read Maps" ON public.site_assignments;
-DROP POLICY IF EXISTS "Auth Read Maps" ON public.site_assignments;
 CREATE POLICY "Auth Read Maps" ON public.site_assignments FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
 
 -- 6. [DATA RECOVERY] MIGRATE FROM LEGACY "inventory_sites" IF PRESENT
 DO $$
