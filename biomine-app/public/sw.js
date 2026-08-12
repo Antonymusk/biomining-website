@@ -1,4 +1,4 @@
-const CACHE_NAME = "biomine-cache-v0.9.5";
+const CACHE_NAME = "biomine-cache-v1.0.1";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
