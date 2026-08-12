@@ -19,7 +19,8 @@ import {
   Trash2,
   UserCheck,
   Coins,
-  Pin
+  Pin,
+  Building2
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../lib/AuthContext";
@@ -30,6 +31,7 @@ const navGroups = [
     group: "Operations",
     items: [
       { name: "MIS Entry", icon: FileText, path: "/mis-entry", preload: () => import("../../pages/MISEntry") },
+      { name: "Site-Wise MIS", icon: Building2, path: "/mis-entry?view=site_wise", preload: () => import("../../pages/MISEntry") },
       { name: "Fleet Control", icon: Truck, path: "/fleet-control", preload: () => import("../../pages/FleetControl") },
       { name: "Manpower", icon: UserCheck, path: "/manpower", preload: () => import("../../pages/Manpower") },
     ]

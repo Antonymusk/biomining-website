@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Save, Plus, Trash2, CheckCircle2, X, Lock, 
@@ -171,13 +172,26 @@ export default function MISEntry() {
   // Historic state for intelligence engine
   const [historicEntries, setHistoricEntries] = useState([]);
 
+  // URL Query Params
+  const [searchParams] = useSearchParams();
+  const initialView = (searchParams.get("view") === "site_wise" || searchParams.get("tab") === "site_wise") ? "site_wise" : "controller";
+
   // UI Tab & Explorer State
-  const [activeTab, setActiveTab] = useState("controller"); // "controller" | "site_wise"
+  const [activeTab, setActiveTab] = useState(initialView); // "controller" | "site_wise"
   const [selectedExplorerSite, setSelectedExplorerSite] = useState("ALL");
   const [allMisEntries, setAllMisEntries] = useState([]);
   const [isExplorerLoading, setIsExplorerLoading] = useState(false);
   const [explorerSearch, setExplorerSearch] = useState("");
   const [expandedEntryId, setExpandedEntryId] = useState(null);
+
+  useEffect(() => {
+    const qView = searchParams.get("view") || searchParams.get("tab");
+    if (qView === "site_wise") {
+      setActiveTab("site_wise");
+    } else if (qView === "controller") {
+      setActiveTab("controller");
+    }
+  }, [searchParams]);
 
   // UI Control
   const [isSubmitting, setIsSubmitting] = useState(false);
