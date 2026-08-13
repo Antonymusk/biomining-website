@@ -675,29 +675,37 @@ export default function MISEntry() {
 
              <Card className="md:col-span-2 p-5 flex flex-col">
                 <div className="flex justify-between items-center mb-4">
-                   <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Fuel Inventory Reconciliation</h3>
-                   <Badge className={Math.abs(dieselDifference) > 5 ? "bg-red-500/10 text-red-500 border-red-500/20" : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"}>
+                   <div>
+                      <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Fuel Inventory Reconciliation</h3>
+                      <span className="text-[10px] text-emerald-400 font-medium">Closing Stock: <strong className="font-mono text-white font-bold">{dieselLeft} L</strong> (Opening {Number(openingBalance) || 0}L - Consumed {Number(claimedDiesel) || 0}L)</span>
+                   </div>
+                   <Badge className={Math.abs(dieselDifference) <= 5 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}>
                       {Math.abs(dieselDifference) <= 5 ? "Valid" : "Mismatch Gap"}
                    </Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-4 flex-1">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
                    <div>
                       <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Fuel Opening (L)</label>
-                      <Input type="number" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10" />
+                      <Input type="number" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10 font-mono" />
                    </div>
                    <div>
                       <label className="text-[10px] font-bold text-gray-400 uppercase mb-1.5 block">Claimed Consumed (L)</label>
-                      <Input type="number" value={claimedDiesel} onChange={e => setClaimedDiesel(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10" />
+                      <Input type="number" value={claimedDiesel} onChange={e => setClaimedDiesel(e.target.value)} disabled={isShiftClosedToday || isReadOnly} className="bg-slate-950 border-white/10 font-mono" />
                    </div>
                    <div className="bg-slate-900/50 border border-white/5 p-3 rounded-xl flex flex-col justify-center">
-                      <span className="text-[10px] text-gray-500 font-bold uppercase">Calc Total Sum</span>
+                      <span className="text-[10px] text-gray-500 font-bold uppercase" title="Sum of individual vehicle and machine diesel entries logged below">Asset Logged Sum</span>
                       <span className="text-2xl font-black font-mono text-white">{autoCalculatedDiesel} <span className="text-xs font-normal opacity-50">L</span></span>
                    </div>
                    <div className={`border p-3 rounded-xl flex flex-col justify-center ${Math.abs(dieselDifference) > 5 ? 'bg-red-950/20 border-red-500/20' : 'bg-slate-900/50 border-white/5'}`}>
-                      <span className="text-[10px] text-gray-500 font-bold uppercase">Audit Diff</span>
+                      <span className="text-[10px] text-gray-500 font-bold uppercase" title="Audit Difference = Claimed Consumed - Asset Logged Sum">Audit Diff</span>
                       <span className={`text-2xl font-black font-mono ${dieselDifference > 0 ? 'text-red-400' : 'text-emerald-400'}`}>{dieselDifference > 0 ? '+' : ''}{dieselDifference}</span>
                    </div>
                 </div>
+                {Math.abs(dieselDifference) > 5 && (
+                   <p className="text-[10px] text-red-400/80 mt-2 font-medium">
+                      * Audit Diff = Claimed Consumed ({Number(claimedDiesel) || 0} L) − Asset Logged Sum ({autoCalculatedDiesel} L). Add individual vehicle/machine logs below to reconcile.
+                   </p>
+                )}
              </Card>
           </div>
 
