@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Save, Plus, Trash2, CheckCircle2, X, Lock, 
+  Save, Plus, Trash2, CheckCircle2, X, Lock, Unlock, 
   AlertTriangle, FileCheck, BarChart3, ClipboardList, Truck,
   Activity, Building2, MapPin, UserCheck, Clock, Target,
   Search, Download, ChevronDown, ChevronRight, Layers, Calendar, RefreshCw, FileSpreadsheet, Filter
@@ -553,6 +553,36 @@ export default function MISEntry() {
      } finally { setIsClosureLoading(false); }
   };
 
+  const handleUnlockShift = async () => {
+     const activeSite = allowedSites.find(s => s.name === site);
+     if (!activeSite) { showToast("Invalid Site Instance", "error"); return; }
+
+     setIsClosureLoading(true);
+     try {
+        const { error } = await supabase
+           .from('shift_closures')
+           .delete()
+           .eq('site_id', activeSite.id)
+           .eq('shift_date', date);
+
+        if (error) throw error;
+
+        await emitOperationalEvent({
+           title: "Shift Operations Unlocked",
+           message: `Official lock removed for ${site} on ${date}. Form inputs enabled for edit.`,
+           severity: 'INFO',
+           event_type: 'shift_unlocked',
+           source_module: 'MIS',
+           affected_site_id: activeSite.id
+        });
+
+        setIsShiftClosedToday(false);
+        showToast("Shift Operations Unlocked Successfully", "success");
+     } catch (e) {
+        showToast(e.message || "Failed to unlock shift", "error");
+     } finally { setIsClosureLoading(false); }
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 max-w-6xl mx-auto relative pb-20">
       
@@ -571,7 +601,22 @@ export default function MISEntry() {
             <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">Module / Operational MIS</div>
             <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
                {activeTab === "controller" ? "Input Matrix Controller" : "Site-Wise MIS Entries Matrix"}
-               {isShiftClosedToday && activeTab === "controller" && <Badge className="bg-red-500/10 text-red-400 border-red-500/20 font-black uppercase gap-1.5"><Lock size={12} /> Locked</Badge>}
+               {isShiftClosedToday && activeTab === "controller" && (
+                 <div className="flex items-center gap-2">
+                   <Badge className="bg-red-500/10 text-red-400 border-red-500/20 font-black uppercase gap-1.5"><Lock size={12} /> Locked</Badge>
+                   {isSuperAdmin && (
+                     <Button 
+                       onClick={handleUnlockShift} 
+                       disabled={isClosureLoading} 
+                       variant="outline" 
+                       size="sm" 
+                       className="h-7 text-[10px] font-black uppercase gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                     >
+                       <Unlock size={12} /> Unlock Shift
+                     </Button>
+                   )}
+                 </div>
+               )}
                {isReadOnly && <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 font-black uppercase gap-1.5"><Lock size={12} /> Read Only</Badge>}
             </h1>
          </div>
@@ -772,6 +817,16 @@ export default function MISEntry() {
                    </div>
                    <h4 className="text-xl font-bold text-white">Day Window Officially Closed</h4>
                    <p className="text-sm text-gray-400 max-w-md mx-auto">All ledger entries for this day-period have been hashed into the read-only audit record. Edits are locked for governance.</p>
+                   {isSuperAdmin && (
+                      <Button 
+                         onClick={handleUnlockShift} 
+                         disabled={isClosureLoading} 
+                         variant="outline" 
+                         className="mt-2 text-xs font-black uppercase gap-2 border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                      >
+                         <Unlock size={14} /> {isClosureLoading ? "Unlocking..." : "Unlock Shift for Editing"}
+                      </Button>
+                   )}
                 </div>
              ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
