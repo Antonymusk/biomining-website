@@ -159,30 +159,61 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
     current[`disp_${site}`] += disp;
   });
 
-  // 5. Calculate KPIs
+  // 5. Calculate Peak Operational Benchmarks & KPIs across ALL historical entries for selected sites
+  let kpiSourceData = rawData;
+  if (selectedSites && selectedSites.length > 0) {
+    const lowerSelected = selectedSites.map(s => String(s).trim().toLowerCase());
+    kpiSourceData = rawData.filter(d => d.site && lowerSelected.includes(String(d.site).trim().toLowerCase()));
+  }
+
+  let totalFuelLogged = 0;
+  let totalDisposalLogged = 0;
+  filteredData.forEach(entry => {
+    totalFuelLogged += Number(entry.total_diesel ?? entry.diesel ?? 0);
+    totalDisposalLogged += Number(entry.total_disposal ?? entry.disposal ?? 0);
+  });
+
+  const allTimeKpiTotals = {};
+  kpiSourceData.forEach(entry => {
+    const site = entry.site || 'Unknown';
+    if (!allTimeKpiTotals[site]) {
+      allTimeKpiTotals[site] = { production: 0, diesel: 0, disposal: 0, maxProd: 0, maxDisp: 0, minBurn: Infinity, minDiesel: Infinity };
+    }
+    const prod = Number(entry.total_production ?? entry.production ?? 0);
+    const dies = Number(entry.total_diesel ?? entry.diesel ?? 0);
+    const disp = Number(entry.total_disposal ?? entry.disposal ?? 0);
+
+    allTimeKpiTotals[site].production += prod;
+    allTimeKpiTotals[site].diesel += dies;
+    allTimeKpiTotals[site].disposal += disp;
+    if (prod > allTimeKpiTotals[site].maxProd) allTimeKpiTotals[site].maxProd = prod;
+    if (disp > allTimeKpiTotals[site].maxDisp) allTimeKpiTotals[site].maxDisp = disp;
+    if (disp > 0 && dies > 0) {
+      const burn = dies / disp;
+      if (burn < allTimeKpiTotals[site].minBurn) allTimeKpiTotals[site].minBurn = burn;
+    }
+    if (dies > 0 && dies < allTimeKpiTotals[site].minDiesel) allTimeKpiTotals[site].minDiesel = dies;
+  });
+
   let topProductionSite = { site: "N/A", val: 0 };
   let topDisposalSite = { site: "N/A", val: 0 };
   let bestFuelConsumptionSite = { site: "N/A", val: Infinity };
   let lowestDieselSite = { site: "N/A", val: Infinity };
-  let totalFuelLogged = 0;
-  let totalDisposalLogged = 0;
 
-  Object.entries(kpiTotals).forEach(([site, totals]) => {
-    totalFuelLogged += totals.diesel;
-    totalDisposalLogged += totals.disposal;
-
-    if (totals.production > topProductionSite.val) {
-      topProductionSite = { site, val: totals.production };
+  Object.entries(allTimeKpiTotals).forEach(([site, totals]) => {
+    const maxP = Math.max(totals.production, totals.maxProd);
+    if (maxP > topProductionSite.val) {
+      topProductionSite = { site, val: maxP };
     }
-    if (totals.disposal > topDisposalSite.val) {
-      topDisposalSite = { site, val: totals.disposal };
+    const maxD = Math.max(totals.disposal, totals.maxDisp);
+    if (maxD > topDisposalSite.val) {
+      topDisposalSite = { site, val: maxD };
     }
-    const consumption = totals.disposal > 0 ? totals.diesel / totals.disposal : 0;
-    if (consumption < bestFuelConsumptionSite.val && consumption > 0) {
-      bestFuelConsumptionSite = { site, val: consumption };
+    if (totals.minBurn < bestFuelConsumptionSite.val && totals.minBurn > 0) {
+      bestFuelConsumptionSite = { site, val: Number(totals.minBurn.toFixed(2)) };
     }
-    if (totals.diesel < lowestDieselSite.val && totals.diesel > 0) {
-      lowestDieselSite = { site, val: totals.diesel };
+    if (totals.minDiesel < lowestDieselSite.val && totals.minDiesel > 0) {
+      lowestDieselSite = { site, val: totals.minDiesel };
     }
   });
 
