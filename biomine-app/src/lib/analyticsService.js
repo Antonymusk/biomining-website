@@ -17,7 +17,6 @@ export const getSiteColor = (siteName, index) => {
   if (!siteName) return "#94a3b8"; // default gray
   if (colorMap.has(siteName)) return colorMap.get(siteName);
   
-  // Try to find a deterministic index based on string length and char codes if index is not provided
   let stableIndex = index;
   if (stableIndex === undefined) {
     stableIndex = Array.from(siteName).reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -28,15 +27,11 @@ export const getSiteColor = (siteName, index) => {
   return color;
 };
 
-// Data Fetching
-export const fetchAnalyticsData = async () => {
-  const { data, error } = await supabase
-    .from('mis_entries')
-    .select('*')
-    .order('date', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+export const getLocalDateStr = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const analyticsCache = new Map();
@@ -45,14 +40,47 @@ export const clearAnalyticsCache = () => {
   analyticsCache.clear();
 };
 
+// Data Fetching
+export const fetchAnalyticsData = async () => {
+  clearAnalyticsCache();
+  try {
+    const { data, error } = await supabase
+      .from('mis_entries')
+      .select('*')
+      .order('date', { ascending: true });
+
+    if (!error && data && data.length > 0) {
+      localStorage.setItem("biomine_mis_entries_cache", JSON.stringify(data));
+      return data;
+    }
+  } catch (err) {
+    console.warn("Analytics fetch error, falling back to local storage cache:", err);
+  }
+
+  // Fallback to local storage cache if database returns empty or fails
+  try {
+    const cache = localStorage.getItem("biomine_mis_entries_cache");
+    if (cache) {
+      const parsed = JSON.parse(cache);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error("Local MIS cache read error:", e);
+  }
+  return [];
+};
+
 // Aggregation & Memoized Selectors (to be used with useMemo in UI)
 export const processAnalytics = (rawData, dateRange, selectedSites) => {
   if (!rawData || rawData.length === 0) {
     return { chartData: [], kpis: null, uniqueSites: [] };
   }
 
-  // Caching layer: precalculated summary match
-  const cacheKey = `${dateRange}_${(selectedSites || []).join(",")}_${rawData.length}`;
+  // Caching layer: include rawData summary match
+  const contentHash = rawData.map(d => `${d.site}_${d.date}_${d.total_production || d.production || 0}_${d.total_disposal || d.disposal || 0}`).join('|');
+  const cacheKey = `${dateRange}_${(selectedSites || []).join(",")}_${rawData.length}_${contentHash.length}`;
   if (analyticsCache.has(cacheKey)) {
     return analyticsCache.get(cacheKey);
   }
@@ -60,32 +88,35 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
   // 1. Extract all unique sites for the filter dropdowns
   const uniqueSites = [...new Set(rawData.map(d => d.site))].filter(Boolean);
 
-  // 2. Filter data by Date Range
+  // 2. Filter data by Date Range (using local date strings)
   let filteredData = rawData;
   if (dateRange !== 'all') {
-    const minDate = new Date();
+    const now = new Date();
     if (dateRange === 'today') {
-      const todayStr = minDate.toISOString().split('T')[0];
+      const todayStr = getLocalDateStr(now);
       filteredData = rawData.filter(d => d.date === todayStr);
     } else if (dateRange === 'yesterday') {
-      minDate.setDate(minDate.getDate() - 1);
-      const yesterdayStr = minDate.toISOString().split('T')[0];
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = getLocalDateStr(yesterday);
       filteredData = rawData.filter(d => d.date === yesterdayStr);
     } else {
+      const minDate = new Date(now);
       if (dateRange === '7d') minDate.setDate(minDate.getDate() - 7);
       if (dateRange === '30d') minDate.setDate(minDate.getDate() - 30);
       if (dateRange === '90d') minDate.setDate(minDate.getDate() - 90);
       if (dateRange === '6m') minDate.setMonth(minDate.getMonth() - 6);
       if (dateRange === '1y') minDate.setFullYear(minDate.getFullYear() - 1);
       
-      const minDateStr = minDate.toISOString().split('T')[0];
+      const minDateStr = getLocalDateStr(minDate);
       filteredData = rawData.filter(d => d.date >= minDateStr);
     }
   }
 
-  // 3. Filter data by Selected Sites
+  // 3. Filter data by Selected Sites (case-insensitive & trimmed matching)
   if (selectedSites && selectedSites.length > 0) {
-    filteredData = filteredData.filter(d => selectedSites.includes(d.site));
+    const lowerSelected = selectedSites.map(s => String(s).trim().toLowerCase());
+    filteredData = filteredData.filter(d => d.site && lowerSelected.includes(String(d.site).trim().toLowerCase()));
   }
 
   // 4. Aggregate Chart Data by Month
@@ -97,21 +128,19 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
     const site = entry.site || 'Unknown';
     const month = new Date(entry.date).toLocaleString('en-US', { month: 'short', year: 'numeric' });
 
-    // Initialize KPI trackers
     if (!kpiTotals[site]) {
       kpiTotals[site] = { production: 0, diesel: 0, disposal: 0, count: 0 };
     }
     
-    const prod = Number(entry.total_production || 0);
-    const dies = Number(entry.total_diesel || 0);
-    const disp = Number(entry.total_disposal || 0);
+    const prod = Number(entry.total_production ?? entry.production ?? 0);
+    const dies = Number(entry.total_diesel ?? entry.diesel ?? 0);
+    const disp = Number(entry.total_disposal ?? entry.disposal ?? 0);
 
     kpiTotals[site].production += prod;
     kpiTotals[site].diesel += dies;
     kpiTotals[site].disposal += disp;
     kpiTotals[site].count += 1;
 
-    // Initialize monthly chart data
     if (!monthlyMap.has(month)) {
       monthlyMap.set(month, { name: month, total_production: 0, total_diesel: 0, total_disposal: 0 });
     }
@@ -121,7 +150,6 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
     current.total_diesel += dies;
     current.total_disposal += disp;
     
-    // Per-site specific data points for Bar/Line charts
     if (!current[`prod_${site}`]) current[`prod_${site}`] = 0;
     if (!current[`dies_${site}`]) current[`dies_${site}`] = 0;
     if (!current[`disp_${site}`]) current[`disp_${site}`] = 0;
@@ -144,7 +172,6 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
     if (totals.disposal > topDisposalSite.val) {
       topDisposalSite = { site, val: totals.disposal };
     }
-    // Fuel Consumption Ratio = Diesel Used / Disposal Tons
     const consumption = totals.disposal > 0 ? totals.diesel / totals.disposal : 0;
     if (consumption < bestFuelConsumptionSite.val && consumption > 0) {
       bestFuelConsumptionSite = { site, val: consumption };

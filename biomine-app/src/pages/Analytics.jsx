@@ -101,6 +101,10 @@ export default function Analytics() {
 
   useEffect(() => {
     loadData();
+    window.addEventListener("biomine_mis_updated", loadData);
+    return () => {
+      window.removeEventListener("biomine_mis_updated", loadData);
+    };
   }, []);
 
   useRealtimeSubscription('mis_entries', loadData);

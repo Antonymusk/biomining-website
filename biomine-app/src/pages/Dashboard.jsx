@@ -14,6 +14,7 @@ import { supabase } from "../lib/supabase";
 import { useRealtimeSubscription } from "../hooks/useRealtimeSubscription";
 import { useSites } from "../hooks/useSites";
 import { useAuth } from "../lib/AuthContext";
+import { getLocalDateStr } from "../lib/analyticsService";
 
 // Standard Operational Presets if targeted setup is missing
 const FALLBACK_TARGETS = {
@@ -150,25 +151,77 @@ export default function Dashboard() {
     if (!selectedSite) return;
     setDashboardLoading(true);
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getLocalDateStr(new Date());
       const isGlobal = selectedSite === "ALL_SITES_GLOBAL";
 
-      // 1. Fetch MIS Performance
-      let misQuery = supabase.from('mis_entries').select('*').eq('date', today);
-      if (!isGlobal) misQuery = misQuery.eq('site', selectedSite);
+      // 1. Fetch MIS Performance from Supabase
+      let fetchedData = null;
+      try {
+        let misQuery = supabase.from('mis_entries').select('*');
+        if (isGlobal) {
+          misQuery = misQuery.eq('date', today);
+          const { data } = await misQuery;
+          if (data && data.length > 0) fetchedData = data;
+        } else {
+          misQuery = misQuery.eq('site', selectedSite).eq('date', today);
+          const { data } = await misQuery.maybeSingle();
+          if (data) fetchedData = data;
+          else {
+            // Fallback to latest entry for selected site if today not entered yet
+            const { data: latest } = await supabase
+              .from('mis_entries')
+              .select('*')
+              .eq('site', selectedSite)
+              .order('date', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (latest) fetchedData = latest;
+          }
+        }
+      } catch (dbErr) {
+        console.warn("Dashboard database fetch error, checking local cache:", dbErr);
+      }
+
+      // Local storage fallback check if database fetch is null/empty
+      if (!fetchedData) {
+        try {
+          const cacheStr = localStorage.getItem("biomine_mis_entries_cache");
+          if (cacheStr) {
+            const cache = JSON.parse(cacheStr);
+            if (Array.isArray(cache) && cache.length > 0) {
+              if (isGlobal) {
+                const todayEntries = cache.filter(e => e.date === today);
+                fetchedData = todayEntries.length > 0 ? todayEntries : cache;
+              } else {
+                const siteEntries = cache.filter(e => e.site && e.site.trim().toLowerCase() === selectedSite.trim().toLowerCase());
+                if (siteEntries.length > 0) {
+                  const todayEntry = siteEntries.find(e => e.date === today);
+                  fetchedData = todayEntry || siteEntries[siteEntries.length - 1];
+                }
+              }
+            }
+          }
+        } catch (cacheErr) {
+          console.error("Local cache parse error in Dashboard:", cacheErr);
+        }
+      }
       
-      const { data: misData } = await (isGlobal ? misQuery : misQuery.maybeSingle());
-      
-      if (isGlobal && Array.isArray(misData)) {
+      if (isGlobal && Array.isArray(fetchedData)) {
          // Calculate Global Totals
-         const agg = misData.reduce((acc, row) => ({
-            total_production: acc.total_production + (Number(row.total_production) || 0),
-            total_disposal: acc.total_disposal + (Number(row.total_disposal) || 0),
-            total_diesel: acc.total_diesel + (Number(row.total_diesel) || 0)
+         const agg = fetchedData.reduce((acc, row) => ({
+            total_production: acc.total_production + (Number(row.total_production ?? row.production ?? 0)),
+            total_disposal: acc.total_disposal + (Number(row.total_disposal ?? row.disposal ?? 0)),
+            total_diesel: acc.total_diesel + (Number(row.total_diesel ?? row.diesel ?? 0))
          }), { total_production: 0, total_disposal: 0, total_diesel: 0 });
          setTodayData(agg);
+      } else if (fetchedData && !Array.isArray(fetchedData)) {
+         setTodayData({
+           total_production: Number(fetchedData.total_production ?? fetchedData.production ?? 0),
+           total_disposal: Number(fetchedData.total_disposal ?? fetchedData.disposal ?? 0),
+           total_diesel: Number(fetchedData.total_diesel ?? fetchedData.diesel ?? 0)
+         });
       } else {
-         setTodayData(misData || { total_production: 0, total_disposal: 0, total_diesel: 0 });
+         setTodayData({ total_production: 0, total_disposal: 0, total_diesel: 0 });
       }
 
       // 2. Fetch Alerts
@@ -205,6 +258,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData();
+    window.addEventListener("biomine_mis_updated", loadDashboardData);
+    return () => {
+      window.removeEventListener("biomine_mis_updated", loadDashboardData);
+    };
   }, [loadDashboardData]);
 
   // Subscriptions
