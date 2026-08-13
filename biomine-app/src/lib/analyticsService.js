@@ -164,8 +164,13 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
   let topDisposalSite = { site: "N/A", val: 0 };
   let bestFuelConsumptionSite = { site: "N/A", val: Infinity };
   let lowestDieselSite = { site: "N/A", val: Infinity };
+  let totalFuelLogged = 0;
+  let totalDisposalLogged = 0;
 
   Object.entries(kpiTotals).forEach(([site, totals]) => {
+    totalFuelLogged += totals.diesel;
+    totalDisposalLogged += totals.disposal;
+
     if (totals.production > topProductionSite.val) {
       topProductionSite = { site, val: totals.production };
     }
@@ -184,6 +189,115 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
   if (lowestDieselSite.val === Infinity) lowestDieselSite.val = 0;
   if (bestFuelConsumptionSite.val === Infinity) bestFuelConsumptionSite.val = 0;
 
+  const overallAvgBurn = totalDisposalLogged > 0 ? (totalFuelLogged / totalDisposalLogged) : 0;
+  const avgFuelVariance = overallAvgBurn > 0 ? Number((((overallAvgBurn - 0.6) / 0.6) * 100).toFixed(1)) : 0;
+
+  // Dynamic AI Insights Generation
+  const siteEntries = Object.entries(kpiTotals);
+  const aiInsights = [];
+
+  // Insight 1: Site Production / Output Risk
+  if (siteEntries.length > 0 && topProductionSite.val > 0) {
+    const lowProd = siteEntries.find(([s, t]) => s !== topProductionSite.site && t.production > 0 && t.production < topProductionSite.val * 0.7);
+    if (lowProd) {
+      const dropPct = Math.round(((topProductionSite.val - lowProd[1].production) / topProductionSite.val) * 100);
+      aiInsights.push({
+        title: "SITE PRODUCTION RISK",
+        type: "production",
+        text: `${lowProd[0]} site output is ${dropPct}% below top producer (${topProductionSite.site}: ${topProductionSite.val.toLocaleString()} Tons). Target output gap detected.`,
+        iconColor: "text-primary",
+        badgeColor: "text-danger font-bold"
+      });
+    } else {
+      aiInsights.push({
+        title: "SITE PRODUCTION TRAJECTORY",
+        type: "production",
+        text: `${topProductionSite.site} site is leading operations with ${topProductionSite.val.toLocaleString()} Tons yield. Production trajectory is currently stable.`,
+        iconColor: "text-primary",
+        badgeColor: "text-emerald-400 font-bold"
+      });
+    }
+  } else {
+    aiInsights.push({
+      title: "SITE PRODUCTION RISK",
+      type: "production",
+      text: "Awaiting active site MIS logs to run dynamic production trend projections.",
+      iconColor: "text-primary",
+      badgeColor: "text-gray-400 font-bold"
+    });
+  }
+
+  // Insight 2: Fuel Efficiency Anomaly / Drop
+  let maxBurnSite = null;
+  let maxBurnRatio = 0;
+  siteEntries.forEach(([s, t]) => {
+    if (t.disposal > 0) {
+      const ratio = t.diesel / t.disposal;
+      if (ratio > maxBurnRatio) {
+        maxBurnRatio = ratio;
+        maxBurnSite = s;
+      }
+    }
+  });
+
+  if (maxBurnSite && maxBurnRatio > 0) {
+    const isAboveBench = maxBurnRatio > 0.6;
+    const devPct = Math.round(Math.abs(maxBurnRatio - 0.6) / 0.6 * 100);
+    aiInsights.push({
+      title: isAboveBench ? "FUEL EFFICIENCY DROP" : "OPTIMAL FUEL EFFICIENCY",
+      type: "fuel",
+      text: `${maxBurnSite} fuel consumption rate is ${maxBurnRatio.toFixed(2)} L/T (${isAboveBench ? `${devPct}% above benchmark rate` : 'optimal fuel burn rate'}).`,
+      iconColor: "text-violet-400",
+      badgeColor: isAboveBench ? "text-warning font-bold" : "text-emerald-400 font-bold"
+    });
+  } else {
+    aiInsights.push({
+      title: "FUEL EFFICIENCY MONITOR",
+      type: "fuel",
+      text: "Fuel intelligence matrix operating within expected baseline consumption parameters.",
+      iconColor: "text-violet-400",
+      badgeColor: "text-gray-400 font-bold"
+    });
+  }
+
+  // Insight 3: Anomalous Fleet Usage
+  let anomalousVehicle = null;
+  filteredData.forEach(entry => {
+    if (entry.vehicles && Array.isArray(entry.vehicles)) {
+      entry.vehicles.forEach(v => {
+        const h = Number(v.hours) || 0;
+        const d = Number(v.diesel) || 0;
+        const burn = h > 0 ? d / h : 0;
+        if (burn > 10) {
+          anomalousVehicle = { name: v.name, site: entry.site, burn: burn.toFixed(1), hours: h };
+        }
+      });
+    }
+  });
+
+  if (anomalousVehicle) {
+    aiInsights.push({
+      title: "ANOMALOUS FLEET USAGE",
+      type: "fleet",
+      text: `${anomalousVehicle.name} at ${anomalousVehicle.site} logged ${anomalousVehicle.hours} hrs with a high burn rate of ${anomalousVehicle.burn} L/Hr.`,
+      iconColor: "text-emerald-400",
+      badgeColor: "text-emerald-400 font-semibold"
+    });
+  } else {
+    const totalVehiclesCount = filteredData.reduce((s, e) => s + (e.vehicles?.length || 0) + (e.machines?.length || 0), 0);
+    aiInsights.push({
+      title: "FLEET & ASSET INTELLIGENCE",
+      type: "fleet",
+      text: totalVehiclesCount > 0 
+        ? `${totalVehiclesCount} asset operational tracks analyzed across monitored site streams.`
+        : "Fleet assets across monitored sites are operating within benchmark efficiency thresholds.",
+      iconColor: "text-emerald-400",
+      badgeColor: "text-emerald-400 font-semibold"
+    });
+  }
+
+  const filteredDataVehiclesCount = filteredData.reduce((s, e) => s + (e.vehicles?.length || 0) + (e.machines?.length || 0), 0);
+
   const result = {
     chartData: Array.from(monthlyMap.values()),
     uniqueSites,
@@ -193,7 +307,12 @@ export const processAnalytics = (rawData, dateRange, selectedSites) => {
       bestEfficiency: bestFuelConsumptionSite,
       bestFuelConsumption: bestFuelConsumptionSite,
       lowestDiesel: lowestDieselSite
-    }
+    },
+    aiInsights,
+    totalFuelLogged,
+    avgFuelVariance,
+    totalDisposalLogged,
+    filteredDataVehiclesCount
   };
 
   analyticsCache.set(cacheKey, result);

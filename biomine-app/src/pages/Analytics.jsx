@@ -110,7 +110,15 @@ export default function Analytics() {
   useRealtimeSubscription('mis_entries', loadData);
 
   // Memoized Aggregation
-  const { chartData, kpis } = useMemo(() => {
+  const { 
+    chartData, 
+    kpis, 
+    aiInsights, 
+    totalFuelLogged, 
+    avgFuelVariance, 
+    totalDisposalLogged, 
+    filteredDataVehiclesCount 
+  } = useMemo(() => {
     return processAnalytics(rawData, dateRange, selectedSites);
   }, [rawData, dateRange, selectedSites]);
 
@@ -449,24 +457,23 @@ export default function Analytics() {
               <h3 className="text-lg font-bold text-white">AI Predictive Insights & Anomaly Detections</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-3.5 rounded-xl bg-dark-bg/60 border border-dark-border/60 hover:border-primary/30 transition-colors">
-                <div className="flex items-center gap-2 text-primary font-semibold text-xs uppercase mb-1">
-                  <Activity size={14} /> Site Production Risk
+              {aiInsights && aiInsights.length > 0 ? (
+                aiInsights.map((insight, idx) => (
+                  <div key={idx} className="p-3.5 rounded-xl bg-dark-bg/60 border border-dark-border/60 hover:border-primary/30 transition-colors">
+                    <div className={`flex items-center gap-2 font-semibold text-xs uppercase mb-1 ${insight.iconColor}`}>
+                      {insight.type === 'production' && <Activity size={14} />}
+                      {insight.type === 'fuel' && <Zap size={14} />}
+                      {insight.type === 'fleet' && <Truck size={14} />}
+                      {insight.title}
+                    </div>
+                    <p className="text-sm text-gray-200 font-medium">{insight.text}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-center text-xs text-gray-400 py-2">
+                  Awaiting operational data to compute real-time predictive insights.
                 </div>
-                <p className="text-sm text-gray-200 font-medium">Delhi site is projected to miss its weekly disposal target by <span className="text-danger font-bold">8.4%</span> based on 3-day output dip.</p>
-              </div>
-              <div className="p-3.5 rounded-xl bg-dark-bg/60 border border-dark-border/60 hover:border-violet-500/30 transition-colors">
-                <div className="flex items-center gap-2 text-violet-400 font-semibold text-xs uppercase mb-1">
-                  <Zap size={14} /> Fuel Efficiency Drop
-                </div>
-                <p className="text-sm text-gray-200 font-medium">Siliguri fuel consumption rate dropped by <span className="text-warning font-bold">12%</span> over the last 7 days due to rainy weather delays.</p>
-              </div>
-              <div className="p-3.5 rounded-xl bg-dark-bg/60 border border-dark-border/60 hover:border-emerald-500/30 transition-colors">
-                <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs uppercase mb-1">
-                  <Truck size={14} /> Anomalous Fleet Usage
-                </div>
-                <p className="text-sm text-gray-200 font-medium">Excavator <span className="text-emerald-400 font-semibold">PC140-02</span> exceeded benchmark fuel consumption rate for 5 consecutive days.</p>
-              </div>
+              )}
             </div>
           </Card>
 
@@ -487,8 +494,8 @@ export default function Analytics() {
               </div>
               <div>
                 <p className="text-xs text-gray-400">Total Fuel Logged</p>
-                <h4 className="text-lg font-bold text-white">45,280 Liters</h4>
-                <p className="text-xs text-primary font-medium">Across active operational centers</p>
+                <h4 className="text-lg font-bold text-white">{totalFuelLogged ? `${totalFuelLogged.toLocaleString()} Liters` : "0 Liters"}</h4>
+                <p className="text-xs text-primary font-medium">Across selected operational centers</p>
               </div>
             </Card>
             <Card className="p-4 border-l-4 border-l-amber-500 flex items-start gap-4">
@@ -497,8 +504,8 @@ export default function Analytics() {
               </div>
               <div>
                 <p className="text-xs text-gray-400">Avg Model Fuel Variance</p>
-                <h4 className="text-lg font-bold text-white">+3.8% Deviation</h4>
-                <p className="text-xs text-amber-500 font-medium">Against benchmark consumption profiles</p>
+                <h4 className="text-lg font-bold text-white">{avgFuelVariance > 0 ? `+${avgFuelVariance}%` : `${avgFuelVariance}%`} Deviation</h4>
+                <p className="text-xs text-amber-500 font-medium">Against 0.6 L/T benchmark consumption profile</p>
               </div>
             </Card>
           </div>
@@ -518,9 +525,9 @@ export default function Analytics() {
                 <Activity className="text-emerald-500" size={20} />
               </div>
               <div>
-                <p className="text-xs text-gray-400">Total Disposal Target Achievement</p>
-                <h4 className="text-lg font-bold text-white">92.4% Achieved</h4>
-                <p className="text-xs text-emerald-500 font-medium">Average across 12 monitoring sites</p>
+                <p className="text-xs text-gray-400">Total Disposal Logged</p>
+                <h4 className="text-lg font-bold text-white">{totalDisposalLogged ? `${totalDisposalLogged.toLocaleString()} Tons` : "0 Tons"}</h4>
+                <p className="text-xs text-emerald-500 font-medium">Cumulated output across active sites</p>
               </div>
             </Card>
             <Card className="p-4 border-l-4 border-l-violet-500 flex items-start gap-4">
@@ -528,9 +535,9 @@ export default function Analytics() {
                 <TrendingUp className="text-violet-500" size={20} />
               </div>
               <div>
-                <p className="text-xs text-gray-400">Top Performing Site</p>
-                <h4 className="text-lg font-bold text-white">{kpis?.topDisposal?.site || "Siliguri"}</h4>
-                <p className="text-xs text-violet-500 font-medium">{kpis?.topDisposal?.val?.toLocaleString() || "3,200"} Tons Disposed</p>
+                <p className="text-xs text-gray-400">Top Performing Disposal Site</p>
+                <h4 className="text-lg font-bold text-white">{kpis?.topDisposal?.site !== "N/A" ? kpis.topDisposal.site : "N/A"}</h4>
+                <p className="text-xs text-violet-500 font-medium">{kpis?.topDisposal?.val ? `${kpis.topDisposal.val.toLocaleString()} Tons Disposed` : "0 Tons"}</p>
               </div>
             </Card>
           </div>
@@ -550,9 +557,9 @@ export default function Analytics() {
                 <Truck size={20} />
               </div>
               <div>
-                <p className="text-xs text-gray-400">Active Operating Fleet</p>
-                <h4 className="text-lg font-bold text-white">48 Vehicles</h4>
-                <p className="text-[10px] text-emerald-500 font-medium">94% Fleet Utilization Rate</p>
+                <p className="text-xs text-gray-400">Active Logged Fleet Assets</p>
+                <h4 className="text-lg font-bold text-white">{filteredDataVehiclesCount} Asset Tracks</h4>
+                <p className="text-[10px] text-emerald-500 font-medium">Recorded via MIS logs</p>
               </div>
             </Card>
             <Card className="p-4 flex items-center gap-4">
@@ -560,9 +567,9 @@ export default function Analytics() {
                 <Settings size={20} />
               </div>
               <div>
-                <p className="text-xs text-gray-400">Maintenance Backlog</p>
-                <h4 className="text-lg font-bold text-white">3 Pending Servicing</h4>
-                <p className="text-[10px] text-amber-500 font-medium">Overdue limit within 72 hrs</p>
+                <p className="text-xs text-gray-400">Lowest Diesel Site</p>
+                <h4 className="text-lg font-bold text-white">{kpis?.lowestDiesel?.site !== "N/A" ? kpis.lowestDiesel.site : "N/A"}</h4>
+                <p className="text-[10px] text-amber-500 font-medium">{kpis?.lowestDiesel?.val ? `${kpis.lowestDiesel.val.toLocaleString()} L Used` : "0 L"}</p>
               </div>
             </Card>
             <Card className="p-4 flex items-center gap-4">
